@@ -1,11 +1,30 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @layer base {
+  :root {
+    --bg-main: #f8fafc;
+    --text-main: #0f172a;
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+    --nav-bg: rgba(255, 255, 255, 0.85);
+  }
+
+  html.dark, :root[data-theme="dark"] {
+    --bg-main: #020617;
+    --text-main: #f8fafc;
+    --card-bg: #0f172a;
+    --card-border: #1e293b;
+    --nav-bg: rgba(2, 6, 23, 0.9);
+  }
+
   body {
     margin: 0;
-    background-color: #020617;
-    color: #f8fafc;
+    background-color: var(--bg-main);
+    color: var(--text-main);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 

@@ -13,6 +13,7 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
     key_findings: 'Implementing dual-layered schema validation reduces unhandled execution branching by 98.4% without incurring prohibitive model invocation overhead.',
     methodology: 'Empirical Benchmark & Automated Safety Verification Framework',
     zotero_key: 'LANKFORD_2026_GUARDRAILS',
+    image_url: '/paper_guardrails.jpg',
     created_at: new Date('2026-02-15').toISOString(),
     tenant: 'academic',
     tags: [
@@ -31,6 +32,7 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
     key_findings: 'Middleware-driven header assertion combined with SQLModel row security ensures zero cross-tenant data leaks at 50k RPS.',
     methodology: 'Quantitative Load Testing & Threat Vector Simulation',
     zotero_key: 'LANKFORD_2025_STATE_ISOLATION',
+    image_url: '/paper_isolation.jpg',
     created_at: new Date('2025-11-04').toISOString(),
     tenant: 'academic',
     tags: [
@@ -49,12 +51,33 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
     key_findings: 'Introspection-guided AST rewrites lower technical debt resolution cycles by 42% in production Python environments.',
     methodology: 'Static Analysis & Dynamic AST Metaprogramming',
     zotero_key: 'LANKFORD_2025_METAPROGRAMMING',
+    image_url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop',
     created_at: new Date('2025-06-20').toISOString(),
     tenant: 'academic',
     tags: [
       { id: 107, name: 'Metaprogramming', slug: 'metaprogramming' },
       { id: 108, name: 'Static Analysis', slug: 'static-analysis' },
       { id: 102, name: 'LLM Governance', slug: 'llm-governance' }
+    ]
+  },
+  {
+    id: 4,
+    title: 'Building the Stack Around the Copilot: The Agentic Development Life Cycle',
+    authors: 'Lankford, J. W.',
+    publication_year: 2026,
+    journal_or_conf: 'LinkedIn Pulse / Industry Analysis',
+    abstract: 'AI was a debate until recently. Software engineering teams spent 2 years arguing whether inline coding assistants made engineers 20% faster or 40% faster. This article examines the architectural evolution from inline autocomplete to agentic development workflows, analyzing ecosystem tooling, isolated execution sandboxes, and deterministic verification guardrails.',
+    key_findings: 'Transitioning from inline completion to an agentic SDLC requires restructuring software engineering stacks around sandboxed execution environments, deterministic schema verification, and continuous context delivery.',
+    methodology: 'Industry Synthesis & Agentic System Architecture Review',
+    zotero_key: 'LANKFORD_2026_AGENTIC_SDLC',
+    url: 'https://www.linkedin.com/pulse/building-stack-around-copilot-agentic-development-lankford-mba-nmd3e/',
+    image_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop',
+    created_at: new Date('2026-07-20').toISOString(),
+    tenant: 'academic',
+    tags: [
+      { id: 109, name: 'Agentic Development', slug: 'agentic-development' },
+      { id: 102, name: 'LLM Governance', slug: 'llm-governance' },
+      { id: 110, name: 'Software Lifecycle', slug: 'software-lifecycle' }
     ]
   }
 ];
@@ -83,21 +106,16 @@ export async function fetchResearchPapers(): Promise<{ papers: ResearchPaper[]; 
       }
     });
     if (res.ok) {
-      const data: ResearchPaper[] = await res.json();
-      return { papers: data.length > 0 ? data : INITIAL_PAPERS, isLiveBackend: true };
+      const data = await res.json();
+      return { papers: data, isLiveBackend: true };
     }
-  } catch (err) {
-    console.warn('[Academic Service] Backend unavailable, using local research index cache.', err);
+    return { papers: INITIAL_PAPERS, isLiveBackend: false };
+  } catch {
+    return { papers: INITIAL_PAPERS, isLiveBackend: false };
   }
-  return { papers: INITIAL_PAPERS, isLiveBackend: false };
 }
 
 export async function createResearchPaper(input: NewResearchPaperInput): Promise<{ paper: ResearchPaper; isLiveBackend: boolean }> {
-  const payload: Partial<ResearchPaper> = {
-    ...input,
-    tenant: 'academic'
-  };
-
   try {
     const res = await fetch(`${API_BASE}/papers`, {
       method: 'POST',
@@ -106,26 +124,26 @@ export async function createResearchPaper(input: NewResearchPaperInput): Promise
         'Host': 'academic.localhost',
         'X-Tenant': 'academic'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(input)
     });
-
     if (res.ok) {
-      const data: ResearchPaper = await res.json();
+      const data = await res.json();
       return { paper: data, isLiveBackend: true };
     }
-  } catch (err) {
-    console.warn('[Academic Service] API write failed, falling back to local session store.', err);
+    const mockPaper: ResearchPaper = {
+      ...input,
+      id: Date.now(),
+      created_at: new Date().toISOString(),
+      tenant: 'academic'
+    };
+    return { paper: mockPaper, isLiveBackend: false };
+  } catch {
+    const mockPaper: ResearchPaper = {
+      ...input,
+      id: Date.now(),
+      created_at: new Date().toISOString(),
+      tenant: 'academic'
+    };
+    return { paper: mockPaper, isLiveBackend: false };
   }
-
-  // Fallback local paper creation
-  const fallbackPaper: ResearchPaper = {
-    id: Date.now(),
-    ...input,
-    created_at: new Date().toISOString(),
-    tenant: 'academic',
-    tags: [
-      { id: 999, name: 'New Research', slug: 'new-research' }
-    ]
-  };
-  return { paper: fallbackPaper, isLiveBackend: false };
 }
