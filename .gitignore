@@ -1,8 +1,29 @@
-# Workspace ignores
-.venv/
-__pycache__/
-*.pyc
+# Workspace & Subdirectory Ignores
 node_modules/
+**/node_modules/
+dist/
+**/dist/
+dist-ssr/
+**/dist-ssr/
+
+# Python Virtual Environments & Caches
+.venv/
+**/.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment Variables & Secret Files
 .env
+.env.*
+!.env.example
+
+# IDE & OS Files
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+.idea/
 .DS_Store
-EOT
+*.log
