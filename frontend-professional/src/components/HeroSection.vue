@@ -15,8 +15,8 @@ defineEmits<{
         <!-- Left Text Column -->
         <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
           <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-100 dark:bg-blue-950/80 border border-blue-300 dark:border-blue-500/30 text-blue-800 dark:text-blue-400 text-xs font-mono font-semibold transition-colors">
-            <span class="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse"></span>
-            <span>Upcoming Release • 2026 Edition</span>
+            <span class="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse"></span>
+            <span>Under Development • Upcoming Release • 2026 Edition</span>
           </div>
 
           <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight transition-colors">
@@ -71,6 +71,9 @@ defineEmits<{
             
             <!-- Book Cover Image Container -->
             <div class="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700/80 shadow-2xl bg-white dark:bg-slate-900 group-hover:scale-[1.02] transition-transform duration-500">
+              <div class="absolute top-4 right-4 z-10 px-3 py-1 bg-amber-500/90 backdrop-blur text-white text-[10px] font-mono font-bold uppercase tracking-wider rounded-md border border-amber-400 shadow">
+                Under Development
+              </div>
               <img
                 src="/book-cover.jpg"
                 alt="Today's Software Developer - Mastering the Business of Tech in the Era of AI by Jeremy Lankford"

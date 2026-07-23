@@ -19,14 +19,14 @@
         <!-- Author Bio Details -->
         <div class="md:col-span-8 space-y-4 text-center md:text-left">
           <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-400 text-xs font-mono border border-blue-300 dark:border-blue-500/30">
-            <span>ABOUT THE AUTHOR</span>
+            <span>ABOUT THE INSTRUCTOR</span>
           </div>
 
           <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Jeremy Lankford</h2>
-          <p class="text-sm font-mono text-cyan-700 dark:text-cyan-400">Senior Software Architect & PhD Researcher</p>
+          <p class="text-sm font-mono text-cyan-700 dark:text-cyan-400">Senior Software Architect, Premier Instructor & PhD in IT (AI Focus) student at University of the Cumberlands</p>
 
           <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
-            Jeremy Lankford leads engineering teams building mission-critical distributed systems and multi-tenant cloud platforms. His work bridges high-concurrency production engineering with cutting-edge academic research in deterministic LLM governance.
+            Jeremy Lankford leads engineering teams building mission-critical distributed systems and multi-tenant cloud platforms. As a premier Udemy instructor, he teaches advanced system design, database isolation patterns, metaprogramming abstractions, and AI guardrails to thousands of software engineers worldwide.
           </p>
 
           <!-- Social Media Contact Links -->
@@ -69,20 +69,23 @@
               </svg>
               <span>Facebook</span>
             </a>
+
+            <a 
+              href="https://www.udemy.com/user/jeremy-lankford-22/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition-colors"
+              title="Udemy Instructor Profile"
+            >
+              <svg class="w-4 h-4 text-indigo-650 dark:text-indigo-405" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-2.76 0-5-2.24-5-5V7h2v5c0 1.66 1.34 3 3 3s3-1.34 3-3V7h2v5c0 2.76-2.24 5-5 5z"/>
+              </svg>
+              <span>Udemy</span>
+            </a>
           </div>
 
           <div class="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-mono">
             <span class="text-slate-500 dark:text-slate-400">Domain: <strong class="text-slate-900 dark:text-white">jeremylankford.com</strong></span>
-            <a 
-              href="http://academic.localhost:5174" 
-              target="_blank" 
-              class="text-blue-600 dark:text-blue-400 hover:text-cyan-600 dark:hover:text-cyan-300 hover:underline flex items-center space-x-1"
-            >
-              <span>Explore PhD Research Index (jwlankford.com)</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-              </svg>
-            </a>
           </div>
         </div>
       </div>
