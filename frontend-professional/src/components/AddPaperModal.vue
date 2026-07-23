@@ -63,7 +63,7 @@ function handleSubmit() {
         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-6">
           <div>
             <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white flex items-center space-x-2">
-              <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
               <span>Index New Research Study</span>
             </h2>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Submit paper metadata to the Lankford Academic Domain Index</p>
@@ -87,7 +87,7 @@ function handleSubmit() {
               type="text"
               required
               placeholder="e.g. Deterministic Verification in Autonomous LLM Workflows"
-              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500"
             />
           </div>
 
@@ -100,7 +100,7 @@ function handleSubmit() {
                 type="text"
                 required
                 placeholder="Lankford, J. W.; Smith, A."
-                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500"
               />
             </div>
             <div>
@@ -111,7 +111,7 @@ function handleSubmit() {
                 min="1990"
                 max="2030"
                 required
-                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-500"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500"
               />
             </div>
           </div>
@@ -124,7 +124,7 @@ function handleSubmit() {
                 v-model="journal_or_conf"
                 type="text"
                 placeholder="IEEE TSE / ACM CCS"
-                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500"
               />
             </div>
             <div>
@@ -133,7 +133,7 @@ function handleSubmit() {
                 v-model="zotero_key"
                 type="text"
                 placeholder="LANKFORD_2026_GOVERNANCE"
-                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono text-xs"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono text-xs"
               />
             </div>
           </div>
@@ -145,7 +145,7 @@ function handleSubmit() {
               v-model="url"
               type="url"
               placeholder="https://www.linkedin.com/pulse/..."
-              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono text-xs"
+              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono text-xs"
             />
           </div>
 
@@ -156,7 +156,7 @@ function handleSubmit() {
               v-model="abstract"
               rows="3"
               placeholder="Summary of research problem, methodology, and primary conclusions..."
-              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none"
+              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
             ></textarea>
           </div>
 
@@ -168,7 +168,7 @@ function handleSubmit() {
                 v-model="key_findings"
                 rows="2"
                 placeholder="e.g. Reduced execution branching error by 98.4%"
-                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
               ></textarea>
             </div>
             <div>
@@ -177,7 +177,7 @@ function handleSubmit() {
                 v-model="methodology"
                 rows="2"
                 placeholder="e.g. Empirical Benchmark & Load Simulation"
-                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
               ></textarea>
             </div>
           </div>
@@ -194,7 +194,7 @@ function handleSubmit() {
             <button 
               type="submit"
               :disabled="isSubmitting"
-              class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold shadow-md shadow-emerald-600/30 transition-all text-xs flex items-center space-x-1.5"
+              class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold shadow-md shadow-blue-600/30 transition-all text-xs flex items-center space-x-1.5"
             >
               <span v-if="isSubmitting">Indexing...</span>
               <span v-else>Commit to Index</span>

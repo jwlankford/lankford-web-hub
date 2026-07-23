@@ -73,6 +73,7 @@ class ResearchPaper(TenantBase, table=True):
     
     # Internal Organization
     zotero_key: Optional[str] = Field(default=None, index=True)
+    url: Optional[str] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     
     # Pass the actual class object directly now:

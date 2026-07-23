@@ -1,3 +1,8 @@
+export interface SignupInput {
+  email: string;
+  first_name?: string;
+}
+
 export interface ResearchTag {
   id?: number;
   name: string;

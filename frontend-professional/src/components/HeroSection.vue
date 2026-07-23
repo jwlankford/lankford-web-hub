@@ -14,20 +14,21 @@ defineEmits<{
         
         <!-- Left Text Column -->
         <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
-          <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-950/80 border border-blue-500/30 text-blue-400 text-xs font-mono font-semibold">
-            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-            <span>Upcoming Release • 2026 Edition</span>
+          <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-100 dark:bg-blue-950/80 border border-blue-300 dark:border-blue-500/30 text-blue-800 dark:text-blue-400 text-xs font-mono font-semibold transition-colors">
+            <span class="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse"></span>
+            <span>Under Development • Upcoming Release • 2026 Edition</span>
           </div>
 
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight transition-colors">
             Today's Software <br class="hidden sm:inline" />
-            <span class="bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-400 bg-clip-text text-transparent">
+            <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 dark:from-blue-400 dark:via-indigo-300 dark:to-cyan-400 bg-clip-text text-transparent">
               Developer
             </span>
           </h1>
 
-          <p class="text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
-            Navigating modern software architecture, AI-assisted engineering workflows, deterministic guardrails, and production resilience in complex distributed systems.
+          <p class="text-slate-600 dark:text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
+            <strong class="text-cyan-700 dark:text-cyan-300 font-semibold block mb-1">Developing Software in the AI Era</strong>
+            Navigating modern software architecture, engineering FinOps, executive communication, and team resiliency in complex distributed systems.
           </p>
 
           <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
@@ -39,58 +40,45 @@ defineEmits<{
             </button>
             <a 
               href="#outline"
-              class="w-full sm:w-auto px-6 py-3.5 bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white font-semibold rounded-xl border border-slate-700/80 transition-colors text-center"
+              class="w-full sm:w-auto px-6 py-3.5 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-semibold rounded-xl border border-slate-300 dark:border-slate-700/80 transition-colors text-center"
             >
               Explore Table of Contents
             </a>
           </div>
 
           <!-- Quick Metrics -->
-          <div class="grid grid-cols-3 gap-4 pt-6 border-t border-slate-800/80 max-w-md mx-auto lg:mx-0">
+          <div class="grid grid-cols-3 gap-4 pt-6 border-t border-slate-200 dark:border-slate-800/80 max-w-md mx-auto lg:mx-0">
             <div>
-              <div class="text-2xl font-bold font-mono text-white">12+</div>
-              <div class="text-xs text-slate-400 font-mono">Core Modules</div>
+              <div class="text-2xl font-bold font-mono text-slate-900 dark:text-white">7</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 font-mono">Chapters in 4 Parts</div>
             </div>
             <div>
-              <div class="text-2xl font-bold font-mono text-blue-400">100%</div>
-              <div class="text-xs text-slate-400 font-mono">Production Focus</div>
+              <div class="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">100%</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 font-mono">Production Focus</div>
             </div>
             <div>
-              <div class="text-2xl font-bold font-mono text-cyan-400">Free</div>
-              <div class="text-xs text-slate-400 font-mono">Beta Excerpts</div>
+              <div class="text-2xl font-bold font-mono text-cyan-600 dark:text-cyan-400">Free</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 font-mono">Beta Excerpts</div>
             </div>
           </div>
         </div>
 
-        <!-- Right Graphic Column: Book Mockup -->
+        <!-- Right Graphic Column: Book Cover -->
         <div class="lg:col-span-5 flex justify-center">
-          <div class="relative group max-w-sm w-full">
-            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-3xl blur-xl opacity-40 group-hover:opacity-75 transition duration-500"></div>
+          <div class="relative group max-w-xs sm:max-w-sm w-full">
+            <!-- Glow background -->
+            <div class="absolute -inset-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-cyan-400 rounded-3xl blur-2xl opacity-40 dark:opacity-50 group-hover:opacity-85 transition duration-500"></div>
             
-            <div class="relative bg-slate-900 border border-slate-700/80 rounded-2xl p-8 shadow-2xl flex flex-col justify-between space-y-8 aspect-[3/4]">
-              <!-- Book Spine/Header -->
-              <div class="space-y-4">
-                <div class="flex items-center justify-between text-xs font-mono text-blue-400">
-                  <span>JEREMY LANKFORD</span>
-                  <span class="px-2 py-0.5 bg-blue-950 rounded border border-blue-500/30">HARDCOVER</span>
-                </div>
-                <div class="h-1 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full"></div>
-                <h2 class="text-3xl font-black text-white leading-tight font-sans tracking-tight">
-                  TODAY'S <br />
-                  SOFTWARE <br />
-                  <span class="text-blue-400">DEVELOPER</span>
-                </h2>
-                <p class="text-xs text-slate-400 font-mono">
-                  Mastering Systems Architecture, AI Integration & Metaprogramming
-                </p>
+            <!-- Book Cover Image Container -->
+            <div class="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700/80 shadow-2xl bg-white dark:bg-slate-900 group-hover:scale-[1.02] transition-transform duration-500">
+              <div class="absolute top-4 right-4 z-10 px-3 py-1 bg-amber-500/90 backdrop-blur text-white text-[10px] font-mono font-bold uppercase tracking-wider rounded-md border border-amber-400 shadow">
+                Under Development
               </div>
-
-              <!-- Book Footer Code Visual -->
-              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-400 space-y-1">
-                <div class="text-blue-400">// Production Verification</div>
-                <div><span class="text-purple-400">async def</span> <span class="text-emerald-400">deploy_resilience</span>():</div>
-                <div class="pl-4 text-cyan-300">await system.enforce_guardrails()</div>
-              </div>
+              <img
+                src="/book-cover.jpg"
+                alt="Today's Software Developer - Mastering the Business of Tech in the Era of AI by Jeremy Lankford"
+                class="w-full h-auto object-cover rounded-2xl shadow-2xl"
+              />
             </div>
           </div>
         </div>

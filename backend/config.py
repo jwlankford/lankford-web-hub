@@ -1,7 +1,12 @@
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    # Match the credentials defined in your docker-compose.yml
+    # Set USE_SQLITE to True for Docker-free local database operation
+    USE_SQLITE: bool = True
+    SQLITE_FILE: str = "lankford_hub.db"
+
+    # PostgreSQL configuration (used if USE_SQLITE is False)
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "development_password_only"
     POSTGRES_DB: str = "lankford_hub_dev"
@@ -10,7 +15,9 @@ class Settings(BaseSettings):
 
     @property
     def ASYNC_DATABASE_URL(self) -> str:
-        # Construct the async connection string required by asyncpg
+        if self.USE_SQLITE:
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.SQLITE_FILE)
+            return f"sqlite+aiosqlite:///{db_path}"
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
