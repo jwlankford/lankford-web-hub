@@ -3,21 +3,21 @@
 
 <template>
   <section class="pt-6 pb-2 border-t border-slate-200 dark:border-slate-800">
-    <div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 p-8 sm:p-10 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-hidden transition-colors">
+    <div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-hidden transition-colors">
       <div class="absolute bottom-0 right-0 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center relative z-10">
+      <div class="grid grid-cols-1 md:grid-cols-12 relative z-10">
         <!-- Author Avatar Image -->
-        <div class="md:col-span-4 flex justify-center">
+        <div class="md:col-span-4 h-64 md:h-auto flex">
           <img
             src="/jeremy-lankford.jpg"
             alt="Jeremy Lankford"
-            class="w-32 h-32 rounded-2xl object-cover shadow-2xl ring-4 ring-blue-500/30"
+            class="w-full h-full object-cover"
           />
         </div>
 
         <!-- Author Bio Details -->
-        <div class="md:col-span-8 space-y-4 text-center md:text-left">
+        <div class="md:col-span-8 p-8 sm:p-10 space-y-4 text-center md:text-left">
           <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-400 text-xs font-mono border border-blue-300 dark:border-blue-500/30">
             <span>ABOUT THE INSTRUCTOR</span>
           </div>
