@@ -222,34 +222,6 @@ By treating the database session as a bounded environment, we ensure zero cross-
         if not existing_jbooks:
             initial_jbooks = [
                 models.JupyterNotebook(
-                    title="Guardrail Verification Simulation",
-                    description="Executable notebook with step-by-step simulations of dual-layer Pydantic schema validation. Benchmarks evaluation speed and failure catch rate.",
-                    notebook_url="https://github.com/jwlankford/notebook-vault/blob/main/guardrail_simulation.ipynb",
-                    tags="Pydantic,Simulation,LLM-Safety",
-                    tenant="professional"
-                ),
-                models.JupyterNotebook(
-                    title="Multi-Tenant Concurrency Tests",
-                    description="Python load testing scripts asserting isolation boundaries at 10,000 requests per second. Simulates tenant injection and header tampering.",
-                    notebook_url="https://github.com/jwlankford/notebook-vault/blob/main/multi_tenant_loadtest.ipynb",
-                    tags="LoadTesting,SQLite,Isolation",
-                    tenant="professional"
-                ),
-                models.JupyterNotebook(
-                    title="Orchestration Loop Simulation",
-                    description="Walkthrough of ReAct orchestration flows and Manager/Worker hierarchies. Implements circuit breakers to detect agent loop spirals.",
-                    notebook_url="https://github.com/jwlankford/notebook-vault/blob/main/react_orchestration_loop.ipynb",
-                    tags="Orchestration,ReAct,Agentic",
-                    tenant="professional"
-                ),
-                models.JupyterNotebook(
-                    title="LLM-as-a-Judge Evaluation Playground",
-                    description="An interactive workspace testing judge prompts, consensus algorithms, and agreement scores against baseline golden datasets.",
-                    notebook_url="https://github.com/jwlankford/notebook-vault/blob/main/llm_as_a_judge_evaluator.ipynb",
-                    tags="LLM-as-a-Judge,Evaluation,Factual-Drift",
-                    tenant="professional"
-                ),
-                models.JupyterNotebook(
                     title="Colab Notebook: Multi-Agent Evaluation & Verification",
                     description="Interactive Google Colab workspace demonstrating live feed integration, multi-agent evaluation workflows, and runtime verification constraints.",
                     notebook_url="https://colab.research.google.com/drive/1XEQT-oTF_KkmY5FHkMIcWEuAlJziBaoe?usp=sharing",
