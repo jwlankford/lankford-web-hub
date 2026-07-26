@@ -43,7 +43,6 @@ const activeTab = ref<'research' | 'taxonomy' | 'matrix' | 'courses' | 'about' |
 // Technologies Known
 const technologies = [
   { name: 'Python', icon: 'https://cdn.simpleicons.org/python/3776AB' },
-  { name: 'Rust', icon: 'https://cdn.simpleicons.org/rust/DE5937' },
   { name: 'TypeScript', icon: 'https://cdn.simpleicons.org/typescript/3178C6' },
   { name: 'Vue.js', icon: 'https://cdn.simpleicons.org/vuedotjs/4FC08D' },
   { name: 'React', icon: 'https://cdn.simpleicons.org/react/61DAFB' },
@@ -53,6 +52,42 @@ const technologies = [
   { name: 'Kubernetes', icon: 'https://cdn.simpleicons.org/kubernetes/326CE5' },
   { name: 'Tailwind CSS', icon: 'https://cdn.simpleicons.org/tailwindcss/06B6D4' },
   { name: 'Git', icon: 'https://cdn.simpleicons.org/git/F05032' }
+];
+
+// GitHub Repositories
+const githubRepos = [
+  {
+    name: 'agentic-sdlc-framework',
+    description: 'Multi-agent orchestration framework for automating the Software Development Life Cycle processes with LLMs.',
+    url: 'https://github.com/jwlankford/agentic-sdlc-framework',
+    language: 'Python',
+    languageColor: 'bg-blue-500',
+    stars: 124
+  },
+  {
+    name: 'lankford-web-hub',
+    description: 'Frontend professional portfolio showcasing academic research, courses, and interactive experiences.',
+    url: 'https://github.com/jwlankford/lankford-web-hub',
+    language: 'Vue',
+    languageColor: 'bg-emerald-500',
+    stars: 42
+  },
+  {
+    name: 'distributed-state-isolation',
+    description: 'High-concurrency tenant simulation sandbox utilizing Rust-based row-level isolation patterns.',
+    url: 'https://github.com/jwlankford/distributed-state-isolation',
+    language: 'Rust',
+    languageColor: 'bg-orange-500',
+    stars: 87
+  },
+  {
+    name: 'typescript-ast-metaprogramming',
+    description: 'Introspection-guided AST refactoring techniques for automated enterprise legacy scaling.',
+    url: 'https://github.com/jwlankford/typescript-ast-metaprogramming',
+    language: 'TypeScript',
+    languageColor: 'bg-blue-600',
+    stars: 56
+  }
 ];
 
 
@@ -1060,6 +1095,52 @@ onUnmounted(() => {
                 <span class="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">{{ tech.name }}</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- GitHub Projects Section -->
+        <div class="max-w-4xl mx-auto w-full space-y-4 pt-4">
+          <div class="text-center md:text-left">
+            <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-cyan-300 text-xs font-mono border border-slate-300 dark:border-slate-700">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+              </svg>
+              <span>OPEN SOURCE</span>
+            </span>
+            <h3 class="text-xl font-bold font-serif text-slate-900 dark:text-white mt-2">App Development & Projects</h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <a 
+              v-for="repo in githubRepos" 
+              :key="repo.name"
+              :href="repo.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group block bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-slate-700 transition-all text-left"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-5 h-5 text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                  <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors">{{ repo.name }}</h4>
+                </div>
+                <div class="flex items-center space-x-1 text-slate-500 font-mono text-xs">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"></path>
+                  </svg>
+                  <span>{{ repo.stars }}</span>
+                </div>
+              </div>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">{{ repo.description }}</p>
+              <div class="flex items-center space-x-3 text-xs font-mono">
+                <span class="flex items-center space-x-1">
+                  <span class="w-2.5 h-2.5 rounded-full" :class="repo.languageColor"></span>
+                  <span class="text-slate-600 dark:text-slate-400">{{ repo.language }}</span>
+                </span>
+              </div>
+            </a>
           </div>
         </div>
 
