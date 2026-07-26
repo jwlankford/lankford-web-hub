@@ -99,6 +99,25 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
         { id: 125, name: 'Large Language Models (LLMs)', slug: 'llms' },
         { id: 126, name: 'Automation', slug: 'automation' }
     ]
+  },
+  {
+    id: 5,
+    title: 'The Impact of LLMs on Software Development',
+    authors: 'IEEE Authors',
+    publication_year: 2026,
+    journal_or_conf: 'IEEE Conference Publication / IEEE Xplore',
+    abstract: 'This paper examines the profound impact of Large Language Models (LLMs) on modern software development practices. The study explores how these advanced models are integrated into diverse development workflows, focusing on automated code generation, complex refactoring tasks, and the optimization of debugging processes. It also addresses the emerging challenges associated with reliance on LLMs, such as managing technical debt, identifying hallucinated code logic, and mitigating subtle security vulnerabilities. Through empirical analysis, the research provides a comprehensive overview of how teams can carefully govern these tools while accelerating the overall software delivery speed.',
+    key_findings: 'Extensive empirical evidence demonstrating LLMs capabilities to augment programming pace vs safety trade-off risks when automating pipeline deployments.',
+    methodology: 'Literature Review & Empirical Analytics',
+    zotero_key: 'IEEE_XPLORE_11499962',
+    url: 'https://ieeexplore.ieee.org/abstract/document/11499962',
+    created_at: new Date('2026-07-27').toISOString(),
+    tenant: 'academic',
+    tags: [
+        { id: 131, name: 'Software Development', slug: 'software-development' },
+        { id: 125, name: 'Large Language Models (LLMs)', slug: 'llms' },
+        { id: 126, name: 'Automation', slug: 'automation' }
+    ]
   }
 ];
 
