@@ -952,16 +952,16 @@ onUnmounted(() => {
             <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300">
               <thead class="bg-slate-100 dark:bg-slate-950 font-mono text-blue-700 dark:text-cyan-400 uppercase border-b border-slate-200 dark:border-slate-800">
                 <tr>
-                  <th class="p-3">Paper Title & Year</th>
-                  <th class="p-3">Authors</th>
+                  <th class="p-3 w-1/3">Paper Title & Year</th>
+                  <th class="p-3 w-1/6">Authors</th>
                   <th class="p-3">Methodology</th>
                   <th class="p-3">Key Empirical Findings</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                <tr v-for="paper in papers" :key="paper.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                  <td class="p-3 font-semibold text-slate-900 dark:text-white font-serif max-w-xs">{{ paper.title }} ({{ paper.publication_year }})</td>
-                  <td class="p-3 font-mono text-blue-700 dark:text-cyan-400/90 whitespace-nowrap">{{ paper.authors }}</td>
+                <tr v-for="paper in papers" :key="paper.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors align-top">
+                  <td class="p-3 font-semibold text-slate-900 dark:text-white font-serif">{{ paper.title }} ({{ paper.publication_year }})</td>
+                  <td class="p-3 font-mono text-blue-700 dark:text-cyan-400/90">{{ paper.authors }}</td>
                   <td class="p-3 text-slate-600 dark:text-slate-400">{{ paper.methodology || 'Empirical Study' }}</td>
                   <td class="p-3 text-slate-700 dark:text-slate-300">{{ paper.key_findings || 'N/A' }}</td>
                 </tr>
