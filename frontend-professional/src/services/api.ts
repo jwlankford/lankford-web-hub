@@ -17,6 +17,7 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
     key_findings: 'Implementing dual-layered schema validation reduces unhandled execution branching by 98.4% without incurring prohibitive model invocation overhead.',
     methodology: 'Empirical Benchmark & Automated Safety Verification Framework',
     zotero_key: 'LANKFORD_2026_LLM_ADLC',
+    url: 'https://ieeexplore.ieee.org/abstract/document/11390990',
     created_at: new Date('2026-07-27').toISOString(),
     tenant: 'academic',
     tags: [
@@ -54,6 +55,28 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
         { id: 119, name: 'GitHub Copilot', slug: 'github-copilot' },
         { id: 120, name: 'Software Testing', slug: 'software-testing' },
         { id: 121, name: 'Requirements Engineering', slug: 'requirements-engineering' }
+    ]
+  },
+  {
+    id: 3,
+    title: 'Next-Generation Software Engineering: A Multi-Agent System for End-to-End Sdlc Automation Using Large Language Models',
+    authors: 'Periyasamy, T.; Anburaj, J.; Fyzal, K.; Jayakrishnan, B.; Prasanth, S.',
+    publication_year: 2026,
+    journal_or_conf: 'Atlantis Press / ICAISDA 2025',
+    abstract: 'Software development, a multi-phase process composed of requirements, coding, testing, and deployment that can take a lot of time, be error-prone, and consume a lot of resources to do manually. AI-assisted tools that currently exist, such as code suggestion tools, are focused on single tasks and do not provide an end-to-end automation of the Software Development Life Cycle. The purpose of the paper is to introduce an intelligent solution that will utilize Generative Artificial Intelligence (AI) and Multi-Agent Systems to automate the SDLC processes. The intelligent system will include all the phases of SDLC using specialized agents including a Requirements Agent, a Code Generation Agent, a Test Agent, and a Fixer Agent, all orchestrated by a Controller Agent that will manage all the collaborative workflows. The agents will generate context-aware outputs by leveraging Large Language Models (LLM) with a human-in-the-loop to validate their results and ensure rigorous quality control. Additionally, the approach will use adaptive learning loops to continuously improve based on test results, bug fixes, and software developer feedback. The intelligent solution represents a scalable and cost-effective approach to accelerate software delivery while maintaining low-quality and high-reliability development. The proposed solution will be a significant step towards a new paradigm of software development by leveraging AI to expand software engineering leading to a revolution in accelerating how users and organizations develop software and ultimately designers’ ability to build software applications.',
+    key_findings: 'The purpose of the paper is to introduce an intelligent solution that will utilize Generative Artificial Intelligence (AI) and Multi-Agent Systems to automate the SDLC processes.',
+    methodology: 'Multi-Agent Systems & Generative Artificial Intelligence (AI)',
+    zotero_key: 'Periyasamy2026',
+    url: 'https://www.atlantis-press.com/proceedings/icaisda-25/126022738',
+    created_at: new Date('2026-07-27').toISOString(),
+    tenant: 'academic',
+    tags: [
+        { id: 122, name: 'Software Development Life Cycle (SDLC)', slug: 'sdlc' },
+        { id: 123, name: 'Generative AI', slug: 'generative-ai' },
+        { id: 124, name: 'Multi-Agent Systems', slug: 'multi-agent-systems' },
+        { id: 125, name: 'Large Language Models (LLMs)', slug: 'llms' },
+        { id: 126, name: 'Automation', slug: 'automation' },
+        { id: 127, name: 'Human-in-the-loop', slug: 'human-in-the-loop' }
     ]
   }
 ];
