@@ -305,22 +305,6 @@ export const INITIAL_GOOGLE_NOTEBOOKS: GoogleNotebook[] = [
 export const INITIAL_JUPYTER_NOTEBOOKS: JupyterNotebook[] = [
   {
     id: 1,
-    title: "Orchestration Loop Simulation",
-    description: "Walkthrough of ReAct orchestration flows and Manager/Worker hierarchies. Implements circuit breakers to detect agent loop spirals.",
-    notebook_url: "https://github.com/jwlankford/notebook-vault/blob/main/react_orchestration_loop.ipynb",
-    tags: "Orchestration,ReAct,Agentic",
-    tenant: "professional"
-  },
-  {
-    id: 2,
-    title: "LLM-as-a-Judge Evaluation Playground",
-    description: "An interactive workspace testing judge prompts, consensus algorithms, and agreement scores against baseline golden datasets.",
-    notebook_url: "https://github.com/jwlankford/notebook-vault/blob/main/llm_as_a_judge_evaluator.ipynb",
-    tags: "LLM-as-a-Judge,Evaluation,Factual-Drift",
-    tenant: "professional"
-  },
-  {
-    id: 3,
     title: "Colab Notebook: Multi-Agent Evaluation & Verification",
     description: "Interactive Google Colab workspace demonstrating live feed integration, multi-agent evaluation workflows, and runtime verification constraints.",
     notebook_url: "https://colab.research.google.com/drive/1XEQT-oTF_KkmY5FHkMIcWEuAlJziBaoe?usp=sharing",
