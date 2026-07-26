@@ -72,7 +72,7 @@ const emit = defineEmits<{
           @click.stop="emit('filterTag', tag.slug)"
           class="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-slate-700 dark:text-slate-300 hover:text-blue-900 dark:hover:text-cyan-200 border border-slate-200 dark:border-slate-700/60 hover:border-blue-500/30 transition-all"
         >
-          #{{ tag.name }}
+          {{ tag.name }}
         </button>
       </div>
 
