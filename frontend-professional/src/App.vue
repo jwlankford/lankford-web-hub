@@ -410,7 +410,7 @@ onUnmounted(() => {
                 aria-label="Open User Menu"
               >
                 <img
-                  src="/jeremy-lankford.jpg"
+                  src="/jeremy-lankford.png"
                   alt="Jeremy Lankford"
                   class="w-7 h-7 rounded-full object-cover ring-1.5 ring-blue-400/50 transition-transform"
                 />
