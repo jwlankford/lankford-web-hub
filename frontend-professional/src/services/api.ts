@@ -41,6 +41,7 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
     key_findings: 'The review concludes that LLMs significantly enhance productivity and automation across all SDLC phases, but their adoption requires careful architectural alignment, mitigation of hallucinations, cost‑aware evaluation, and strong human oversight to be viable in real-world, safety‑critical environments.',
     methodology: 'The study uses a systematic review methodology, collecting peer‑reviewed research from major digital libraries, applying inclusion/exclusion criteria, categorizing findings by SDLC phase, and synthesizing cross‑cutting themes such as productivity gains, hallucination risks, and governance concerns',
     zotero_key: 'ALDC_2026_Generative_SDLC',
+    url: 'https://www.ijsrtjournal.com/article/the-generative-sdlc-a-systematic-review-of-integrating-modern-llms-in-software-development-life-cycle#',
     created_at: new Date('2026-07-27').toISOString(),
     tenant: 'academic',
     tags: [
