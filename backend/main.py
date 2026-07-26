@@ -14,7 +14,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from database import init_db, get_async_session
 # Import our new data models alongside the tenant helpers
-from models import TenantDomain, BookMailingList, ResearchPaper, ResearchTag
+from models import TenantDomain, BookMailingList, ResearchPaper, ResearchTag, Article, GoogleNotebook, JupyterNotebook
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -107,10 +107,10 @@ async def get_research_papers(
     """
     Fetches papers linked ONLY to the active tenant environment.
     """
-    if request.state.tenant != "academic":
+    if request.state.tenant not in ["professional", "academic"]:
         raise HTTPException(
             status_code=403, 
-            detail="Academic assets are restricted outside of the academic domain context."
+            detail="Academic assets are restricted outside of valid domain contexts."
         )
         
     # Enforce row-level multi-tenancy inside the query select statement
@@ -128,10 +128,10 @@ async def add_research_paper(
     """
     Indexes a new academic reference, explicitly embedding the tenant key.
     """
-    if request.state.tenant != "academic":
+    if request.state.tenant not in ["professional", "academic"]:
         raise HTTPException(
             status_code=403, 
-            detail="Modifying academic records requires an active academic domain context."
+            detail="Modifying academic records requires an active domain context."
         )
         
     paper.tenant = request.state.tenant
@@ -139,3 +139,137 @@ async def add_research_paper(
     await db.commit()
     await db.refresh(paper)
     return paper
+
+
+# ==========================================
+# WEEKLY ARTICLES ROUTES (LinkedIn & Web)
+# ==========================================
+
+@app.get("/api/v1/articles", response_model=list[Article])
+async def get_articles(
+    request: Request,
+    db: AsyncSession = Depends(get_async_session)
+):
+    """
+    Fetches articles linked ONLY to the active tenant environment.
+    """
+    statement = select(Article).where(
+        Article.tenant == request.state.tenant,
+        Article.is_published == True
+    ).order_by(Article.published_at.desc())
+    results = await db.execute(statement)
+    return results.scalars().all()
+
+
+@app.post("/api/v1/articles", status_code=status.HTTP_201_CREATED, response_model=Article)
+async def add_article(
+    article: Article,
+    request: Request,
+    db: AsyncSession = Depends(get_async_session)
+):
+    """
+    Publishes a new article, explicitly embedding the active tenant identifier.
+    """
+    # Restrict modifying articles to active tenants (e.g., professional or academic)
+    if request.state.tenant not in ["professional", "academic"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Modifying articles requires a valid domain context."
+        )
+        
+    article.tenant = request.state.tenant
+    db.add(article)
+    await db.commit()
+    await db.refresh(article)
+    return article
+
+
+# ==========================================
+# GOOGLE NOTEBOOKLM ROUTES
+# ==========================================
+
+@app.get("/api/v1/notebooks/google", response_model=list[GoogleNotebook])
+async def get_google_notebooks(
+    request: Request,
+    db: AsyncSession = Depends(get_async_session)
+):
+    """
+    Fetches Google NotebookLM notebooks linked ONLY to the active tenant environment.
+    """
+    if request.state.tenant not in ["professional", "academic"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Domain context is required to query Google Notebooks."
+        )
+    statement = select(GoogleNotebook).where(
+        GoogleNotebook.tenant == request.state.tenant,
+        GoogleNotebook.is_public == True
+    ).order_by(GoogleNotebook.created_at.desc())
+    results = await db.execute(statement)
+    return results.scalars().all()
+
+
+@app.post("/api/v1/notebooks/google", status_code=status.HTTP_201_CREATED, response_model=GoogleNotebook)
+async def add_google_notebook(
+    notebook: GoogleNotebook,
+    request: Request,
+    db: AsyncSession = Depends(get_async_session)
+):
+    """
+    Saves a new Google NotebookLM link, explicitly embedding the active tenant context.
+    """
+    if request.state.tenant not in ["professional", "academic"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Modifying records requires a valid domain context."
+        )
+    notebook.tenant = request.state.tenant
+    db.add(notebook)
+    await db.commit()
+    await db.refresh(notebook)
+    return notebook
+
+
+# ==========================================
+# JUPYTER NOTEBOOK ROUTES
+# ==========================================
+
+@app.get("/api/v1/notebooks/jupyter", response_model=list[JupyterNotebook])
+async def get_jupyter_notebooks(
+    request: Request,
+    db: AsyncSession = Depends(get_async_session)
+):
+    """
+    Fetches Jupyter notebooks linked ONLY to the active tenant environment.
+    """
+    if request.state.tenant not in ["professional", "academic"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Domain context is required to query Jupyter Notebooks."
+        )
+    statement = select(JupyterNotebook).where(
+        JupyterNotebook.tenant == request.state.tenant
+    ).order_by(JupyterNotebook.created_at.desc())
+    results = await db.execute(statement)
+    return results.scalars().all()
+
+
+@app.post("/api/v1/notebooks/jupyter", status_code=status.HTTP_201_CREATED, response_model=JupyterNotebook)
+async def add_jupyter_notebook(
+    notebook: JupyterNotebook,
+    request: Request,
+    db: AsyncSession = Depends(get_async_session)
+):
+    """
+    Saves a new Jupyter notebook link, explicitly embedding the active tenant context.
+    """
+    if request.state.tenant not in ["professional", "academic"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Modifying records requires a valid domain context."
+        )
+    notebook.tenant = request.state.tenant
+    db.add(notebook)
+    await db.commit()
+    await db.refresh(notebook)
+    return notebook

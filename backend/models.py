@@ -98,3 +98,53 @@ class ResearchTag(TenantBase, table=True):
         back_populates="tags", 
         link_model=ResearchPaperTagLink
     )
+
+
+class Article(TenantBase, table=True):
+    """
+    Weekly articles published by Jeremy Lankford on LinkedIn and the Web.
+    Row-level isolated by tenant (typically 'professional' or 'academic').
+    """
+    __tablename__ = "articles"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    title: str = Field(index=True, nullable=False)
+    summary: str = Field(nullable=False)
+    content: Optional[str] = Field(default=None, nullable=True) # Full content/markdown for web
+    linkedin_url: Optional[str] = Field(default=None, nullable=True) # Optional link to LinkedIn post
+    image_url: Optional[str] = Field(default=None, nullable=True) # Cover image URL
+    published_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+    is_published: bool = Field(default=True)
+
+
+class GoogleNotebook(TenantBase, table=True):
+    """
+    Lists Google NotebookLM notebooks shared publicly.
+    Row-level isolated by tenant (typically 'professional' or 'academic').
+    """
+    __tablename__ = "google_notebooks"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    title: str = Field(index=True, nullable=False)
+    description: str = Field(nullable=False)
+    notebook_url: str = Field(nullable=False) # URL to Google NotebookLM
+    audio_url: Optional[str] = Field(default=None, nullable=True) # Optional URL to hosted audio overview MP3
+    sources_count: int = Field(default=0) # Number of indexed sources
+    is_public: bool = Field(default=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+
+
+class JupyterNotebook(TenantBase, table=True):
+    """
+    Lists interactive Jupyter notebooks (hosted on GitHub or Colab).
+    Row-level isolated by tenant (typically 'professional' or 'academic').
+    """
+    __tablename__ = "jupyter_notebooks"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    title: str = Field(index=True, nullable=False)
+    description: str = Field(nullable=False)
+    notebook_url: str = Field(nullable=False) # URL to the notebook online (GitHub/Colab)
+    tags: Optional[str] = Field(default=None, nullable=True) # Comma-separated tags
+    created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+

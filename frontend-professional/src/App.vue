@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import type { ResearchPaper, NewResearchPaperInput } from './types';
+import type { ResearchPaper, NewResearchPaperInput, Article, NewArticleInput, GoogleNotebook, JupyterNotebook, NewGoogleNotebookInput, NewJupyterNotebookInput } from './types';
 import { 
   fetchResearchPapers, 
   createResearchPaper, 
-  checkAcademicBackendHealth
+  checkAcademicBackendHealth,
+  fetchArticles,
+  createArticle,
+  fetchGoogleNotebooks,
+  createGoogleNotebook,
+  fetchJupyterNotebooks,
+  createJupyterNotebook
 } from './services/api';
 import { useTheme } from './composables/useTheme';
 
@@ -20,8 +26,41 @@ import PaperDetailModal from './components/PaperDetailModal.vue';
 import AddPaperModal from './components/AddPaperModal.vue';
 import AdminLoginModal from './components/AdminLoginModal.vue';
 
+// Article Components
+import ArticleCard from './components/ArticleCard.vue';
+import ArticleDetailModal from './components/ArticleDetailModal.vue';
+import AddArticleModal from './components/AddArticleModal.vue';
+
+// Notebook Components
+import GoogleNotebookCard from './components/GoogleNotebookCard.vue';
+import JupyterNotebookCard from './components/JupyterNotebookCard.vue';
+import AddNotebookModal from './components/AddNotebookModal.vue';
+
+
 // Navigation State
-const activeTab = ref<'research' | 'taxonomy' | 'matrix' | 'courses' | 'about'>('courses');
+const activeTab = ref<'research' | 'taxonomy' | 'matrix' | 'courses' | 'about' | 'articles'>('courses');
+
+// Technologies Known
+const technologies = [
+  { name: 'Python', icon: 'https://cdn.simpleicons.org/python/3776AB' },
+  { name: 'Rust', icon: 'https://cdn.simpleicons.org/rust/DE5937' },
+  { name: 'TypeScript', icon: 'https://cdn.simpleicons.org/typescript/3178C6' },
+  { name: 'Vue.js', icon: 'https://cdn.simpleicons.org/vuedotjs/4FC08D' },
+  { name: 'React', icon: 'https://cdn.simpleicons.org/react/61DAFB' },
+  { name: 'Node.js', icon: 'https://cdn.simpleicons.org/nodedotjs/339933' },
+  { name: 'PostgreSQL', icon: 'https://cdn.simpleicons.org/postgresql/4169E1' },
+  { name: 'Docker', icon: 'https://cdn.simpleicons.org/docker/2496ED' },
+  { name: 'Kubernetes', icon: 'https://cdn.simpleicons.org/kubernetes/326CE5' },
+  { name: 'Tailwind CSS', icon: 'https://cdn.simpleicons.org/tailwindcss/06B6D4' },
+  { name: 'Git', icon: 'https://cdn.simpleicons.org/git/F05032' }
+];
+
+
+// Article State
+const articles = ref<Article[]>([]);
+const isLoadingArticles = ref(true);
+const selectedArticle = ref<Article | null>(null);
+const isAddArticleModalOpen = ref(false);
 
 // Academic Research State
 const papers = ref<ResearchPaper[]>([]);
@@ -31,6 +70,18 @@ const searchQuery = ref('');
 const selectedTagSlug = ref<string | null>(null);
 const selectedPaper = ref<ResearchPaper | null>(null);
 const isAddModalOpen = ref(false);
+
+// Notebooks State
+const googleNotebooks = ref<GoogleNotebook[]>([]);
+const jupyterNotebooks = ref<JupyterNotebook[]>([]);
+const isGoogleNotebooksExpanded = ref(false);
+const isJupyterNotebooksExpanded = ref(false);
+const isAddNotebookModalOpen = ref(false);
+const isLoadingNotebooks = ref(true);
+const jupyterViewMode = ref<'grid' | 'feed'>('grid');
+const activeFeedNotebook = ref<JupyterNotebook | null>(null);
+
+
 
 // Admin Auth State
 const isAdmin = ref(sessionStorage.getItem('academic_admin') === 'true');
@@ -86,14 +137,57 @@ const filteredPapers = computed(() => {
   });
 });
 
+const filteredArticles = computed(() => {
+  if (!searchQuery.value.trim()) return articles.value;
+  const q = searchQuery.value.toLowerCase().trim();
+  return articles.value.filter(article => {
+    return article.title.toLowerCase().includes(q) || 
+           article.summary.toLowerCase().includes(q) || 
+           (article.content?.toLowerCase().includes(q) ?? false);
+  });
+});
+
 async function loadData() {
   isLoadingResearch.value = true;
+  isLoadingArticles.value = true;
+  isLoadingNotebooks.value = true;
   isLiveBackend.value = await checkAcademicBackendHealth();
+  
+  // Papers
   const res = await fetchResearchPapers();
   papers.value = res.papers;
   isLiveBackend.value = res.isLiveBackend;
   isLoadingResearch.value = false;
+
+  // Articles
+  const artRes = await fetchArticles();
+  articles.value = artRes.articles;
+  isLoadingArticles.value = false;
+
+  // Notebooks
+  const gbookRes = await fetchGoogleNotebooks();
+  googleNotebooks.value = gbookRes.notebooks;
+  const jbookRes = await fetchJupyterNotebooks();
+  jupyterNotebooks.value = jbookRes.notebooks;
+  if (jupyterNotebooks.value.length > 0) {
+    activeFeedNotebook.value = jupyterNotebooks.value[0];
+  }
+  isLoadingNotebooks.value = false;
 }
+
+async function handleAddNotebook(type: 'google' | 'jupyter', payload: NewGoogleNotebookInput | NewJupyterNotebookInput) {
+  if (type === 'google') {
+    const res = await createGoogleNotebook(payload as NewGoogleNotebookInput);
+    googleNotebooks.value.unshift(res.notebook);
+  } else {
+    const res = await createJupyterNotebook(payload as NewJupyterNotebookInput);
+    jupyterNotebooks.value.unshift(res.notebook);
+    activeFeedNotebook.value = res.notebook;
+  }
+  isAddNotebookModalOpen.value = false;
+}
+
+
 
 async function handleAddPaper(input: NewResearchPaperInput) {
   const result = await createResearchPaper(input);
@@ -101,6 +195,14 @@ async function handleAddPaper(input: NewResearchPaperInput) {
   isAddModalOpen.value = false;
   selectedPaper.value = result.paper;
 }
+
+async function handleAddArticle(input: NewArticleInput) {
+  const result = await createArticle(input);
+  articles.value.unshift(result.article);
+  isAddArticleModalOpen.value = false;
+  selectedArticle.value = result.article;
+}
+
 
 function handleFilterTag(slug: string) {
   if (selectedTagSlug.value === slug) {
@@ -164,17 +266,6 @@ onUnmounted(() => {
             <span class="px-1.5 py-0.2 text-[9px] font-mono rounded bg-blue-50 dark:bg-slate-950/60 text-blue-800 dark:text-cyan-300 border border-blue-300 dark:border-blue-500/30">{{ papers.length }}</span>
           </button>
           <button
-            @click="activeTab = 'matrix'"
-            :class="[
-              'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200',
-              activeTab === 'matrix'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-600/30 border border-blue-400/30'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800/80'
-            ]"
-          >
-            Synthesis Matrix
-          </button>
-          <button
             @click="activeTab = 'courses'"
             :class="[
               'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200',
@@ -198,6 +289,18 @@ onUnmounted(() => {
             <span class="px-1.5 py-0.2 text-[9px] font-mono rounded bg-blue-50 dark:bg-slate-950/60 text-blue-800 dark:text-cyan-300 border border-blue-300 dark:border-blue-500/30">{{ allTags.length }}</span>
           </button>
           <button
+            @click="activeTab = 'articles'"
+            :class="[
+              'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 flex items-center space-x-1.5',
+              activeTab === 'articles'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-600/30 border border-blue-400/30'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800/80'
+            ]"
+          >
+            <span>Articles</span>
+            <span class="px-1.5 py-0.2 text-[9px] font-mono rounded bg-blue-50 dark:bg-slate-950/60 text-blue-800 dark:text-cyan-300 border border-blue-300 dark:border-blue-500/30">{{ articles.length }}</span>
+          </button>
+          <button
             @click="activeTab = 'about'"
             :class="[
               'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200',
@@ -216,7 +319,7 @@ onUnmounted(() => {
           <button
             v-if="isAdmin && activeTab === 'research'"
             @click="isAddModalOpen = true"
-            class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-blue-600/20 border border-blue-400/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center space-x-1 leading-tight"
+            class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-blue-600/20 border border-blue-400/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center space-x-1 leading-tight cursor-pointer"
             title="Index a new study to your database"
           >
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,6 +327,34 @@ onUnmounted(() => {
             </svg>
             <span class="hidden sm:inline">Index Study</span>
           </button>
+
+          <!-- Index Notebook CTA Button -->
+          <button
+            v-if="isAdmin && activeTab === 'research'"
+            @click="isAddNotebookModalOpen = true"
+            class="bg-gradient-to-r from-amber-500 via-orange-650 to-amber-600 hover:from-amber-450 hover:to-orange-550 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-amber-600/20 border border-amber-400/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center space-x-1 leading-tight cursor-pointer"
+            title="Index a new Google NotebookLM or Jupyter Notebook"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span class="hidden sm:inline">Index Notebook</span>
+          </button>
+
+
+          <!-- Publish Article CTA Button -->
+          <button
+            v-if="isAdmin && activeTab === 'articles'"
+            @click="isAddArticleModalOpen = true"
+            class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-sm shadow-blue-600/20 border border-blue-400/40 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center space-x-1 leading-tight cursor-pointer"
+            title="Publish a new article"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span class="hidden sm:inline">Publish Article</span>
+          </button>
+
 
           <!-- Grouped Icons: Dark/Light Toggle, Backend Status Icon, Avatar Icon with Dropdown Menu -->
           <div class="flex items-center space-x-1.5 pl-1 border-l border-slate-200 dark:border-slate-800">
@@ -333,6 +464,12 @@ onUnmounted(() => {
                       <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
                       <span>LinkedIn</span>
                     </a>
+                    <a href="https://github.com/jwlankford" target="_blank" class="px-4 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center space-x-2.5 text-slate-700 dark:text-slate-300 transition-colors">
+                      <svg class="w-3.5 h-3.5 text-slate-900 dark:text-slate-100" fill="currentColor" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                      </svg>
+                      <span>GitHub</span>
+                    </a>
                     <a href="https://x.com/jwlankford" target="_blank" class="px-4 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center space-x-2.5 text-slate-700 dark:text-slate-300 transition-colors">
                       <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                       <span>X (Twitter)</span>
@@ -390,15 +527,6 @@ onUnmounted(() => {
           Research Index ({{ papers.length }})
         </button>
         <button
-          @click="activeTab = 'matrix'"
-          :class="[
-            'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
-            activeTab === 'matrix' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
-          ]"
-        >
-          Matrix
-        </button>
-        <button
           @click="activeTab = 'courses'"
           :class="[
             'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
@@ -417,6 +545,15 @@ onUnmounted(() => {
           Taxonomy ({{ allTags.length }})
         </button>
         <button
+          @click="activeTab = 'articles'"
+          :class="[
+            'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
+            activeTab === 'articles' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
+          ]"
+        >
+          Articles ({{ articles.length }})
+        </button>
+        <button
           @click="activeTab = 'about'"
           :class="[
             'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
@@ -433,6 +570,280 @@ onUnmounted(() => {
       
       <!-- TAB 2: RESEARCH INDEX VIEW -->
       <div v-if="activeTab === 'research'" class="space-y-6 animate-fadeIn">
+        <!-- Dashboard Widgets Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Google NotebookLM Card Widget -->
+          <button 
+            @click="isGoogleNotebooksExpanded = !isGoogleNotebooksExpanded; if(isGoogleNotebooksExpanded) isJupyterNotebooksExpanded = false;"
+            :class="[
+              'text-left p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden group cursor-pointer shadow-md hover:shadow-lg',
+              isGoogleNotebooksExpanded 
+                ? 'bg-gradient-to-br from-blue-50 to-indigo-50/50 dark:from-blue-950/40 dark:to-indigo-950/20 border-blue-550 dark:border-blue-400 ring-2 ring-blue-500/20 shadow-blue-500/10' 
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800/80 hover:border-blue-500/40'
+            ]"
+          >
+            <div class="absolute -bottom-6 -right-6 w-16 h-16 bg-blue-600/5 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
+            <div class="flex items-start justify-between">
+              <div class="space-y-1">
+                <div class="text-[10px] font-mono font-bold text-blue-600 dark:text-cyan-300 uppercase tracking-widest">NotebookLM Deep-Dives</div>
+                <h4 class="text-base font-serif font-bold text-slate-905 dark:text-white">Google Notebooks</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-tight">AI summary overviews & podcast discussions.</p>
+              </div>
+              <span class="px-2.5 py-1 rounded bg-blue-100 dark:bg-blue-950 border border-blue-200 dark:border-blue-500/30 text-blue-800 dark:text-cyan-300 text-[10px] font-mono font-black shadow-inner">
+                {{ googleNotebooks.length }} Links
+              </span>
+            </div>
+            <div class="flex items-center justify-between pt-4 mt-3 border-t border-slate-105/50 dark:border-slate-800 text-[10px] font-mono text-slate-405 dark:text-slate-500">
+              <span>{{ isGoogleNotebooksExpanded ? 'Click to collapse grid' : 'Click to expand grid' }}</span>
+              <svg class="w-3.5 h-3.5 transform transition-transform" :class="isGoogleNotebooksExpanded ? 'rotate-180 text-blue-600' : 'rotate-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </button>
+
+          <!-- Jupyter Notebooks Card Widget -->
+          <button 
+            @click="isJupyterNotebooksExpanded = !isJupyterNotebooksExpanded; if(isJupyterNotebooksExpanded) isGoogleNotebooksExpanded = false;"
+            :class="[
+              'text-left p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden group cursor-pointer shadow-md hover:shadow-lg',
+              isJupyterNotebooksExpanded 
+                ? 'bg-gradient-to-br from-amber-50 to-orange-50/50 dark:from-amber-950/40 dark:to-orange-950/20 border-amber-550 dark:border-amber-400 ring-2 ring-amber-500/20 shadow-amber-500/10' 
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800/80 hover:border-amber-500/40'
+            ]"
+          >
+            <div class="absolute -bottom-6 -right-6 w-16 h-16 bg-amber-500/5 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
+            <div class="flex items-start justify-between">
+              <div class="space-y-1">
+                <div class="text-[10px] font-mono font-bold text-amber-600 dark:text-amber-350 uppercase tracking-widest">Interactive Code</div>
+                <h4 class="text-base font-serif font-bold text-slate-905 dark:text-white">Jupyter Notebooks</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-tight">Python simulations, calculations & tests.</p>
+              </div>
+              <span class="px-2.5 py-1 rounded bg-amber-100 dark:bg-amber-950 border border-amber-200 dark:border-amber-500/30 text-amber-800 dark:text-amber-350 text-[10px] font-mono font-black shadow-inner">
+                {{ jupyterNotebooks.length }} Files
+              </span>
+            </div>
+            <div class="flex items-center justify-between pt-4 mt-3 border-t border-slate-105/50 dark:border-slate-800 text-[10px] font-mono text-slate-405 dark:text-slate-500">
+              <span>{{ isJupyterNotebooksExpanded ? 'Click to collapse grid' : 'Click to expand grid' }}</span>
+              <svg class="w-3.5 h-3.5 transform transition-transform" :class="isJupyterNotebooksExpanded ? 'rotate-180 text-amber-600' : 'rotate-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </button>
+
+          <!-- Synthesis Matrix Card Widget -->
+          <button 
+            @click="activeTab = 'matrix'"
+            class="text-left p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 hover:border-cyan-500/40 transition-all duration-300 relative overflow-hidden group cursor-pointer shadow-md hover:shadow-lg"
+          >
+            <div class="absolute -bottom-6 -right-6 w-16 h-16 bg-cyan-600/5 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
+            <div class="flex items-start justify-between">
+              <div class="space-y-1">
+                <div class="text-[10px] font-mono font-bold text-cyan-600 dark:text-cyan-300 uppercase tracking-widest">Cross-Reference Literature</div>
+                <h4 class="text-base font-serif font-bold text-slate-905 dark:text-white">Synthesis Matrix</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-tight">Comparative analysis grid of findings & metrics.</p>
+              </div>
+              <span class="px-2.5 py-1 rounded bg-cyan-50 dark:bg-slate-950 border border-cyan-200 dark:border-cyan-500/30 text-cyan-800 dark:text-cyan-300 text-[10px] font-mono font-black shadow-inner">
+                View Matrix
+              </span>
+            </div>
+            <div class="flex items-center justify-between pt-4 mt-3 border-t border-slate-105/50 dark:border-slate-800 text-[10px] font-mono text-slate-405 dark:text-slate-500">
+              <span>Go to Matrix page</span>
+              <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </button>
+        </div>
+
+        <!-- Expansion 1: Google Notebooks Grid -->
+        <div 
+          v-if="isGoogleNotebooksExpanded" 
+          class="p-6 bg-slate-100/40 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800/80 rounded-3xl space-y-4 animate-fadeIn"
+        >
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-serif font-bold text-slate-900 dark:text-white">Public Google Notebooks</h3>
+            <button @click="isGoogleNotebooksExpanded = false" class="text-xs text-blue-600 dark:text-cyan-400 hover:underline">Collapse Section</button>
+          </div>
+          <div v-if="isLoadingNotebooks" class="py-8 text-center text-slate-400 text-xs font-mono">
+            Loading Google Notebooks...
+          </div>
+          <div v-else-if="googleNotebooks.length === 0" class="py-8 text-center text-slate-400 text-xs font-mono">
+            No public Google Notebooks found.
+          </div>
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <GoogleNotebookCard 
+              v-for="notebook in googleNotebooks" 
+              :key="notebook.id" 
+              :notebook="notebook" 
+            />
+          </div>
+        </div>
+
+        <!-- Expansion 2: Jupyter Notebooks Grid & Direct Feed -->
+        <div 
+          v-if="isJupyterNotebooksExpanded" 
+          class="p-6 bg-slate-100/40 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800/80 rounded-3xl space-y-6 animate-fadeIn"
+        >
+          <!-- Header and Toggle Controls -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/60 dark:border-slate-800 pb-4">
+            <div class="space-y-1">
+              <h3 class="text-lg font-serif font-bold text-slate-900 dark:text-white">Interactive Google Colab Notebooks</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Run code, evaluate models, and verify orchestration loop logic.</p>
+            </div>
+            
+            <div class="flex items-center space-x-3 self-end sm:self-auto">
+              <!-- View Mode Toggle -->
+              <div class="flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-xl text-xs font-mono border border-slate-300/40 dark:border-slate-700/30">
+                <button 
+                  @click="jupyterViewMode = 'grid'"
+                  type="button"
+                  :class="[
+                    'px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 cursor-pointer',
+                    jupyterViewMode === 'grid' 
+                      ? 'bg-white dark:bg-slate-900 shadow-sm text-amber-755 dark:text-amber-400 font-bold' 
+                      : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-205'
+                  ]"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                  </svg>
+                  <span>Grid View</span>
+                </button>
+                <button 
+                  @click="jupyterViewMode = 'feed'"
+                  type="button"
+                  :class="[
+                    'px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 cursor-pointer',
+                    jupyterViewMode === 'feed' 
+                      ? 'bg-white dark:bg-slate-900 shadow-sm text-amber-755 dark:text-amber-400 font-bold' 
+                      : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-205'
+                  ]"
+                >
+                  <!-- Google Colab Infinity Logo -->
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.8 12.6C12.9 9.6 10.2 7.5 7.1 7.5 3.1 7.5 0 10.6 0 14.5s3.1 7 7.1 7c3.1 0 5.8-2.1 6.7-5.1L13.8 12.6z" fill="#F9AB00" />
+                    <path d="M20.5 7.5c-3.1 0-5.8 2.1-6.7 5.1l0.1 3.8c0.9 3 3.6 5.1 6.7 5.1 4 0 7.1-3.1 7.1-7s-3.1-7-7.1-7z" fill="#E8710A" />
+                  </svg>
+                  <span>Direct Feed</span>
+                </button>
+              </div>
+              <button @click="isJupyterNotebooksExpanded = false" class="text-xs text-amber-600 dark:text-amber-400 hover:underline">Collapse</button>
+            </div>
+          </div>
+
+          <!-- Loading & Empty States -->
+          <div v-if="isLoadingNotebooks" class="py-12 text-center text-slate-400 text-xs font-mono">
+            Loading Google Colab Notebooks...
+          </div>
+          <div v-else-if="jupyterNotebooks.length === 0" class="py-12 text-center text-slate-400 text-xs font-mono">
+            No interactive Google Colab Notebooks found.
+          </div>
+
+          <!-- Grid View Render -->
+          <div v-else-if="jupyterViewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+            <JupyterNotebookCard 
+              v-for="notebook in jupyterNotebooks" 
+              :key="notebook.id" 
+              :notebook="notebook" 
+            />
+          </div>
+
+          <!-- Direct Feed Render (Split Panel Layout) -->
+          <div v-else class="flex flex-col lg:flex-row gap-6 animate-fadeIn">
+            <!-- Left Sidebar: Feed List Selector -->
+            <div class="w-full lg:w-1/4 flex flex-col space-y-2 lg:max-h-[690px] lg:overflow-y-auto pr-1">
+              <div class="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 pl-1">Available Feeds</div>
+              <button 
+                v-for="notebook in jupyterNotebooks"
+                :key="notebook.id"
+                @click="activeFeedNotebook = notebook"
+                type="button"
+                :class="[
+                  'w-full text-left p-4 rounded-xl border transition-all duration-300 flex flex-col space-y-2 cursor-pointer relative overflow-hidden group',
+                  activeFeedNotebook?.id === notebook.id 
+                    ? 'bg-gradient-to-r from-amber-50 to-orange-55/50 dark:from-amber-950/30 dark:to-orange-950/10 border-amber-500 dark:border-amber-400 shadow-md ring-1 ring-amber-500/20' 
+                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800/80 hover:border-amber-500/40 hover:bg-slate-50/50 dark:hover:bg-slate-850/50'
+                ]"
+              >
+                <!-- Active Indicator Border -->
+                <div v-if="activeFeedNotebook?.id === notebook.id" class="absolute left-0 top-0 bottom-0 w-1 bg-amber-600 dark:bg-amber-500"></div>
+
+                <div class="flex items-center justify-between">
+                  <span class="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded bg-slate-105 dark:bg-slate-800/80 text-[9px] font-mono font-bold text-slate-500 dark:text-slate-400">
+                    <svg class="w-2.5 h-2.5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13.8 12.6C12.9 9.6 10.2 7.5 7.1 7.5 3.1 7.5 0 10.6 0 14.5s3.1 7 7.1 7c3.1 0 5.8-2.1 6.7-5.1L13.8 12.6z" fill="#F9AB00" />
+                      <path d="M20.5 7.5c-3.1 0-5.8 2.1-6.7 5.1l0.1 3.8c0.9 3 3.6 5.1 6.7 5.1 4 0 7.1-3.1 7.1-7s-3.1-7-7.1-7z" fill="#E8710A" />
+                    </svg>
+                    <span>Colab Link</span>
+                  </span>
+                </div>
+                
+                <h5 class="text-sm font-bold text-slate-900 dark:text-white leading-snug group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-1">
+                  {{ notebook.title }}
+                </h5>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">
+                  {{ notebook.description }}
+                </p>
+              </button>
+            </div>
+
+            <!-- Right Area: Embedded Iframe & Detail Info -->
+            <div class="w-full lg:w-3/4 flex flex-col space-y-4">
+              <div v-if="activeFeedNotebook" class="flex flex-col bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-lg">
+                <!-- Viewport Top Header -->
+                <div class="p-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div class="space-y-1">
+                    <h4 class="text-base font-serif font-black text-slate-900 dark:text-white leading-tight">
+                      {{ activeFeedNotebook.title }}
+                    </h4>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 leading-normal">
+                      {{ activeFeedNotebook.description }}
+                    </p>
+                  </div>
+
+                  <a 
+                    :href="activeFeedNotebook.notebook_url" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="px-4 py-2 font-bold text-xs rounded-xl bg-amber-600 hover:bg-amber-500 dark:bg-amber-550 dark:hover:bg-amber-450 text-white shadow-md active:scale-95 transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 self-end sm:self-auto cursor-pointer"
+                  >
+                    <span>Open in New Tab</span>
+                    <svg class="w-3.5 h-3.5 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                  </a>
+                </div>
+
+                <!-- Iframe Viewport Container -->
+                <div class="relative bg-slate-50 dark:bg-slate-950 p-4 flex flex-col space-y-4">
+                  <!-- Fallback Alert Box -->
+                  <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-800 dark:text-amber-300 flex items-start space-x-3 text-xs leading-relaxed">
+                    <svg class="w-5 h-5 text-amber-650 dark:text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <div>
+                      <span class="font-bold">Colab Iframe Notice:</span> Due to Google's strict browser security headers (`X-Frame-Options: deny`), this direct feed represents a live container reference. If the content below displays a connection error or remains blank, click <a :href="activeFeedNotebook.notebook_url" target="_blank" rel="noopener noreferrer" class="font-bold underline hover:text-amber-900 dark:hover:text-amber-250">Open in New Tab</a> to launch it directly in Google Colab.
+                    </div>
+                  </div>
+
+                  <!-- Actual Frame -->
+                  <div class="w-full h-[650px] rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-inner relative">
+                    <iframe 
+                      :src="activeFeedNotebook.notebook_url"
+                      class="w-full h-full border-none"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="h-[400px] flex items-center justify-center border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl text-slate-400 text-sm font-mono">
+                Select a notebook from the sidebar to load the feed.
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Search & Tag Chips Bar -->
         <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-xl space-y-4 transition-colors">
           <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -492,7 +903,7 @@ onUnmounted(() => {
                   : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700/60'
               ]"
             >
-              #{{ tag.name }}
+              {{ tag.name }}
             </button>
           </div>
         </div>
@@ -560,16 +971,101 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- TAB 5: UDEMY COURSES VIEW -->
+      <!-- TAB 5: ARTICLES VIEW -->
+      <div v-else-if="activeTab === 'articles'" class="space-y-6 animate-fadeIn">
+        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-xl space-y-4 transition-colors">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <!-- Search Bar -->
+            <div class="relative w-full sm:max-w-md">
+              <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <input 
+                v-model="searchQuery"
+                type="text"
+                placeholder="Search articles by title or body..."
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
+              />
+              <button 
+                v-if="searchQuery"
+                @click="searchQuery = ''"
+                class="absolute right-3 top-3 text-slate-400 hover:text-slate-700 dark:hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div class="flex items-center space-x-3 text-xs font-mono text-slate-500 dark:text-slate-400">
+              <span>Showing <strong class="text-blue-600 dark:text-cyan-400">{{ filteredArticles.length }}</strong> of {{ articles.length }} Articles</span>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="isLoadingArticles" class="py-16 text-center text-slate-500 dark:text-slate-400 font-mono">
+          <div class="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          Synchronizing Articles Database...
+        </div>
+
+        <div v-else-if="filteredArticles.length === 0" class="py-16 text-center bg-white dark:bg-slate-900/40 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <p class="text-slate-600 dark:text-slate-400 font-medium mb-3">No articles match your search criteria.</p>
+          <button 
+            @click="searchQuery = ''"
+            class="text-xs font-mono px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-blue-600 dark:text-cyan-400 rounded-lg border border-slate-300 dark:border-slate-700"
+          >
+            Reset Filters
+          </button>
+        </div>
+
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <ArticleCard
+            v-for="article in filteredArticles"
+            :key="article.id || article.title"
+            :article="article"
+            @select="selectedArticle = $event"
+          />
+        </div>
+      </div>
+
+      <!-- TAB 6: UDEMY COURSES VIEW -->
       <UdemyCourses
         v-else-if="activeTab === 'courses'"
       />
 
       <!-- TAB 6: ABOUT & BIO VIEW (Unified biography section with contact) -->
-      <div v-else-if="activeTab === 'about'" class="space-y-12 animate-fadeIn">
+      <div v-else-if="activeTab === 'about'" class="space-y-6 animate-fadeIn">
         <AuthorSection />
+
+        <!-- Technologies Moving Icons Marquee -->
+        <div class="max-w-4xl mx-auto w-full space-y-4">
+          <div class="text-center md:text-left">
+            <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-cyan-300 text-xs font-mono border border-blue-300 dark:border-blue-500/30">
+              <span>TECHNICAL STACK</span>
+            </span>
+            <h3 class="text-xl font-bold font-serif text-slate-900 dark:text-white mt-2">Core Competencies & Technologies</h3>
+          </div>
+          
+          <div class="relative w-full overflow-hidden bg-slate-100/50 dark:bg-slate-900/30 py-6 border border-slate-200 dark:border-slate-800 rounded-3xl transition-colors">
+            <!-- Fade gradients -->
+            <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white dark:from-slate-950 to-transparent z-10 pointer-events-none"></div>
+            <div class="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white dark:from-slate-950 to-transparent z-10 pointer-events-none"></div>
+
+            <div class="animate-marquee space-x-6">
+              <!-- Double the array to allow continuous looping -->
+              <div 
+                v-for="(tech, idx) in [...technologies, ...technologies]" 
+                :key="tech.name + '-' + idx"
+                class="inline-flex items-center space-x-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 py-2.5 rounded-2xl shadow-sm hover:border-blue-500/30 dark:hover:border-blue-500/30 hover:shadow transition-all transform hover:-translate-y-0.5 select-none"
+              >
+                <img :src="tech.icon" class="w-5 h-5 shrink-0" :alt="tech.name" />
+                <span class="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">{{ tech.name }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <ContactForm />
       </div>
+
 
     </main>
 
@@ -586,6 +1082,18 @@ onUnmounted(() => {
             <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
           </svg>
           <span>LinkedIn</span>
+        </a>
+
+        <a 
+          href="https://github.com/jwlankford" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="hover:text-slate-900 dark:hover:text-slate-100 flex items-center space-x-1.5 transition-colors text-slate-650 dark:text-slate-305"
+        >
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span>GitHub</span>
         </a>
 
         <a 
@@ -634,6 +1142,17 @@ onUnmounted(() => {
       @filterTag="handleFilterTag"
     />
 
+    <ArticleDetailModal
+      :article="selectedArticle"
+      @close="selectedArticle = null"
+    />
+
+    <AddArticleModal
+      :isOpen="isAddArticleModalOpen"
+      @close="isAddArticleModalOpen = false"
+      @submit="handleAddArticle"
+    />
+
     <AddPaperModal
       :isOpen="isAddModalOpen"
       @close="isAddModalOpen = false"
@@ -644,6 +1163,12 @@ onUnmounted(() => {
       :isOpen="isAdminModalOpen"
       @close="isAdminModalOpen = false"
       @login="handleAdminLogin"
+    />
+
+    <AddNotebookModal
+      :isOpen="isAddNotebookModalOpen"
+      @close="isAddNotebookModalOpen = false"
+      @submit="handleAddNotebook"
     />
   </div>
 </template>
