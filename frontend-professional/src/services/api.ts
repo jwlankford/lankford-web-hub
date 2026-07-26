@@ -78,6 +78,27 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
         { id: 126, name: 'Automation', slug: 'automation' },
         { id: 127, name: 'Human-in-the-loop', slug: 'human-in-the-loop' }
     ]
+  },
+  {
+    id: 4,
+    title: 'Enhancing Human-IDE Interaction in the SDLC using LLM-based Mediator Agents',
+    authors: 'Li, Ziyou; Izadi, Maliheh',
+    publication_year: 2025,
+    journal_or_conf: 'ACM International Conference on the Foundations of Software Engineering',
+    abstract: 'Large Language Model (LLM)-based autonomous agents provide state-of-the-art performance in various tasks throughout the Software Development Lifecycle (SDLC). Although these agents can be integrated into Integrated Development Environments (IDEs), standalone applications impose cognitive burdens on programmers due to fragmented tool usage across the SDLC. This paper proposes a framework for a mediator agent that serves as the unified interface between the programmer, IDE tools, agentic tools, and external multi-agent systems. The framework aims to simplify interaction, reduce context switching, and automate the orchestration of the IDE tools. By aligning with proposed levels of SE automation, the mediator agent sets the stage for next-generation human-computer collaboration, enhancing productivity, and advancing software engineering automation.',
+    key_findings: 'The paper proposes a framework for a mediator agent that serves as the unified interface between the programmer, IDE tools, agentic tools, and external multi-agent systems, reducing context switching and cognitive burdens.',
+    methodology: 'Framework Proposal & Mediator Base Interaction',
+    zotero_key: 'Li2025',
+    url: 'https://dl.acm.org/doi/abs/10.1145/3696630.3728721',
+    created_at: new Date('2026-07-27').toISOString(),
+    tenant: 'academic',
+    tags: [
+        { id: 128, name: 'Integrated Development Environments', slug: 'ide' },
+        { id: 129, name: 'LLM-based Mediator Agents', slug: 'mediator-agents' },
+        { id: 130, name: 'Human-Computer Collaboration', slug: 'human-computer-collaboration' },
+        { id: 125, name: 'Large Language Models (LLMs)', slug: 'llms' },
+        { id: 126, name: 'Automation', slug: 'automation' }
+    ]
   }
 ];
 
