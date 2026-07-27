@@ -61,6 +61,10 @@ async def init_db() -> None:
         from sqlalchemy import text
         for table in ["book_mailing_list", "research_papers", "research_tags", "articles", "google_notebooks", "jupyter_notebooks", "contact_messages"]:
             await conn.execute(text(f"UPDATE {table} SET tenant = 'professional' WHERE tenant = 'academic'"))
+            try:
+                await conn.execute(text(f"SELECT setval(pg_get_serial_sequence('{table}', 'id'), coalesce(max(id), 1)) FROM {table}"))
+            except Exception:
+                pass
 
     # Seed initial academic research papers if table is empty
     async with async_session_maker() as session:
