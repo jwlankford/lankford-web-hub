@@ -40,6 +40,12 @@ async def get_db():
 async def init_db() -> None:
     import models  
     
+    os_url = os.environ.get("DATABASE_URL")
+    safe_os_host = os_url.split("@")[1].split("/")[0] if os_url and "@" in os_url else os_url
+    safe_settings_host = settings.DATABASE_URL.split("@")[1].split("/")[0] if settings.DATABASE_URL and "@" in settings.DATABASE_URL else settings.DATABASE_URL
+    print(f"[SYSTEM] Debug OS Env DATABASE_URL Host: {safe_os_host}")
+    print(f"[SYSTEM] Debug Settings DATABASE_URL Host: {safe_settings_host}")
+    
     db_url = settings.ASYNC_DATABASE_URL
     if "@" in db_url:
         host = db_url.split("@")[1].split("/")[0]
