@@ -40,6 +40,13 @@ async def get_db():
 async def init_db() -> None:
     import models  
     
+    db_url = settings.ASYNC_DATABASE_URL
+    if "@" in db_url:
+        host = db_url.split("@")[1].split("/")[0]
+        print(f"[SYSTEM] Database connection target host: {host}")
+    else:
+        print(f"[SYSTEM] Database connection target: {db_url}")
+
     async with engine.begin() as conn:
         # Automatically generate missing tables safely
         await conn.run_sync(SQLModel.metadata.create_all)
