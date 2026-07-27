@@ -103,6 +103,7 @@ const isLiveBackend = ref(false);
 const isLoadingResearch = ref(true);
 const searchQuery = ref('');
 const selectedTagSlug = ref<string | null>(null);
+const showTaxonomyFilters = ref(false);
 const selectedPaper = ref<ResearchPaper | null>(null);
 const isAddModalOpen = ref(false);
 
@@ -245,6 +246,7 @@ function handleFilterTag(slug: string) {
   } else {
     selectedTagSlug.value = slug;
     activeTab.value = 'research';
+    showTaxonomyFilters.value = true;
   }
 }
 
@@ -905,6 +907,24 @@ onUnmounted(() => {
             <!-- Active Tag Filter Badge / Counter -->
             <div class="flex items-center space-x-3 text-xs font-mono text-slate-500 dark:text-slate-400">
               <span>Showing <strong class="text-blue-600 dark:text-cyan-400">{{ filteredPapers.length }}</strong> of {{ papers.length }} Studies</span>
+              
+              <button 
+                type="button"
+                @click="showTaxonomyFilters = !showTaxonomyFilters"
+                class="px-2 py-1 rounded text-[11px] border transition-colors flex items-center gap-1 font-mono"
+                :class="[
+                  showTaxonomyFilters || selectedTagSlug
+                    ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-cyan-400 border-blue-200 dark:border-blue-800/60 font-semibold'
+                    : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900'
+                ]"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                </svg>
+                <span>{{ showTaxonomyFilters ? 'Hide Topics' : 'Filter by Topic' }}</span>
+                <span v-if="selectedTagSlug" class="ml-0.5 px-1.5 py-0.25 bg-blue-600 dark:bg-cyan-500 text-white dark:text-slate-950 rounded-full text-[9px] font-bold">1</span>
+              </button>
+
               <button 
                 v-if="selectedTagSlug || searchQuery"
                 @click="selectedTagSlug = null; searchQuery = '';"
@@ -916,7 +936,7 @@ onUnmounted(() => {
           </div>
 
           <!-- Tag Chips -->
-          <div v-if="allTags.length" class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-800/80">
+          <div v-if="allTags.length && showTaxonomyFilters" class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-800/80">
             <span class="text-xs font-mono text-slate-500 dark:text-slate-400 mr-1">Taxonomy Filter:</span>
             <button
               @click="selectedTagSlug = null"
