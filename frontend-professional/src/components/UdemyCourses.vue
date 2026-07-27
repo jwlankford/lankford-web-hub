@@ -261,13 +261,7 @@ const courses = ref<Course[]>([
 const featuredCourse = computed(() => courses.value[0]);
 const upcomingCourses = computed(() => courses.value.slice(1));
 
-const totalStudents = computed(() => {
-  return courses.value.reduce((acc, c) => acc + c.studentsCount, 0);
-});
 
-const totalReviews = computed(() => {
-  return courses.value.reduce((acc, c) => acc + c.reviewsCount, 0);
-});
 
 function toggleSyllabus(courseId: number) {
   if (activeCourseId.value === courseId) {

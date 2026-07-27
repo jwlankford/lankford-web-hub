@@ -1,9 +1,11 @@
 import type { SignupInput, ResearchPaper, NewResearchPaperInput, Article, NewArticleInput, GoogleNotebook, NewGoogleNotebookInput, JupyterNotebook, NewJupyterNotebookInput } from '../types';
 
-const API_BOOK_BASE = 'http://localhost:8000/api/v1/book';
-const API_RESEARCH_BASE = 'http://localhost:8000/api/v1/research';
-const API_ARTICLE_BASE = 'http://localhost:8000/api/v1/articles';
-const API_NOTEBOOKS_BASE = 'http://localhost:8000/api/v1/notebooks';
+const API_HOST = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BOOK_BASE = `${API_HOST}/api/v1/book`;
+const API_RESEARCH_BASE = `${API_HOST}/api/v1/research`;
+const API_ARTICLE_BASE = `${API_HOST}/api/v1/articles`;
+const API_NOTEBOOKS_BASE = `${API_HOST}/api/v1/notebooks`;
+
 
 
 export const INITIAL_PAPERS: ResearchPaper[] = [
