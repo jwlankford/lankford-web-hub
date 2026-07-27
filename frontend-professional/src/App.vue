@@ -49,7 +49,6 @@ const technologies = [
   { name: 'Node.js', icon: 'https://cdn.simpleicons.org/nodedotjs/339933' },
   { name: 'PostgreSQL', icon: 'https://cdn.simpleicons.org/postgresql/4169E1' },
   { name: 'Docker', icon: 'https://cdn.simpleicons.org/docker/2496ED' },
-  { name: 'Kubernetes', icon: 'https://cdn.simpleicons.org/kubernetes/326CE5' },
   { name: 'Tailwind CSS', icon: 'https://cdn.simpleicons.org/tailwindcss/06B6D4' },
   { name: 'Git', icon: 'https://cdn.simpleicons.org/git/F05032' }
 ];
