@@ -273,6 +273,12 @@ onUnmounted(() => {
         
         <!-- High-Tech Brand & Header Title -->
         <div class="flex items-center space-x-3 group cursor-pointer" @click="activeTab = 'courses'">
+          <!-- Brand Logo -->
+          <img 
+            src="/logo.png" 
+            alt="Jeremy Lankford Logo" 
+            class="h-10 w-10 object-contain rounded-lg transition-transform group-hover:scale-105"
+          />
           <!-- Brand Typography -->
           <div>
             <div class="flex items-center space-x-2">
