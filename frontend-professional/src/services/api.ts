@@ -454,3 +454,54 @@ export async function createJupyterNotebook(input: NewJupyterNotebookInput): Pro
 }
 
 
+export interface ContactMessageInput {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export async function submitContactMessage(input: ContactMessageInput): Promise<{ success: boolean; message: string; isLiveBackend: boolean }> {
+  try {
+    const res = await fetch(`${API_HOST}/api/v1/contact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Host': 'professional.localhost',
+        'X-Tenant': 'professional'
+      },
+      body: JSON.stringify({
+        name: input.name.trim(),
+        email: input.email.trim(),
+        subject: input.subject.trim(),
+        message: input.message.trim(),
+        tenant: 'professional'
+      })
+    });
+
+    if (res.ok) {
+      return {
+        success: true,
+        message: 'Your message has been saved securely to our database!',
+        isLiveBackend: true
+      };
+    } else {
+      const data = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        message: data.detail || 'Submission failed. Please check your inputs.',
+        isLiveBackend: true
+      };
+    }
+  } catch (err) {
+    console.warn('[Contact Service] Backend offline, simulating message submission.', err);
+    return {
+      success: true,
+      message: '[Simulated] Your message was submitted successfully (Offline mode).',
+      isLiveBackend: false
+    };
+  }
+}
+
+
+

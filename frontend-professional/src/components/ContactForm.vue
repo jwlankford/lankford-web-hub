@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { submitContactMessage } from '../services/api';
 
 const name = ref('');
 const email = ref('');
@@ -10,7 +11,7 @@ const isSubmitting = ref(false);
 const isSuccess = ref(false);
 const errorMessage = ref('');
 
-function handleSubmit() {
+async function handleSubmit() {
   if (!name.value || !email.value || !message.value) {
     errorMessage.value = 'Please fill out all required fields.';
     return;
@@ -19,22 +20,34 @@ function handleSubmit() {
   isSubmitting.value = true;
   errorMessage.value = '';
   
-  // Simulate API post submission
-  setTimeout(() => {
+  try {
+    const res = await submitContactMessage({
+      name: name.value,
+      email: email.value,
+      subject: subject.value,
+      message: message.value
+    });
+    
+    if (res.success) {
+      isSuccess.value = true;
+      // Reset form fields
+      name.value = '';
+      email.value = '';
+      subject.value = 'General Inquiry';
+      message.value = '';
+      
+      // Auto clear success banner after 6 seconds
+      setTimeout(() => {
+        isSuccess.value = false;
+      }, 6000);
+    } else {
+      errorMessage.value = res.message;
+    }
+  } catch (err: any) {
+    errorMessage.value = err.message || 'An error occurred while sending your message.';
+  } finally {
     isSubmitting.value = false;
-    isSuccess.value = true;
-    
-    // Reset form fields
-    name.value = '';
-    email.value = '';
-    subject.value = 'General Inquiry';
-    message.value = '';
-    
-    // Auto clear success banner after 6 seconds
-    setTimeout(() => {
-      isSuccess.value = false;
-    }, 6000);
-  }, 1200);
+  }
 }
 </script>
 

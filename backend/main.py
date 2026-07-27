@@ -15,7 +15,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from database import init_db, get_async_session
 from sqlalchemy.orm import selectinload
 # Import our new data models alongside the tenant helpers
-from models import TenantDomain, BookMailingList, ResearchPaper, ResearchTag, ResearchPaperRead, Article, GoogleNotebook, JupyterNotebook
+from models import TenantDomain, BookMailingList, ResearchPaper, ResearchTag, ResearchPaperRead, Article, GoogleNotebook, JupyterNotebook, ContactMessage
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -99,6 +99,35 @@ async def add_to_mailing_list(
     except Exception:
         await db.rollback()
         raise HTTPException(status_code=400, detail="This email is already registered.")
+
+
+@app.post("/api/v1/contact", status_code=status.HTTP_201_CREATED)
+async def submit_contact_message(
+    message: ContactMessage,
+    request: Request,
+    db: AsyncSession = Depends(get_async_session)
+):
+    """
+    Saves a contact form message submission, binding it to the active tenant context.
+    """
+    if request.state.tenant not in ["professional", "academic"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Contact message submission requires a valid tenant domain context."
+        )
+        
+    message.tenant = request.state.tenant
+    try:
+        db.add(message)
+        await db.commit()
+        await db.refresh(message)
+        return {"status": "success", "id": message.id}
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database submission failed: {str(e)}"
+        )
 
 
 # ==========================================

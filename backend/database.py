@@ -59,7 +59,7 @@ async def init_db() -> None:
         
         # Migrate existing academic tenant rows to professional tenant context
         from sqlalchemy import text
-        for table in ["book_mailing_list", "research_papers", "research_tags", "articles", "google_notebooks", "jupyter_notebooks"]:
+        for table in ["book_mailing_list", "research_papers", "research_tags", "articles", "google_notebooks", "jupyter_notebooks", "contact_messages"]:
             await conn.execute(text(f"UPDATE {table} SET tenant = 'professional' WHERE tenant = 'academic'"))
 
     # Seed initial academic research papers if table is empty

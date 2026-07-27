@@ -170,4 +170,20 @@ class JupyterNotebook(TenantBase, table=True):
     notebook_url: str = Field(nullable=False) # URL to the notebook online (GitHub/Colab)
     tags: Optional[str] = Field(default=None, nullable=True) # Comma-separated tags
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+
+
+class ContactMessage(TenantBase, table=True):
+    """
+    Stores contact form submissions securely.
+    Supports multi-tenant context.
+    """
+    __tablename__ = "contact_messages"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(nullable=False)
+    email: str = Field(nullable=False)
+    subject: str = Field(nullable=False)
+    message: str = Field(nullable=False)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 
