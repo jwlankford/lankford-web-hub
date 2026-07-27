@@ -4,3 +4,5 @@ sqlmodel>=0.0.16
 asyncpg>=0.29.0
 aiosqlite>=0.20.0
 pydantic-settings>=2.2.1
+requests>=2.32.0
+python-dotenv>=1.0.0
