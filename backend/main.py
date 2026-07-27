@@ -13,8 +13,9 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from database import init_db, get_async_session
+from sqlalchemy.orm import selectinload
 # Import our new data models alongside the tenant helpers
-from models import TenantDomain, BookMailingList, ResearchPaper, ResearchTag, Article, GoogleNotebook, JupyterNotebook
+from models import TenantDomain, BookMailingList, ResearchPaper, ResearchTag, ResearchPaperRead, Article, GoogleNotebook, JupyterNotebook
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,6 +32,11 @@ origins = [
     "http://localhost:5174",          # Vite dev port 2
     "http://professional.localhost",
     "http://academic.localhost",
+    "https://jeremylankford.com",
+    "https://www.jeremylankford.com",
+    "https://jwlankford.com",
+    "https://www.jwlankford.com",
+    "https://jwlankford.github.io",
 ]
 
 app.add_middleware(
@@ -99,7 +105,7 @@ async def add_to_mailing_list(
 # ACADEMIC DOMAIN ROUTES (Research Index)
 # ==========================================
 
-@app.get("/api/v1/research/papers", response_model=list[ResearchPaper])
+@app.get("/api/v1/research/papers", response_model=list[ResearchPaperRead])
 async def get_research_papers(
     request: Request,
     db: AsyncSession = Depends(get_async_session)
@@ -114,7 +120,11 @@ async def get_research_papers(
         )
         
     # Enforce row-level multi-tenancy inside the query select statement
-    statement = select(ResearchPaper).where(ResearchPaper.tenant == request.state.tenant)
+    statement = (
+        select(ResearchPaper)
+        .where(ResearchPaper.tenant == request.state.tenant)
+        .options(selectinload(ResearchPaper.tags))
+    )
     results = await db.execute(statement)
     return results.scalars().all()
 

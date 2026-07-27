@@ -1,9 +1,11 @@
 import type { SignupInput, ResearchPaper, NewResearchPaperInput, Article, NewArticleInput, GoogleNotebook, NewGoogleNotebookInput, JupyterNotebook, NewJupyterNotebookInput } from '../types';
 
-const API_BOOK_BASE = 'http://localhost:8000/api/v1/book';
-const API_RESEARCH_BASE = 'http://localhost:8000/api/v1/research';
-const API_ARTICLE_BASE = 'http://localhost:8000/api/v1/articles';
-const API_NOTEBOOKS_BASE = 'http://localhost:8000/api/v1/notebooks';
+const API_HOST = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BOOK_BASE = `${API_HOST}/api/v1/book`;
+const API_RESEARCH_BASE = `${API_HOST}/api/v1/research`;
+const API_ARTICLE_BASE = `${API_HOST}/api/v1/articles`;
+const API_NOTEBOOKS_BASE = `${API_HOST}/api/v1/notebooks`;
+
 
 
 export const INITIAL_PAPERS: ResearchPaper[] = [
@@ -19,7 +21,7 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
     zotero_key: 'LANKFORD_2026_LLM_ADLC',
     url: 'https://ieeexplore.ieee.org/abstract/document/11390990',
     created_at: new Date('2026-07-27').toISOString(),
-    tenant: 'academic',
+    tenant: 'professional',
     tags: [
         { id: 101, name: 'Automation', slug: 'automation' },
         { id: 102, name: 'Large language models', slug: 'large-language-models' },
@@ -44,7 +46,7 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
     zotero_key: 'ALDC_2026_Generative_SDLC',
     url: 'https://www.ijsrtjournal.com/article/the-generative-sdlc-a-systematic-review-of-integrating-modern-llms-in-software-development-life-cycle#',
     created_at: new Date('2026-07-27').toISOString(),
-    tenant: 'academic',
+    tenant: 'professional',
     tags: [
         { id: 113, name: 'Artificial Intelligence', slug: 'artificial-intelligence' },
         { id: 114, name: 'Large Language Models', slug: 'large-language-models' },
@@ -69,7 +71,7 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
     zotero_key: 'Periyasamy2026',
     url: 'https://www.atlantis-press.com/proceedings/icaisda-25/126022738',
     created_at: new Date('2026-07-27').toISOString(),
-    tenant: 'academic',
+    tenant: 'professional',
     tags: [
         { id: 122, name: 'Software Development Life Cycle (SDLC)', slug: 'sdlc' },
         { id: 123, name: 'Generative AI', slug: 'generative-ai' },
@@ -91,7 +93,7 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
     zotero_key: 'Li2025',
     url: 'https://dl.acm.org/doi/abs/10.1145/3696630.3728721',
     created_at: new Date('2026-07-27').toISOString(),
-    tenant: 'academic',
+    tenant: 'professional',
     tags: [
         { id: 128, name: 'Integrated Development Environments', slug: 'ide' },
         { id: 129, name: 'LLM-based Mediator Agents', slug: 'mediator-agents' },
@@ -112,7 +114,7 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
     zotero_key: 'IEEE_XPLORE_11499962',
     url: 'https://ieeexplore.ieee.org/abstract/document/11499962',
     created_at: new Date('2026-07-27').toISOString(),
-    tenant: 'academic',
+    tenant: 'professional',
     tags: [
         { id: 131, name: 'Software Development', slug: 'software-development' },
         { id: 125, name: 'Large Language Models (LLMs)', slug: 'llms' },
@@ -185,8 +187,8 @@ export async function checkAcademicBackendHealth(): Promise<boolean> {
     const res = await fetch(`${API_RESEARCH_BASE}/papers`, {
       method: 'GET',
       headers: {
-        'Host': 'academic.localhost',
-        'X-Tenant': 'academic'
+        'Host': 'professional.localhost',
+        'X-Tenant': 'professional'
       }
     });
     return res.ok;
@@ -199,8 +201,8 @@ export async function fetchResearchPapers(): Promise<{ papers: ResearchPaper[]; 
   try {
     const res = await fetch(`${API_RESEARCH_BASE}/papers`, {
       headers: {
-        'Host': 'academic.localhost',
-        'X-Tenant': 'academic'
+        'Host': 'professional.localhost',
+        'X-Tenant': 'professional'
       }
     });
     if (res.ok) {
@@ -219,8 +221,8 @@ export async function createResearchPaper(input: NewResearchPaperInput): Promise
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Host': 'academic.localhost',
-        'X-Tenant': 'academic'
+        'Host': 'professional.localhost',
+        'X-Tenant': 'professional'
       },
       body: JSON.stringify(input)
     });
@@ -232,7 +234,7 @@ export async function createResearchPaper(input: NewResearchPaperInput): Promise
       ...input,
       id: Date.now(),
       created_at: new Date().toISOString(),
-      tenant: 'academic'
+      tenant: 'professional'
     };
     return { paper: mockPaper, isLiveBackend: false };
   } catch {
@@ -240,7 +242,7 @@ export async function createResearchPaper(input: NewResearchPaperInput): Promise
       ...input,
       id: Date.now(),
       created_at: new Date().toISOString(),
-      tenant: 'academic'
+      tenant: 'professional'
     };
     return { paper: mockPaper, isLiveBackend: false };
   }
