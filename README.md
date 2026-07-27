@@ -69,10 +69,12 @@ A **Vue 3 + TypeScript + Vite** Single Page Application (SPA) designed to build 
 
 ---
 
-## Tech Stack
-*   **Backend:** Python 3, FastAPI, SQLModel, PostgreSQL / SQLite
-*   **Frontend:** Vue 3 (Composition API), Vite, TypeScript, CSS 
-*   **Infrastructure:** Docker, Docker Compose, GitHub Actions (Pages deployment)
+## Tech Stack & Infrastructure
+*   **Backend Hosting:** Render.com (FastAPI application server)
+*   **Frontend Hosting:** GitHub Pages (Static hosting for Vue SPA)
+*   **Database:** Neon (Serverless PostgreSQL in production) / SQLite (for local development fallback)
+*   **Core Languages & Frameworks:** Python 3, FastAPI, SQLModel, Vue 3, Vite, TypeScript
+*   **Tooling & Containers:** Docker, Docker Compose, GitHub Actions (CI/CD build-and-deploy workflow)
 
 ---
 
