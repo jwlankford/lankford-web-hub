@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = "lankford_hub_dev"
     POSTGRES_HOST: str = "127.0.0.1"
     POSTGRES_PORT: int = 5432
+    
+    # Gemini API configuration
+    GEMINI_API_KEY: str | None = None
 
     @property
     def ASYNC_DATABASE_URL(self) -> str:

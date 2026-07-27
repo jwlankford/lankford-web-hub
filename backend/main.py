@@ -1,5 +1,9 @@
 import os
 import sys
+from dotenv import load_dotenv
+
+# Load environment variables before setting up app config
+load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
 # Dynamic root patching for Python 3.14 worker threads
 backend_root = os.path.dirname(os.path.abspath(__file__))
@@ -19,6 +23,7 @@ from bs4 import BeautifulSoup
 import google.generativeai as genai
 
 from database import init_db, get_async_session
+from config import settings
 from sqlalchemy.orm import selectinload
 # Import our new data models alongside the tenant helpers
 from models import TenantDomain, BookMailingList, ResearchPaper, ResearchTag, ResearchPaperRead, Article, GoogleNotebook, JupyterNotebook, ContactMessage
@@ -218,9 +223,9 @@ async def auto_extract_paper_metadata(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to parse article content: {str(e)}")
         
-    gemini_key = os.environ.get("GEMINI_API_KEY")
+    gemini_key = settings.GEMINI_API_KEY or os.environ.get("GEMINI_API_KEY")
     if not gemini_key:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not configured on the server.")
+        raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not configured on the server. Please add it to your local backend/.env file.")
         
     try:
         genai.configure(api_key=gemini_key)
