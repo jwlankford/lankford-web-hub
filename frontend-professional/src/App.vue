@@ -73,12 +73,12 @@ const githubRepos = [
     stars: 42
   },
   {
-    name: 'distributed-state-isolation',
-    description: 'High-concurrency tenant simulation sandbox utilizing Rust-based row-level isolation patterns.',
-    url: 'https://github.com/jwlankford/distributed-state-isolation',
-    language: 'Rust',
-    languageColor: 'bg-orange-500',
-    stars: 87
+    name: 'crown-clothing',
+    description: 'Enterprise-grade e-commerce clothing application featuring React, Redux state management, Firebase authentication, and Stripe payment integration.',
+    url: 'https://github.com/jwlankford/crown-clothing',
+    language: 'React',
+    languageColor: 'bg-cyan-500',
+    stars: 34
   },
   {
     name: 'typescript-ast-metaprogramming',
