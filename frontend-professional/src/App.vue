@@ -706,7 +706,7 @@ onUnmounted(() => {
           <div v-else-if="googleNotebooks.length === 0" class="py-8 text-center text-slate-400 text-xs font-mono">
             No public Google Notebooks found.
           </div>
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <GoogleNotebookCard 
               v-for="notebook in googleNotebooks" 
               :key="notebook.id" 
