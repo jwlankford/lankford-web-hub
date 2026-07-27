@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import type { ResearchPaper } from '../types';
 
 defineProps<{
@@ -9,6 +10,17 @@ const emit = defineEmits<{
   (e: 'close'): void;
   (e: 'filterTag', tagSlug: string): void;
 }>();
+
+const isCopied = ref(false);
+
+function copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text).then(() => {
+    isCopied.value = true;
+    setTimeout(() => {
+      isCopied.value = false;
+    }, 2000);
+  });
+}
 </script>
 
 <template>
@@ -47,19 +59,6 @@ const emit = defineEmits<{
             </h2>
           </div>
           <div class="flex items-center space-x-2 ml-4 flex-shrink-0 mt-1 sm:mt-0">
-            <a 
-              v-if="paper.url"
-              :href="paper.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center space-x-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
-              title="View Article"
-            >
-              <span>View</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-              </svg>
-            </a>
             <button 
               @click="emit('close')"
               class="text-slate-400 hover:text-slate-700 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 p-2 rounded-full transition-colors"
@@ -81,9 +80,22 @@ const emit = defineEmits<{
             </div>
             <div v-if="paper.zotero_key" class="pt-2 border-t border-slate-200 dark:border-slate-700/40 flex items-center justify-between">
               <span class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">Zotero Reference Key</span>
-              <span class="text-xs font-mono bg-slate-100 dark:bg-slate-900 px-2.5 py-1 rounded text-blue-800 dark:text-cyan-400 border border-blue-300 dark:border-blue-500/20">
-                {{ paper.zotero_key }}
-              </span>
+              <div class="flex items-center space-x-1.5 bg-slate-100/50 dark:bg-slate-900/60 px-2.5 py-1 rounded border border-slate-200/60 dark:border-slate-800/60 font-mono text-xs text-blue-800 dark:text-cyan-400">
+                <span>{{ paper.zotero_key }}</span>
+                <button 
+                  type="button"
+                  @click.stop="copyToClipboard(paper.zotero_key)"
+                  class="text-slate-400 hover:text-blue-600 dark:hover:text-cyan-400 p-0.5 rounded transition-colors flex items-center justify-center cursor-pointer ml-1.5"
+                  title="Copy Zotero Key"
+                >
+                  <svg v-if="!isCopied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                  </svg>
+                  <svg v-else class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </button>
+              </div>
             </div>
             <div v-if="paper.url" class="pt-2 border-t border-slate-200 dark:border-slate-700/40 flex items-center justify-between">
               <span class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono">Article Link</span>
