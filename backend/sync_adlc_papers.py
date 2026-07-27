@@ -93,7 +93,7 @@ async def sync_one_paper():
                 publication_year=pub_year,
                 abstract=paper['summary'],
                 url=url,
-                tenant="academic", # Always academic context for research papers
+                tenant="professional", # Always professional context for unified portal
                 journal_or_conf="arXiv Preprint"
             )
             
