@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import type { NewResearchPaperInput } from '../types';
+import { autoExtractPaper } from '../services/api';
 
 defineProps<{
   isOpen: boolean;
@@ -22,6 +23,35 @@ const zotero_key = ref('');
 const url = ref('');
 
 const isSubmitting = ref(false);
+const isExtracting = ref(false);
+const extractionError = ref('');
+const tags = ref<string[]>([]);
+
+async function handleAutoExtract() {
+  if (!url.value.trim()) {
+    extractionError.value = 'Please enter a URL first.';
+    return;
+  }
+  
+  isExtracting.value = true;
+  extractionError.value = '';
+  try {
+    const data = await autoExtractPaper(url.value.trim());
+    title.value = data.title;
+    authors.value = data.authors;
+    publication_year.value = data.publication_year;
+    journal_or_conf.value = data.journal_or_conf || '';
+    abstract.value = data.abstract || '';
+    key_findings.value = data.key_findings || '';
+    methodology.value = data.methodology || '';
+    zotero_key.value = data.zotero_key || '';
+    tags.value = data.tags || [];
+  } catch (err: any) {
+    extractionError.value = err.message || 'Auto-extraction failed. Please verify the URL or enter details manually.';
+  } finally {
+    isExtracting.value = false;
+  }
+}
 
 function handleSubmit() {
   if (!title.value.trim() || !authors.value.trim()) return;
@@ -36,7 +66,8 @@ function handleSubmit() {
     key_findings: key_findings.value.trim() || undefined,
     methodology: methodology.value.trim() || undefined,
     zotero_key: zotero_key.value.trim() || undefined,
-    url: url.value.trim() || undefined
+    url: url.value.trim() || undefined,
+    tags: tags.value.length ? tags.value : undefined
   });
 
   // Reset form
@@ -47,6 +78,7 @@ function handleSubmit() {
   journal_or_conf.value = '';
   zotero_key.value = '';
   url.value = '';
+  tags.value = [];
   isSubmitting.value = false;
 }
 </script>
@@ -79,6 +111,38 @@ function handleSubmit() {
         </div>
 
         <form @submit.prevent="handleSubmit" class="space-y-4 text-sm max-h-[70vh] overflow-y-auto pr-1">
+          <!-- Auto-Fill Section -->
+          <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 space-y-3 mb-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono font-bold">Auto-Fill from URL</span>
+              <span class="text-[10px] text-blue-650 dark:text-cyan-400 font-mono font-semibold">Gemini Extraction</span>
+            </div>
+            <div class="flex space-x-2">
+              <input 
+                v-model="url"
+                type="url"
+                placeholder="Paste article URL (ArXiv, LinkedIn, PDF, blog...)"
+                class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 text-xs"
+              />
+              <button
+                type="button"
+                @click="handleAutoExtract"
+                :disabled="isExtracting"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold shadow-sm transition-colors text-xs flex items-center justify-center min-w-[120px] disabled:bg-blue-600/60 cursor-pointer"
+              >
+                <svg v-if="isExtracting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span v-if="isExtracting">Analyzing...</span>
+                <span v-else>Auto-Fill Form</span>
+              </button>
+            </div>
+            <p v-if="extractionError" class="text-xs text-red-500 dark:text-red-400 font-medium font-sans">
+              {{ extractionError }}
+            </p>
+          </div>
+
           <!-- Title -->
           <div>
             <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Paper Title *</label>
@@ -179,6 +243,28 @@ function handleSubmit() {
                 placeholder="e.g. Empirical Benchmark & Load Simulation"
                 class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
               ></textarea>
+            </div>
+          </div>
+
+          <!-- Tags Display -->
+          <div v-if="tags.length" class="space-y-1.5">
+            <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Generated Tags ({{ tags.length }})</label>
+            <div class="flex flex-wrap gap-1.5 p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg">
+              <span 
+                v-for="(tag, idx) in tags" 
+                :key="idx"
+                class="text-[10px] px-2.5 py-1 rounded bg-slate-250 dark:bg-slate-800 text-slate-750 dark:text-slate-300 flex items-center space-x-1.5 border border-slate-300 dark:border-slate-700"
+              >
+                <span>{{ tag }}</span>
+                <button 
+                  type="button" 
+                  @click="tags.splice(idx, 1)"
+                  class="text-slate-400 hover:text-red-500 font-bold transition-colors cursor-pointer text-xs leading-none"
+                  title="Remove tag"
+                >
+                  &times;
+                </button>
+              </span>
             </div>
           </div>
 

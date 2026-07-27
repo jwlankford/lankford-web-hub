@@ -37,6 +37,7 @@ export interface NewResearchPaperInput {
   zotero_key?: string;
   url?: string;
   image_url?: string;
+  tags?: string[];
 }
 
 export interface Article {

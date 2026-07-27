@@ -216,6 +216,35 @@ export async function fetchResearchPapers(): Promise<{ papers: ResearchPaper[]; 
   }
 }
 
+export interface AutoExtractResponse {
+  title: string;
+  authors: string;
+  publication_year: number;
+  journal_or_conf?: string;
+  abstract?: string;
+  key_findings?: string;
+  methodology?: string;
+  zotero_key: string;
+  tags: string[];
+}
+
+export async function autoExtractPaper(url: string): Promise<AutoExtractResponse> {
+  const res = await fetch(`${API_RESEARCH_BASE}/auto-extract`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Host': 'professional.localhost',
+      'X-Tenant': 'professional'
+    },
+    body: JSON.stringify({ url })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to extract paper data' }));
+    throw new Error(err.detail || 'Failed to extract paper data');
+  }
+  return res.json();
+}
+
 export async function createResearchPaper(input: NewResearchPaperInput): Promise<{ paper: ResearchPaper; isLiveBackend: boolean }> {
   try {
     const res = await fetch(`${API_RESEARCH_BASE}/papers`, {
@@ -235,7 +264,8 @@ export async function createResearchPaper(input: NewResearchPaperInput): Promise
       ...input,
       id: Date.now(),
       created_at: new Date().toISOString(),
-      tenant: 'professional'
+      tenant: 'professional',
+      tags: input.tags ? input.tags.map(t => ({ name: t, slug: t.toLowerCase().replace(/ /g, '-') })) : undefined
     };
     return { paper: mockPaper, isLiveBackend: false };
   } catch {
@@ -243,7 +273,8 @@ export async function createResearchPaper(input: NewResearchPaperInput): Promise
       ...input,
       id: Date.now(),
       created_at: new Date().toISOString(),
-      tenant: 'professional'
+      tenant: 'professional',
+      tags: input.tags ? input.tags.map(t => ({ name: t, slug: t.toLowerCase().replace(/ /g, '-') })) : undefined
     };
     return { paper: mockPaper, isLiveBackend: false };
   }
