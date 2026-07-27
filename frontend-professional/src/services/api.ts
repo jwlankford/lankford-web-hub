@@ -1,5 +1,6 @@
 import type { SignupInput, ResearchPaper, NewResearchPaperInput, Article, NewArticleInput, GoogleNotebook, NewGoogleNotebookInput, JupyterNotebook, NewJupyterNotebookInput } from '../types';
 
+// Active production API host config
 const API_HOST = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const API_BOOK_BASE = `${API_HOST}/api/v1/book`;
 const API_RESEARCH_BASE = `${API_HOST}/api/v1/research`;
