@@ -353,10 +353,18 @@ async def add_research_paper(
                 db.add(db_tag)
                 await db.flush() # Populate db_tag.id
                 
-            # Add link to join table directly to avoid async lazy loading problems
+            # Add link to join table directly if it doesn't already exist
             from models import ResearchPaperTagLink
-            link = ResearchPaperTagLink(paper_id=paper.id, tag_id=db_tag.id)
-            db.add(link)
+            link_stmt = select(ResearchPaperTagLink).where(
+                ResearchPaperTagLink.paper_id == paper.id,
+                ResearchPaperTagLink.tag_id == db_tag.id
+            )
+            link_res = await db.execute(link_stmt)
+            db_link = link_res.scalars().first()
+            
+            if not db_link:
+                link = ResearchPaperTagLink(paper_id=paper.id, tag_id=db_tag.id)
+                db.add(link)
             
     await db.commit()
     await db.refresh(paper)

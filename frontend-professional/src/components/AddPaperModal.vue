@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import type { NewResearchPaperInput } from '../types';
 import { autoExtractPaper } from '../services/api';
+import RichTextEditor from './RichTextEditor.vue';
 
 defineProps<{
   isOpen: boolean;
@@ -25,7 +26,7 @@ const url = ref('');
 const isSubmitting = ref(false);
 const isExtracting = ref(false);
 const extractionError = ref('');
-const tags = ref<string[]>([]);
+const tagsString = ref('');
 
 async function handleAutoExtract() {
   if (!url.value.trim()) {
@@ -45,7 +46,7 @@ async function handleAutoExtract() {
     key_findings.value = data.key_findings || '';
     methodology.value = data.methodology || '';
     zotero_key.value = data.zotero_key || '';
-    tags.value = data.tags || [];
+    tagsString.value = data.tags ? data.tags.map(t => `#${t.replace(/\s+/g, '')}`).join(' ') : '';
   } catch (err: any) {
     extractionError.value = err.message || 'Auto-extraction failed. Please verify the URL or enter details manually.';
   } finally {
@@ -55,6 +56,11 @@ async function handleAutoExtract() {
 
 function handleSubmit() {
   if (!title.value.trim() || !authors.value.trim()) return;
+
+  const parsedTags = tagsString.value
+    .split('#')
+    .map(t => t.trim())
+    .filter(Boolean);
 
   isSubmitting.value = true;
   emit('submit', {
@@ -67,7 +73,7 @@ function handleSubmit() {
     methodology: methodology.value.trim() || undefined,
     zotero_key: zotero_key.value.trim() || undefined,
     url: url.value.trim() || undefined,
-    tags: tags.value.length ? tags.value : undefined
+    tags: parsedTags.length ? parsedTags : undefined
   });
 
   // Reset form
@@ -78,7 +84,7 @@ function handleSubmit() {
   journal_or_conf.value = '';
   zotero_key.value = '';
   url.value = '';
-  tags.value = [];
+  tagsString.value = '';
   isSubmitting.value = false;
 }
 </script>
@@ -213,59 +219,42 @@ function handleSubmit() {
             />
           </div>
 
-          <!-- Abstract -->
+          <!-- Abstract Summary (Rich Text) -->
           <div>
             <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Abstract Summary</label>
-            <textarea 
+            <RichTextEditor 
               v-model="abstract"
-              rows="3"
               placeholder="Summary of research problem, methodology, and primary conclusions..."
-              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
-            ></textarea>
+            />
           </div>
 
-          <!-- Key Findings & Methodology -->
+          <!-- Key Findings & Methodology (Rich Text) -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Key Empirical Findings</label>
-              <textarea 
+              <RichTextEditor 
                 v-model="key_findings"
-                rows="2"
                 placeholder="e.g. Reduced execution branching error by 98.4%"
-                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
-              ></textarea>
+              />
             </div>
             <div>
               <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Methodology</label>
-              <textarea 
+              <RichTextEditor 
                 v-model="methodology"
-                rows="2"
                 placeholder="e.g. Empirical Benchmark & Load Simulation"
-                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
-              ></textarea>
+              />
             </div>
           </div>
 
-          <!-- Tags Display -->
-          <div v-if="tags.length" class="space-y-1.5">
-            <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Generated Tags ({{ tags.length }})</label>
-            <div class="flex flex-wrap gap-1.5 p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg">
-              <span 
-                v-for="(tag, idx) in tags" 
-                :key="idx"
-                class="text-[10px] px-2.5 py-1 rounded bg-slate-250 dark:bg-slate-800 text-slate-750 dark:text-slate-300 flex items-center space-x-1.5 border border-slate-300 dark:border-slate-700"
-              >
-                <span>{{ tag }}</span>
-                <button 
-                  type="button" 
-                  @click="tags.splice(idx, 1)"
-                  class="text-slate-400 hover:text-red-500 font-bold transition-colors cursor-pointer text-xs leading-none"
-                  title="Remove tag"
-                >
-                  &times;
-                </button>
-              </span>
-            </div>
+          <!-- TAGS Input (Hashtag formatted string) -->
+          <div>
+            <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">TAGS (Hashtag format)</label>
+            <input 
+              v-model="tagsString"
+              type="text"
+              placeholder="e.g. #AI #SoftwareEngineering #Automation"
+              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono text-xs"
+            />
           </div>
 
           <!-- Submit Controls -->
