@@ -79,7 +79,7 @@ def generate_metadata_via_gemini(title, abstract, api_key):
         prompt = f"""
 You are an expert academic research assistant specializing in Computer Science, Software Engineering, and AI Agents.
 Analyze the following research paper title and abstract. Extract:
-1. A list of 3 to 5 highly relevant taxonomy tags/keywords. Keep them concise (1-3 words each).
+1. A list of exactly 8 to 12 highly relevant, specific taxonomy tags/keywords. Keep them concise (1-3 words each) and ensure they cover both specific technologies/approaches and general domains.
 2. The key findings of the paper (1-2 sentences).
 3. The methodology used in the paper (1-2 sentences).
 
@@ -88,7 +88,7 @@ Abstract: {abstract}
 
 Provide the output strictly in the following JSON format:
 {{
-  "tags": ["tag1", "tag2", "tag3"],
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10"],
   "key_findings": "description of key findings",
   "methodology": "description of methodology"
 }}
@@ -115,11 +115,8 @@ def fetch_google_scholar_papers(query, max_results=5):
     """
     Fetches publications from Google Scholar using the scholarly library.
     """
-    if not HAS_SCHOLARLY:
-        print("[SCHOLAR] scholarly library not installed. Skipping Google Scholar.")
-        return []
-        
-    print(f"[SCHOLAR] Querying Google Scholar for: '{query}'")
+    print("[SCHOLAR] Direct Google Scholar scraping is bypassed to avoid CAPTCHA blocks and connection hangs. Triggering fallbacks...")
+    return []
     try:
         search_query = scholarly.search_pubs(query)
         results = []
@@ -306,16 +303,41 @@ async def sync_one_paper():
                     methodology_text = ai_data.get("methodology", methodology_text)
             else:
                 print("[AI] GEMINI_API_KEY is not set. Using fallback metadata generation.")
-                # Basic heuristic fallback tags based on keywords
-                lower_title = title.lower()
-                if "agent" in lower_title:
-                    ai_tags.append("Agentic AI")
-                if "software" in lower_title or "code" in lower_title:
-                    ai_tags.append("Software Engineering")
-                if "lifecycle" in lower_title or "sdlc" in lower_title:
-                    ai_tags.append("ADLC")
-                if not ai_tags:
-                    ai_tags = ["Academic Research", "Systems Engineering"]
+                # Rich heuristic fallback tags based on keywords to get 8 to 12 tags
+                text_to_scan = f"{title} {paper['summary']}".lower()
+                candidates = [
+                    ("agent", "Agentic AI"),
+                    ("software", "Software Engineering"),
+                    ("lifecycle", "ADLC"),
+                    ("sdlc", "SDLC"),
+                    ("security", "Security & Governance"),
+                    ("verify", "Verification & Testing"),
+                    ("debt", "Technical Debt"),
+                    ("large language", "Large Language Models"),
+                    ("llm", "LLMs"),
+                    ("copilot", "AI Coding Assistants"),
+                    ("code", "Code Generation"),
+                    ("eval", "Benchmarks & Evaluation"),
+                    ("framework", "System Architecture"),
+                    ("autonom", "Autonomous Systems")
+                ]
+                
+                for kw, tag in candidates:
+                    if kw in text_to_scan:
+                        ai_tags.append(tag)
+                        
+                # General fallback padding to guarantee between 8 and 12 tags (aiming for 10)
+                general_tags = [
+                    "AI Agents", "Software Automation", "Developer Tools", 
+                    "DevOps", "AI Safety", "Machine Learning", "System Design",
+                    "Programming Languages", "Research Index", "Computer Science"
+                ]
+                
+                for g_tag in general_tags:
+                    if len(ai_tags) >= 10:  # Aim for 10 tags
+                        break
+                    if g_tag not in ai_tags:
+                        ai_tags.append(g_tag)
             
             new_paper = models.ResearchPaper(
                 title=title,
@@ -338,8 +360,8 @@ async def sync_one_paper():
                 t_slug = t_name.lower().strip().replace(' ', '-')
                 t_slug = "".join(c for c in t_slug if (c.isalnum() or c == '-'))
                 
-                # Check if tag already exists in database
-                tag_stmt = select(models.ResearchTag).where(models.ResearchTag.name == t_name)
+                # Check if tag already exists in database by slug (since slug is unique)
+                tag_stmt = select(models.ResearchTag).where(models.ResearchTag.slug == t_slug)
                 tag_res = await session.execute(tag_stmt)
                 db_tag = tag_res.scalars().first()
                 
