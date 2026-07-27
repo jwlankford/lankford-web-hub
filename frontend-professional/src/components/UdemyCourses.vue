@@ -261,13 +261,7 @@ const courses = ref<Course[]>([
 const featuredCourse = computed(() => courses.value[0]);
 const upcomingCourses = computed(() => courses.value.slice(1));
 
-const totalStudents = computed(() => {
-  return courses.value.reduce((acc, c) => acc + c.studentsCount, 0);
-});
 
-const totalReviews = computed(() => {
-  return courses.value.reduce((acc, c) => acc + c.reviewsCount, 0);
-});
 
 function toggleSyllabus(courseId: number) {
   if (activeCourseId.value === courseId) {
@@ -301,18 +295,23 @@ function toggleSyllabus(courseId: number) {
         <div class="grid grid-cols-3 gap-4 bg-slate-50 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800/80 font-mono text-center shadow-inner">
           <div class="space-y-1">
             <div class="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-widest whitespace-nowrap">Total Students</div>
-            <div class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{{ totalStudents.toLocaleString() }}+</div>
+            <div class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">0</div>
           </div>
           <div class="space-y-1 border-l border-slate-200 dark:border-slate-800 pl-2 sm:pl-4">
             <div class="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-widest whitespace-nowrap">Reviews</div>
-            <div class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{{ totalReviews.toLocaleString() }}+</div>
+            <div class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">0</div>
           </div>
           <div class="space-y-1 border-l border-slate-200 dark:border-slate-800 pl-2 sm:pl-4">
             <div class="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-widest whitespace-nowrap">Rating</div>
-            <div class="text-xl sm:text-2xl font-black text-blue-600 dark:text-cyan-400">★ 4.9</div>
+            <div class="text-xl sm:text-2xl font-black text-blue-600 dark:text-cyan-400">★ 0.0</div>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Under Development Pill -->
+    <div class="w-full bg-yellow-400/20 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-400 font-mono text-xs sm:text-sm font-bold tracking-[0.2em] uppercase py-3 rounded-full border border-yellow-400/50 dark:border-yellow-600/50 flex text-center justify-center items-center shadow-sm">
+      Under Development
     </div>
 
     <!-- FEATURED COURSE SPOTLIGHT -->
@@ -358,14 +357,6 @@ function toggleSyllabus(courseId: number) {
 
           <!-- Stats list row -->
           <div class="pt-4 border-t border-slate-800 flex flex-wrap items-center gap-6 text-xs font-mono text-slate-400">
-            <div class="flex items-center space-x-1.5">
-              <span class="font-extrabold text-blue-400 text-sm">★ 4.9</span>
-              <span class="text-yellow-500">★★★★★</span>
-              <span>({{ featuredCourse.reviewsCount.toLocaleString() }})</span>
-            </div>
-            <span>•</span>
-            <span><strong class="text-white">{{ featuredCourse.studentsCount.toLocaleString() }}</strong> students enrolled</span>
-            <span>•</span>
             <span>{{ featuredCourse.duration }} • {{ featuredCourse.lectures }} lectures</span>
           </div>
         </div>
@@ -390,17 +381,15 @@ function toggleSyllabus(courseId: number) {
             </div>
 
             <div class="flex flex-col gap-2">
-              <a 
-                href="https://www.udemy.com/course/draft/7268013/?instructorPreviewMode=guest" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                class="w-full py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold text-center text-sm rounded-xl shadow-lg shadow-blue-600/30 border border-blue-400/35 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2"
+              <span 
+                class="w-full py-3 bg-slate-800 text-slate-400 font-bold text-center text-sm rounded-xl border border-slate-700 cursor-not-allowed flex items-center justify-center space-x-2"
+                title="Coming soon"
               >
-                <span>Buy Now (Enroll on Udemy)</span>
+                <span>Buy Now (Coming Soon)</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                 </svg>
-              </a>
+              </span>
 
               <button 
                 @click="toggleSyllabus(featuredCourse.id)"

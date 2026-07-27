@@ -1,24 +1,27 @@
 import type { SignupInput, ResearchPaper, NewResearchPaperInput, Article, NewArticleInput, GoogleNotebook, NewGoogleNotebookInput, JupyterNotebook, NewJupyterNotebookInput } from '../types';
 
-const API_BOOK_BASE = 'http://localhost:8000/api/v1/book';
-const API_RESEARCH_BASE = 'http://localhost:8000/api/v1/research';
-const API_ARTICLE_BASE = 'http://localhost:8000/api/v1/articles';
-const API_NOTEBOOKS_BASE = 'http://localhost:8000/api/v1/notebooks';
+const API_HOST = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BOOK_BASE = `${API_HOST}/api/v1/book`;
+const API_RESEARCH_BASE = `${API_HOST}/api/v1/research`;
+const API_ARTICLE_BASE = `${API_HOST}/api/v1/articles`;
+const API_NOTEBOOKS_BASE = `${API_HOST}/api/v1/notebooks`;
+
 
 
 export const INITIAL_PAPERS: ResearchPaper[] = [
   {
     id: 1,
     title: 'Towards the Integration of Large Language Models into the Software Development Life Cycle: A Systematic Literature Review',
-    authors: 'M. Madani; K. Neumann; A. Nahhas; M. Chernigovskaya; D. S. Walia and K. Turowski',
+    authors: 'Madani, M.; Neumann, K.; Nahhas, A.; Chernigovskaya, M.; Walia, D.S. and Turowski, K.',
     publication_year: 2025,
     journal_or_conf: 'IEEE Xplore',
     abstract: 'Models (LLMs) are reshaping the Software Development Life Cycle (SDLC) by introducing new levels of automation and intelligent assistance across core phases, including requirements engineering, design, testing, and maintenance. Previous works have examined the adoption of LLM in these areas, but have overlooked its influence on traditional practices in SDLC. Therefore, this paper builds upon this foundation and investigates, from a phase-level perspective, how LLMs interact with the SDLC as a whole and whether their presence necessitates rethinking of conventional methodologies. To achieve this objective, this article reviews the state of the field using a systematic literature review method. Peer-reviewed studies published between 2019 and 2025, examining the integration, benefits, and limitations of LLM within SDLC are analyzed. The findings indicate that LLMs are most commonly applied in implementation and testing, where they improve productivity through code generation, test automation, and fault localisation. However, their adoption also introduces challenges related to model hallucination, contextual misalignment, computational overhead, and ethical risks such as bias and opacity. Therefore, we synthesise several LLM integration patterns and stress various risk mitigation strategies that can be adopted to enhance the integration of LLMs into software engineering practices. The study concludes by outlining practical implications for software teams and proposing future research directions to improve LLM’s integration with agile, DevOps and CI/CD workflows.',
     key_findings: 'Implementing dual-layered schema validation reduces unhandled execution branching by 98.4% without incurring prohibitive model invocation overhead.',
     methodology: 'Empirical Benchmark & Automated Safety Verification Framework',
     zotero_key: 'LANKFORD_2026_LLM_ADLC',
+    url: 'https://ieeexplore.ieee.org/abstract/document/11390990',
     created_at: new Date('2026-07-27').toISOString(),
-    tenant: 'academic',
+    tenant: 'professional',
     tags: [
         { id: 101, name: 'Automation', slug: 'automation' },
         { id: 102, name: 'Large language models', slug: 'large-language-models' },
@@ -34,15 +37,16 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
   },
   {id: 2,
     title: 'The Generative SDLC: A Systematic Review of Integrating Modern LLMs in Software Development Life-Cycle',
-    authors: 'Mohamanlal, A.; Alaswad, Feisai; Aljaddouh, Batoul',
+    authors: 'Mohamanlal, A.; Alaswad, F.; Aljaddouh, B.',
     publication_year: 2026,
     journal_or_conf: 'IJSRT Journal',
     abstract: 'The rapid advancement of artificial intelligence (AI), machine learning (ML), deep learning (DL), and large language models (LLMs) has created transformative opportunities across every phase of the Software Development Life Cycle (SDLC). This paper presents a comprehensive review of the current state of AI integration in software engineering, examining each SDLC stage: requirements engineering, system design, implementation, testing, deployment, and maintenance. Particular emphasis is placed on modern LLMs such as GPT-4, Codex, and their derivatives, which have emerged as powerful tools capable of automating routine engineering tasks, augmenting developer productivity, and reshaping how software effort is estimated. Drawing upon a curated corpus of recent literature, the review synthesises theoretical frameworks and empirical findings, identifies persistent challenges including hallucination, context limitations, and bias, and outlines future research directions. The paper demonstrates that while LLMs offer significant potential as qualitative decision-support tools and AI pair programmers, their integration into safety-critical and large-scale production environments requires careful architectural alignment, cost-aware evaluation, and robust human oversight.',
     key_findings: 'The review concludes that LLMs significantly enhance productivity and automation across all SDLC phases, but their adoption requires careful architectural alignment, mitigation of hallucinations, cost‑aware evaluation, and strong human oversight to be viable in real-world, safety‑critical environments.',
     methodology: 'The study uses a systematic review methodology, collecting peer‑reviewed research from major digital libraries, applying inclusion/exclusion criteria, categorizing findings by SDLC phase, and synthesizing cross‑cutting themes such as productivity gains, hallucination risks, and governance concerns',
     zotero_key: 'ALDC_2026_Generative_SDLC',
+    url: 'https://www.ijsrtjournal.com/article/the-generative-sdlc-a-systematic-review-of-integrating-modern-llms-in-software-development-life-cycle#',
     created_at: new Date('2026-07-27').toISOString(),
-    tenant: 'academic',
+    tenant: 'professional',
     tags: [
         { id: 113, name: 'Artificial Intelligence', slug: 'artificial-intelligence' },
         { id: 114, name: 'Large Language Models', slug: 'large-language-models' },
@@ -53,6 +57,68 @@ export const INITIAL_PAPERS: ResearchPaper[] = [
         { id: 119, name: 'GitHub Copilot', slug: 'github-copilot' },
         { id: 120, name: 'Software Testing', slug: 'software-testing' },
         { id: 121, name: 'Requirements Engineering', slug: 'requirements-engineering' }
+    ]
+  },
+  {
+    id: 3,
+    title: 'Next-Generation Software Engineering: A Multi-Agent System for End-to-End Sdlc Automation Using Large Language Models',
+    authors: 'Periyasamy, T.; Anburaj, J.; Fyzal, K.; Jayakrishnan, B.; Prasanth, S.',
+    publication_year: 2026,
+    journal_or_conf: 'Atlantis Press / ICAISDA 2025',
+    abstract: 'Software development, a multi-phase process composed of requirements, coding, testing, and deployment that can take a lot of time, be error-prone, and consume a lot of resources to do manually. AI-assisted tools that currently exist, such as code suggestion tools, are focused on single tasks and do not provide an end-to-end automation of the Software Development Life Cycle. The purpose of the paper is to introduce an intelligent solution that will utilize Generative Artificial Intelligence (AI) and Multi-Agent Systems to automate the SDLC processes. The intelligent system will include all the phases of SDLC using specialized agents including a Requirements Agent, a Code Generation Agent, a Test Agent, and a Fixer Agent, all orchestrated by a Controller Agent that will manage all the collaborative workflows. The agents will generate context-aware outputs by leveraging Large Language Models (LLM) with a human-in-the-loop to validate their results and ensure rigorous quality control. Additionally, the approach will use adaptive learning loops to continuously improve based on test results, bug fixes, and software developer feedback. The intelligent solution represents a scalable and cost-effective approach to accelerate software delivery while maintaining low-quality and high-reliability development. The proposed solution will be a significant step towards a new paradigm of software development by leveraging AI to expand software engineering leading to a revolution in accelerating how users and organizations develop software and ultimately designers’ ability to build software applications.',
+    key_findings: 'The purpose of the paper is to introduce an intelligent solution that will utilize Generative Artificial Intelligence (AI) and Multi-Agent Systems to automate the SDLC processes.',
+    methodology: 'Multi-Agent Systems & Generative Artificial Intelligence (AI)',
+    zotero_key: 'Periyasamy2026',
+    url: 'https://www.atlantis-press.com/proceedings/icaisda-25/126022738',
+    created_at: new Date('2026-07-27').toISOString(),
+    tenant: 'professional',
+    tags: [
+        { id: 122, name: 'Software Development Life Cycle (SDLC)', slug: 'sdlc' },
+        { id: 123, name: 'Generative AI', slug: 'generative-ai' },
+        { id: 124, name: 'Multi-Agent Systems', slug: 'multi-agent-systems' },
+        { id: 125, name: 'Large Language Models (LLMs)', slug: 'llms' },
+        { id: 126, name: 'Automation', slug: 'automation' },
+        { id: 127, name: 'Human-in-the-loop', slug: 'human-in-the-loop' }
+    ]
+  },
+  {
+    id: 4,
+    title: 'Enhancing Human-IDE Interaction in the SDLC using LLM-based Mediator Agents',
+    authors: 'Li, Ziyou; Izadi, Maliheh',
+    publication_year: 2025,
+    journal_or_conf: 'ACM International Conference on the Foundations of Software Engineering',
+    abstract: 'Large Language Model (LLM)-based autonomous agents provide state-of-the-art performance in various tasks throughout the Software Development Lifecycle (SDLC). Although these agents can be integrated into Integrated Development Environments (IDEs), standalone applications impose cognitive burdens on programmers due to fragmented tool usage across the SDLC. This paper proposes a framework for a mediator agent that serves as the unified interface between the programmer, IDE tools, agentic tools, and external multi-agent systems. The framework aims to simplify interaction, reduce context switching, and automate the orchestration of the IDE tools. By aligning with proposed levels of SE automation, the mediator agent sets the stage for next-generation human-computer collaboration, enhancing productivity, and advancing software engineering automation.',
+    key_findings: 'The paper proposes a framework for a mediator agent that serves as the unified interface between the programmer, IDE tools, agentic tools, and external multi-agent systems, reducing context switching and cognitive burdens.',
+    methodology: 'Framework Proposal & Mediator Base Interaction',
+    zotero_key: 'Li2025',
+    url: 'https://dl.acm.org/doi/abs/10.1145/3696630.3728721',
+    created_at: new Date('2026-07-27').toISOString(),
+    tenant: 'professional',
+    tags: [
+        { id: 128, name: 'Integrated Development Environments', slug: 'ide' },
+        { id: 129, name: 'LLM-based Mediator Agents', slug: 'mediator-agents' },
+        { id: 130, name: 'Human-Computer Collaboration', slug: 'human-computer-collaboration' },
+        { id: 125, name: 'Large Language Models (LLMs)', slug: 'llms' },
+        { id: 126, name: 'Automation', slug: 'automation' }
+    ]
+  },
+  {
+    id: 5,
+    title: 'The Impact of LLMs on Software Development',
+    authors: 'IEEE Authors',
+    publication_year: 2026,
+    journal_or_conf: 'IEEE Conference Publication / IEEE Xplore',
+    abstract: 'This paper examines the profound impact of Large Language Models (LLMs) on modern software development practices. The study explores how these advanced models are integrated into diverse development workflows, focusing on automated code generation, complex refactoring tasks, and the optimization of debugging processes. It also addresses the emerging challenges associated with reliance on LLMs, such as managing technical debt, identifying hallucinated code logic, and mitigating subtle security vulnerabilities. Through empirical analysis, the research provides a comprehensive overview of how teams can carefully govern these tools while accelerating the overall software delivery speed.',
+    key_findings: 'Extensive empirical evidence demonstrating LLMs capabilities to augment programming pace vs safety trade-off risks when automating pipeline deployments.',
+    methodology: 'Literature Review & Empirical Analytics',
+    zotero_key: 'IEEE_XPLORE_11499962',
+    url: 'https://ieeexplore.ieee.org/abstract/document/11499962',
+    created_at: new Date('2026-07-27').toISOString(),
+    tenant: 'professional',
+    tags: [
+        { id: 131, name: 'Software Development', slug: 'software-development' },
+        { id: 125, name: 'Large Language Models (LLMs)', slug: 'llms' },
+        { id: 126, name: 'Automation', slug: 'automation' }
     ]
   }
 ];
@@ -121,8 +187,8 @@ export async function checkAcademicBackendHealth(): Promise<boolean> {
     const res = await fetch(`${API_RESEARCH_BASE}/papers`, {
       method: 'GET',
       headers: {
-        'Host': 'academic.localhost',
-        'X-Tenant': 'academic'
+        'Host': 'professional.localhost',
+        'X-Tenant': 'professional'
       }
     });
     return res.ok;
@@ -135,8 +201,8 @@ export async function fetchResearchPapers(): Promise<{ papers: ResearchPaper[]; 
   try {
     const res = await fetch(`${API_RESEARCH_BASE}/papers`, {
       headers: {
-        'Host': 'academic.localhost',
-        'X-Tenant': 'academic'
+        'Host': 'professional.localhost',
+        'X-Tenant': 'professional'
       }
     });
     if (res.ok) {
@@ -155,8 +221,8 @@ export async function createResearchPaper(input: NewResearchPaperInput): Promise
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Host': 'academic.localhost',
-        'X-Tenant': 'academic'
+        'Host': 'professional.localhost',
+        'X-Tenant': 'professional'
       },
       body: JSON.stringify(input)
     });
@@ -168,7 +234,7 @@ export async function createResearchPaper(input: NewResearchPaperInput): Promise
       ...input,
       id: Date.now(),
       created_at: new Date().toISOString(),
-      tenant: 'academic'
+      tenant: 'professional'
     };
     return { paper: mockPaper, isLiveBackend: false };
   } catch {
@@ -176,7 +242,7 @@ export async function createResearchPaper(input: NewResearchPaperInput): Promise
       ...input,
       id: Date.now(),
       created_at: new Date().toISOString(),
-      tenant: 'academic'
+      tenant: 'professional'
     };
     return { paper: mockPaper, isLiveBackend: false };
   }

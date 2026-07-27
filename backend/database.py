@@ -1,14 +1,27 @@
+import os
+import ssl
+from dotenv import load_dotenv
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlmodel import SQLModel, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from config import settings
 
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Apply ssl args conditionally if using Neon or specific remote databases
+connect_args = {}
+if settings.ASYNC_DATABASE_URL and "neon.tech" in settings.ASYNC_DATABASE_URL:
+    connect_args["ssl"] = "require"
+
 # 1. Create the asynchronous database engine
 engine = create_async_engine(
     settings.ASYNC_DATABASE_URL,
     echo=False, # Set to False for clean console output
-    future=True
+    future=True,
+    connect_args=connect_args
 )
 
 # 2. Create a session factory to generate isolated request sessions
@@ -17,6 +30,11 @@ async_session_maker = async_sessionmaker(
     class_=AsyncSession, 
     expire_on_commit=False
 )
+
+# Dependency for FastAPI endpoints
+async def get_db():
+    async with async_session_maker() as session:
+        yield session
 
 # 3. Dynamic initialization & automatic seed helper
 async def init_db() -> None:

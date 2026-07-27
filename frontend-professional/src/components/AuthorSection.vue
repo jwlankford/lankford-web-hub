@@ -10,7 +10,7 @@
         <!-- Author Avatar Image -->
         <div class="md:col-span-4 h-64 md:h-auto flex">
           <img
-            src="/jeremy-lankford.jpg"
+            src="/jeremy-lankford.png"
             alt="Jeremy Lankford"
             class="w-full h-full object-cover"
           />

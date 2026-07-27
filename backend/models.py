@@ -100,6 +100,29 @@ class ResearchTag(TenantBase, table=True):
     )
 
 
+class ResearchTagRead(SQLModel):
+    id: Optional[int]
+    name: str
+    slug: str
+    tenant: str
+
+
+class ResearchPaperRead(SQLModel):
+    id: Optional[int] = None
+    title: str
+    authors: str
+    publication_year: int
+    journal_or_conf: Optional[str] = None
+    abstract: Optional[str] = None
+    key_findings: Optional[str] = None
+    methodology: Optional[str] = None
+    zotero_key: Optional[str] = None
+    url: Optional[str] = None
+    created_at: Optional[datetime] = None
+    tenant: str
+    tags: List[ResearchTagRead] = []
+
+
 class Article(TenantBase, table=True):
     """
     Weekly articles published by Jeremy Lankford on LinkedIn and the Web.
