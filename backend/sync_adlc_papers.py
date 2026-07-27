@@ -1,9 +1,12 @@
-import asyncio
 import os
+from dotenv import load_dotenv
+# Load environment variables before importing database engine
+load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
+
+import asyncio
 import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from dotenv import load_dotenv
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -108,6 +111,4 @@ async def sync_one_paper():
         print("[SYNC] All fetched papers already exist in the database. No new articles to load today.")
 
 if __name__ == "__main__":
-    # Ensure environment variables are loaded
-    load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
     asyncio.run(sync_one_paper())
