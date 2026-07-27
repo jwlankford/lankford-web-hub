@@ -42,3 +42,9 @@ The Professional Frontend is a **Vue 3 + TypeScript + Vite** Single Page Applica
 * **Backend:** Python 3, FastAPI, SQLModel, PostgreSQL / SQLite (managed via update scripts)
 * **Frontend:** Vue 3 (Composition API), Vite, TypeScript, CSS 
 * **Infrastructure:** Docker, Docker Compose
+
+## Recent Updates (July 2026)
+* **Collapsible Taxonomy Filters:** Modified the Research Index view to make the extensive list of topic filters collapsible by default under a new "Filter by Topic" toggle. Active filter states are clearly badge-counted and automatically expand when selecting tags elsewhere in the UI.
+* **Secured Author Authentication UI:** Removed references to default credentials (`lankford2026`) from the `AdminLoginModal.vue` helper label and text placeholder.
+* **GitHub Pages Custom Domain Persistence:** Added a `CNAME` file to `frontend-professional/public` mapping to `jeremylankford.com` to prevent the deploy action from stripping the custom domain configuration and breaking SSL provisioning on pushes.
+
