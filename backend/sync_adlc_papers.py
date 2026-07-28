@@ -22,6 +22,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from database import engine, init_db
 import models
+import re
 
 # Try to import scholarly for Google Scholar search
 try:
@@ -29,6 +30,141 @@ try:
     HAS_SCHOLARLY = True
 except ImportError:
     HAS_SCHOLARLY = False
+
+
+def clean_abstract(text):
+    """
+    Strips HTML and XML tags from abstracts.
+    """
+    if not text:
+        return "Abstract not available in metadata registry."
+    clean = re.sub(r'<[^>]+>', '', text)
+    clean = " ".join(clean.split())
+    return clean
+
+
+def fetch_crossref_papers(query, max_results=10):
+    """
+    Queries Crossref API to retrieve DOI-registered papers from diverse publications.
+    """
+    print(f"[CROSSREF] Querying Crossref API for: '{query}'")
+    try:
+        url = "https://api.crossref.org/works"
+        params = {
+            "query": query,
+            "rows": max_results
+        }
+        headers = {
+            "User-Agent": "LankfordWebHub/1.0 (mailto:jwlan@example.com)"
+        }
+        response = requests.get(url, params=params, headers=headers, timeout=15)
+        if response.status_code != 200:
+            print(f"[CROSSREF] Error: Received status code {response.status_code}")
+            return []
+            
+        data = response.json()
+        items = data.get('message', {}).get('items', [])
+        results = []
+        for item in items:
+            title = item.get('title', ['No Title'])[0]
+            
+            # Format authors
+            authors = []
+            for a in item.get('author', []):
+                family = a.get('family', '').strip()
+                given = a.get('given', '').strip()
+                if family and given:
+                    authors.append(f"{family}, {given}")
+                elif family:
+                    authors.append(family)
+                elif given:
+                    authors.append(given)
+            if not authors:
+                authors = ["Unknown Author"]
+                
+            # Date
+            pub_date = item.get('published-print') or item.get('published-online') or item.get('issued') or item.get('created')
+            pub_year = datetime.now().year
+            pub_month = 1
+            pub_day = 1
+            if pub_date and 'date-parts' in pub_date and pub_date['date-parts']:
+                parts = pub_date['date-parts'][0]
+                if len(parts) >= 1 and parts[0]:
+                    pub_year = int(parts[0])
+                if len(parts) >= 2 and parts[1]:
+                    pub_month = int(parts[1])
+                if len(parts) >= 3 and parts[2]:
+                    pub_day = int(parts[2])
+            published_str = f"{pub_year:04d}-{pub_month:02d}-{pub_day:02d}"
+            
+            url_str = item.get('URL') or (f"https://doi.org/{item['DOI']}" if 'DOI' in item else "")
+            journal_or_conf = item.get('container-title', [''])[0] if item.get('container-title') else 'Web Publication'
+            abstract = clean_abstract(item.get('abstract'))
+            
+            results.append({
+                'title': title,
+                'summary': abstract,
+                'published': published_str,
+                'url': url_str,
+                'authors': authors,
+                'journal_or_conf': journal_or_conf
+            })
+        print(f"[CROSSREF] Successfully fetched {len(results)} candidate papers.")
+        return results
+    except Exception as e:
+        print(f"[CROSSREF] Exception during fetch: {e}")
+        return []
+
+
+def get_openalex_abstract_by_doi(doi):
+    """
+    Queries OpenAlex works API using a DOI to reconstruct the abstract from its inverted index.
+    """
+    print(f"[OPENALEX] Querying OpenAlex for DOI: '{doi}'")
+    try:
+        # Clean doi to keep just the suffix if it starts with url
+        if "doi.org/" in doi:
+            doi = doi.split("doi.org/")[-1]
+        url = f"https://api.openalex.org/works/https://doi.org/{doi}"
+        params = {"mailto": "jwlan@example.com"}
+        response = requests.get(url, params=params, timeout=15)
+        if response.status_code != 200:
+            return None
+        work = response.json()
+        abstract_inverted = work.get('abstract_inverted_index')
+        if abstract_inverted:
+            words = {}
+            for word, positions in abstract_inverted.items():
+                for pos in positions:
+                    words[pos] = word
+            reconstructed = " ".join([words[pos] for pos in sorted(words.keys())])
+            return reconstructed
+        return None
+    except Exception as e:
+        print(f"[OPENALEX] Exception fetching abstract: {e}")
+        return None
+
+
+def merge_and_normalize_papers(paper_lists):
+    """
+    Merges multiple lists of paper dictionaries, removing duplicates by case-insensitive title and URL.
+    """
+    merged = []
+    seen_titles = set()
+    seen_urls = set()
+    for paper_list in paper_lists:
+        for paper in paper_list:
+            title_norm = paper['title'].lower().strip()
+            url_norm = paper['url'].lower().strip() if paper['url'] else ""
+            if title_norm in seen_titles:
+                continue
+            if url_norm and url_norm in seen_urls:
+                continue
+            seen_titles.add(title_norm)
+            if url_norm:
+                seen_urls.add(url_norm)
+            merged.append(paper)
+    return merged
 
 
 def generate_zotero_key(authors_list, year, title):
@@ -244,21 +380,30 @@ def fetch_arxiv_papers(query, max_results=10):
 async def sync_one_paper():
     # Run database initialization & sequence resets first
     await init_db()
-    query = "all:\"Agentic Development Life Cycle\" OR all:\"ADLC\" OR all:\"Agentic Software Engineering\""
     
-    # 1. Fetch papers from Google Scholar
-    papers = fetch_google_scholar_papers("\"Agentic Development Life Cycle\" OR \"ADLC\" OR \"Agentic Software Engineering\"", max_results=5)
+    # 1. Fetch papers from Crossref (representing a wide variety of journals and conferences)
+    crossref_query = '"Agentic Development Life Cycle" OR "ADLC" OR "Agentic Software Engineering"'
+    crossref_papers = fetch_crossref_papers(crossref_query, max_results=10)
     
-    # If Google Scholar is blocked/fails, fall back to Semantic Scholar
-    if not papers:
-        print("[SYNC] Falling back to Semantic Scholar...")
-        papers = fetch_semantic_scholar_papers("Agentic Software Engineering", max_results=10)
-        
-    # If Semantic Scholar also fails/returns nothing, fall back to ArXiv
-    if not papers:
-        print("[SYNC] Falling back to ArXiv...")
-        papers = fetch_arxiv_papers(query, max_results=10)
-        
+    # Enrich papers with abstracts from OpenAlex if missing/placeholder
+    for paper in crossref_papers:
+        if not paper.get('summary') or paper['summary'] == "Abstract not available in metadata registry.":
+            url = paper.get('url', '')
+            if url:
+                doi = url.split("doi.org/")[-1] if "doi.org/" in url else url
+                if doi and '/' in doi:
+                    abstract = get_openalex_abstract_by_doi(doi)
+                    if abstract:
+                        paper['summary'] = abstract
+                        print(f"[SYNC] Enriched abstract from OpenAlex for: {paper['title']}")
+
+    # 2. Fetch papers from ArXiv (representing preprints)
+    arxiv_query = "all:\"Agentic Development Life Cycle\" OR all:\"ADLC\" OR all:\"Agentic Software Engineering\""
+    arxiv_papers = fetch_arxiv_papers(arxiv_query, max_results=10)
+    
+    # 3. Merge and deduplicate the sources
+    papers = merge_and_normalize_papers([crossref_papers, arxiv_papers])
+    
     if not papers:
         print("[SYNC] No papers could be retrieved from any source. Exiting.")
         return
