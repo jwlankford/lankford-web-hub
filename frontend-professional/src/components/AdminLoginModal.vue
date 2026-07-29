@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import logoUrl from '../assets/logo.png';
+import logoDarkUrl from '../assets/logo-dark.png';
 
 defineProps<{
   isOpen: boolean;
@@ -30,12 +32,17 @@ function handleSubmit() {
       <div class="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-2xl shadow-2xl max-w-sm w-full p-6 text-slate-900 dark:text-slate-100 transition-colors">
         <!-- Header -->
         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 mb-4">
-          <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950 border border-blue-300 dark:border-blue-500/40 flex items-center justify-center text-blue-700 dark:text-cyan-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-              </svg>
-            </div>
+          <div class="flex items-center space-x-2.5">
+            <img 
+              :src="logoUrl" 
+              alt="Jeremy Lankford Logo" 
+              class="h-10 sm:h-12 w-auto object-contain dark:hidden filter drop-shadow-sm"
+            />
+            <img 
+              :src="logoDarkUrl" 
+              alt="Jeremy Lankford Logo" 
+              class="h-10 sm:h-12 w-auto object-contain hidden dark:block filter drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]"
+            />
             <div>
               <h3 class="text-sm font-bold text-slate-900 dark:text-white font-serif">Author Authentication</h3>
               <p class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Unlock study indexing & administrative controls</p>
