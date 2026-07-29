@@ -23,14 +23,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: 'frontend-professional/package-lock.json'
 
       - name: Install Dependencies
         run: |
           cd frontend-professional
-          npm ci
+          npm install
 
       - name: Build Frontend
         env:
