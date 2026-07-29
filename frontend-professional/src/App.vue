@@ -272,13 +272,7 @@ onUnmounted(() => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         
         <!-- High-Tech Brand & Header Title -->
-        <div class="flex items-center space-x-3 group cursor-pointer" @click="activeTab = 'courses'">
-          <!-- Brand Logo -->
-          <img 
-            src="/logo.png" 
-            alt="Jeremy Lankford Logo" 
-            class="h-10 w-10 object-contain rounded-lg transition-transform group-hover:scale-105"
-          />
+        <div class="flex items-center group cursor-pointer" @click="activeTab = 'courses'">
           <!-- Brand Typography -->
           <div>
             <div class="flex items-center space-x-2">
@@ -438,8 +432,8 @@ onUnmounted(() => {
               </span>
             </div>
 
-            <!-- Profile Avatar Chip Icon & User Dropdown Menu -->
-            <div ref="userMenuContainer" class="relative">
+            <!-- Profile Avatar Chip Icon & User Dropdown Menu (only if signed in) -->
+            <div v-if="isAdmin" ref="userMenuContainer" class="relative">
               <button
                 @click="isUserMenuOpen = !isUserMenuOpen"
                 class="flex items-center justify-center p-0.5 rounded-full bg-slate-100 dark:bg-slate-900/90 border transition-all duration-200 group shadow-sm hover:scale-105 cursor-pointer"
@@ -457,7 +451,7 @@ onUnmounted(() => {
                   class="w-7 h-7 rounded-full object-cover ring-1.5 ring-blue-400/50 transition-transform"
                 />
               </button>
-
+ 
               <!-- Dropdown Menu -->
               <div 
                 v-if="isUserMenuOpen"
@@ -468,7 +462,7 @@ onUnmounted(() => {
                   <div class="text-xs font-bold font-serif text-slate-900 dark:text-white">Jeremy W. Lankford</div>
                   <div class="text-[9px] font-mono text-blue-600 dark:text-cyan-400">PhD in IT (AI Focus) Student</div>
                 </div>
-
+ 
                 <!-- Menu Options -->
                 <div class="py-1.5 text-xs font-medium">
                   <!-- Account & Profile -->
@@ -481,7 +475,7 @@ onUnmounted(() => {
                     </svg>
                     <span>Account & Bio</span>
                   </button>
-
+ 
                   <!-- Preferences / Theme -->
                   <button 
                     @click="toggleTheme();"
@@ -498,37 +492,12 @@ onUnmounted(() => {
                       {{ theme }} mode
                     </span>
                   </button>
-
-                  <!-- Direct Hub Social Link shortcuts -->
-                  <div class="border-t border-slate-100 dark:border-slate-800 pt-1.5 mt-1 pb-1">
-                    <div class="px-4 py-1 text-[9px] font-mono text-slate-400 uppercase tracking-wider">Social Contacts</div>
-                    <a href="http://www.linkedin.com/in/jwlankford" target="_blank" class="px-4 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center space-x-2.5 text-slate-700 dark:text-slate-300 transition-colors">
-                      <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                      <span>LinkedIn</span>
-                    </a>
-                    <a href="https://github.com/jwlankford" target="_blank" class="px-4 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center space-x-2.5 text-slate-700 dark:text-slate-300 transition-colors">
-                      <svg class="w-3.5 h-3.5 text-slate-900 dark:text-slate-100" fill="currentColor" viewBox="0 0 24 24">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-                      </svg>
-                      <span>GitHub</span>
-                    </a>
-                    <a href="https://x.com/jwlankford" target="_blank" class="px-4 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center space-x-2.5 text-slate-700 dark:text-slate-300 transition-colors">
-                      <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                      <span>X (Twitter)</span>
-                    </a>
-                    <a href="https://www.udemy.com/user/jeremy-lankford-22/" target="_blank" class="px-4 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center space-x-2.5 text-slate-700 dark:text-slate-300 transition-colors">
-                      <svg class="w-3.5 h-3.5 text-indigo-500" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-2.76 0-5-2.24-5-5V7h2v5c0 1.66 1.34 3 3 3s3-1.34 3-3V7h2v5c0 2.76-2.24 5-5 5z"/>
-                      </svg>
-                      <span>Udemy Profile</span>
-                    </a>
-                  </div>
+ 
                 </div>
-
+ 
                 <div class="border-t border-slate-100 dark:border-slate-800 pt-1.5">
                   <!-- Admin Auth / Logout Button -->
                   <button 
-                    v-if="isAdmin"
                     @click="handleAdminLogout(); isUserMenuOpen = false;"
                     class="w-full px-4 py-2 text-left hover:bg-rose-50 dark:hover:bg-rose-950/50 flex items-center space-x-2.5 text-rose-600 dark:text-rose-400 transition-colors"
                   >
@@ -537,20 +506,21 @@ onUnmounted(() => {
                     </svg>
                     <span>Log Out (Lock Admin)</span>
                   </button>
-
-                  <button 
-                    v-else
-                    @click="isAdminModalOpen = true; isUserMenuOpen = false;"
-                    class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-800/80 flex items-center space-x-2.5 text-slate-700 dark:text-slate-300 transition-colors"
-                  >
-                    <svg class="w-4 h-4 text-blue-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                    </svg>
-                    <span>Author Login</span>
-                  </button>
                 </div>
               </div>
             </div>
+ 
+            <!-- Author Login Button (shown when not authenticated) -->
+            <button
+              v-else
+              @click="isAdminModalOpen = true"
+              class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-blue-500/50 hover:bg-slate-200/80 dark:hover:bg-slate-800/80 transition-all duration-200 text-xs font-semibold shadow-sm cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+              </svg>
+              <span>Author Login</span>
+            </button>
           </div>
 
         </div>
