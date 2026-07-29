@@ -13,6 +13,7 @@ import {
   createJupyterNotebook
 } from './services/api';
 import { useTheme } from './composables/useTheme';
+import { useAuth } from './composables/useAuth';
 
 import logoUrl from './assets/logo.png';
 import logoDarkUrl from './assets/logo-dark.png';
@@ -122,27 +123,23 @@ const activeFeedNotebook = ref<JupyterNotebook | null>(null);
 
 
 
-// Admin Auth State
-const isAdmin = ref(sessionStorage.getItem('academic_admin') === 'true');
+// Admin & Firebase Auth State
+const { currentUser, isAdmin, setPasskeyAdmin, logout } = useAuth();
 const isAdminModalOpen = ref(false);
 const isUserMenuOpen = ref(false);
 const userMenuContainer = ref<HTMLElement | null>(null);
 
 const { theme, toggleTheme } = useTheme();
 
-
-
 function handleAdminLogin(passkey: string) {
   if (passkey) {
-    isAdmin.value = true;
-    sessionStorage.setItem('academic_admin', 'true');
+    setPasskeyAdmin(passkey);
     isAdminModalOpen.value = false;
   }
 }
 
 function handleAdminLogout() {
-  isAdmin.value = false;
-  sessionStorage.removeItem('academic_admin');
+  logout();
 }
 
 const allTags = computed(() => {
@@ -454,8 +451,8 @@ onUnmounted(() => {
                 aria-label="Open User Menu"
               >
                 <img
-                  src="/jeremy-lankford.png"
-                  alt="Jeremy Lankford"
+                  :src="currentUser?.photoURL || '/jeremy-lankford.png'"
+                  :alt="currentUser?.displayName || 'Jeremy Lankford'"
                   class="w-7 h-7 rounded-full object-cover ring-1.5 ring-blue-400/50 transition-transform"
                 />
               </button>
@@ -463,12 +460,19 @@ onUnmounted(() => {
               <!-- Dropdown Menu -->
               <div 
                 v-if="isUserMenuOpen"
-                class="absolute right-0 mt-2 w-60 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-2 z-50 animate-fadeIn text-slate-900 dark:text-slate-100"
+                class="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-2 z-50 animate-fadeIn text-slate-900 dark:text-slate-100"
               >
                 <!-- User Header Info -->
-                <div class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800">
-                  <div class="text-xs font-bold font-serif text-slate-900 dark:text-white">Jeremy W. Lankford</div>
-                  <div class="text-[9px] font-mono text-blue-600 dark:text-cyan-400">PhD in IT (AI Focus) Student</div>
+                <div class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 flex items-center space-x-2.5">
+                  <img
+                    :src="currentUser?.photoURL || '/jeremy-lankford.png'"
+                    alt="User Avatar"
+                    class="w-8 h-8 rounded-full object-cover ring-1 ring-blue-400/40"
+                  />
+                  <div class="overflow-hidden">
+                    <div class="text-xs font-bold text-slate-900 dark:text-white truncate">{{ currentUser?.displayName || 'Jeremy W. Lankford' }}</div>
+                    <div class="text-[10px] font-mono text-blue-600 dark:text-cyan-400 truncate">{{ currentUser?.email || 'PhD in IT (AI Focus) Student' }}</div>
+                  </div>
                 </div>
  
                 <!-- Menu Options -->
