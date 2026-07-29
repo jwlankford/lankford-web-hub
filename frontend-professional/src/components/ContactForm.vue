@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { submitContactMessage } from '../services/api';
+import logoUrl from '../assets/logo.png';
+import logoDarkUrl from '../assets/logo-dark.png';
 
 const name = ref('');
 const email = ref('');
@@ -57,9 +59,21 @@ async function handleSubmit() {
 
     <div class="relative z-10 space-y-6">
       <div class="space-y-2 text-center sm:text-left">
-        <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-cyan-300 text-xs font-mono border border-blue-300 dark:border-blue-500/30">
-          <span>CONTACT FORM</span>
-        </span>
+        <div class="flex items-center justify-center sm:justify-start space-x-3 mb-1">
+          <img 
+            :src="logoUrl" 
+            alt="Jeremy Lankford Logo" 
+            class="h-11 sm:h-13 w-auto object-contain dark:hidden filter drop-shadow-sm"
+          />
+          <img 
+            :src="logoDarkUrl" 
+            alt="Jeremy Lankford Logo" 
+            class="h-11 sm:h-13 w-auto object-contain hidden dark:block filter drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]"
+          />
+          <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-cyan-300 text-xs font-mono border border-blue-300 dark:border-blue-500/30">
+            <span>CONTACT FORM</span>
+          </span>
+        </div>
         <h3 class="text-2xl font-bold font-serif text-slate-900 dark:text-white">Get in Touch</h3>
         <p class="text-slate-655 dark:text-slate-400 text-xs font-mono">
           Have questions regarding the ADLC curriculum, enterprise consulting opportunities, or academic collaborations? Drop a message below.

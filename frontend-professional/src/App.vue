@@ -14,6 +14,10 @@ import {
 } from './services/api';
 import { useTheme } from './composables/useTheme';
 
+import logoUrl from './assets/logo.png';
+import logoDarkUrl from './assets/logo-dark.png';
+import iconUrl from './assets/icon.svg';
+
 // Components
 import AuthorSection from './components/AuthorSection.vue';
 import UdemyCourses from './components/UdemyCourses.vue';
@@ -271,16 +275,20 @@ onUnmounted(() => {
     <header class="sticky top-0 z-40 backdrop-blur-xl bg-white/85 dark:bg-slate-950/85 border-b border-slate-200 dark:border-blue-500/20 shadow-2xl transition-colors duration-300">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         
-        <!-- High-Tech Brand & Header Title -->
-        <div class="flex items-center group cursor-pointer" @click="activeTab = 'courses'">
-          <!-- Brand Typography -->
+        <!-- High-Tech Brand Icon & Title -->
+        <div class="flex items-center space-x-3.5 group cursor-pointer py-1" @click="activeTab = 'courses'" title="Jeremy Lankford - Home">
+          <img
+            :src="iconUrl"
+            alt="Jeremy Lankford Icon"
+            class="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(56,189,248,0.35)] group-hover:scale-105 transition-transform duration-300"
+          />
           <div>
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-1.5">
               <span class="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">
                 JEREMY <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 dark:from-blue-400 dark:via-indigo-300 dark:to-cyan-400 bg-clip-text text-transparent">LANKFORD</span>
               </span>
             </div>
-            <div class="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400 leading-none pt-1">
+            <div class="flex items-center text-xs text-slate-500 dark:text-slate-400 font-medium leading-none pt-1">
               <span>Software Architect & PhD Student</span>
             </div>
           </div>
@@ -1147,6 +1155,18 @@ onUnmounted(() => {
 
     <!-- Footer -->
     <footer class="mt-20 border-t border-slate-200 dark:border-slate-900 pt-8 pb-4 text-center text-xs font-mono text-slate-500 dark:text-slate-500 space-y-4">
+      <div class="flex flex-col items-center justify-center space-y-2 mb-2">
+        <img 
+          :src="logoUrl" 
+          alt="Jeremy Lankford - Creative Visionary | Digital Innovator" 
+          class="h-12 sm:h-14 w-auto object-contain dark:hidden filter drop-shadow-sm"
+        />
+        <img 
+          :src="logoDarkUrl" 
+          alt="Jeremy Lankford - Creative Visionary | Digital Innovator" 
+          class="h-12 sm:h-14 w-auto object-contain hidden dark:block filter drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]"
+        />
+      </div>
       <div class="flex items-center justify-center space-x-6">
         <a 
           href="http://www.linkedin.com/in/jwlankford" 
