@@ -1,4 +1,4 @@
-name: Sync ArXiv Research Papers
+name: Sync Research Papers
 
 on:
   schedule:
