@@ -1,0 +1,12 @@
+{
+  "name": "lankford-web-hub",
+  "private": true,
+  "workspaces": [
+    "frontend-professional"
+  ],
+  "scripts": {
+    "build": "npm --prefix frontend-professional run build",
+    "dev": "npm --prefix frontend-professional run dev",
+    "start": "npm --prefix frontend-professional run preview"
+  }
+}

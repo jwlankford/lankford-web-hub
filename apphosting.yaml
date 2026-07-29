@@ -1,0 +1,10 @@
+# Firebase App Hosting Configuration
+# https://firebase.google.com/docs/app-hosting/configure
+
+# Root directory pointing to the subfolder containing frontend package.json
+rootDirectory: frontend-professional
+
+runConfig:
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
