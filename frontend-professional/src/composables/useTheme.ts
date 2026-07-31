@@ -2,18 +2,16 @@ import { ref, onMounted } from 'vue';
 
 export type Theme = 'dark' | 'light';
 
-const theme = ref<Theme>('dark');
-const isSystemPreference = ref<boolean>(true);
+const theme = ref<Theme>('light');
 
 /**
- * Returns current OS system theme preference ('dark' or 'light')
- * based on Windows / macOS settings.
+ * Checks Windows / OS system dark mode setting via media query.
  */
-export function getSystemTheme(): Theme {
+export function getWindowsSystemTheme(): Theme {
   if (typeof window !== 'undefined' && window.matchMedia) {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
-  return 'dark';
+  return 'light';
 }
 
 /**
@@ -36,31 +34,19 @@ function applyThemeDOM(t: Theme) {
 }
 
 /**
- * Manually sets theme and persists user override to localStorage.
+ * Sets theme explicitly (on physical user click) and persists to localStorage cache.
  */
 export function applyTheme(t: Theme) {
-  isSystemPreference.value = false;
   applyThemeDOM(t);
   if (typeof window !== 'undefined') {
     localStorage.setItem('lankford_hub_theme', t);
   }
 }
 
-/**
- * Resets manual override so theme follows Windows/macOS system settings.
- */
-export function resetToSystemTheme() {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('lankford_hub_theme');
-  }
-  isSystemPreference.value = true;
-  applyThemeDOM(getSystemTheme());
-}
-
 let mediaQueryListenerAttached = false;
 
 /**
- * Listens for live changes in Windows / macOS dark mode system settings.
+ * Listens for live Windows OS dark/light mode setting changes.
  */
 function setupSystemThemeListener() {
   if (typeof window === 'undefined' || !window.matchMedia || mediaQueryListenerAttached) return;
@@ -69,7 +55,6 @@ function setupSystemThemeListener() {
   const handleSystemThemeChange = (e: MediaQueryListEvent) => {
     const saved = localStorage.getItem('lankford_hub_theme');
     if (!saved) {
-      isSystemPreference.value = true;
       applyThemeDOM(e.matches ? 'dark' : 'light');
     }
   };
@@ -84,17 +69,17 @@ function setupSystemThemeListener() {
 }
 
 /**
- * Initializes theme state from localStorage or OS settings.
+ * Initializes theme state from cached user preference or Windows OS dark/light setting.
  */
 export function initTheme() {
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem('lankford_hub_theme') as Theme | null;
     if (saved === 'dark' || saved === 'light') {
-      isSystemPreference.value = false;
       applyThemeDOM(saved);
     } else {
-      isSystemPreference.value = true;
-      applyThemeDOM(getSystemTheme());
+      // Pull Windows OS preference (if Windows is Dark, set Dark; otherwise Light)
+      const windowsTheme = getWindowsSystemTheme();
+      applyThemeDOM(windowsTheme);
     }
     setupSystemThemeListener();
   }
@@ -115,11 +100,11 @@ export function useTheme() {
 
   return {
     theme,
-    isSystemPreference,
-    getSystemTheme,
     toggleTheme,
     applyTheme,
-    resetToSystemTheme,
+    getWindowsSystemTheme,
   };
 }
+
+
 
