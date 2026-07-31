@@ -5,6 +5,16 @@ export type Theme = 'dark' | 'light';
 const theme = ref<Theme>('light');
 
 /**
+ * Checks Windows / OS system dark mode setting via media query.
+ */
+export function getWindowsSystemTheme(): Theme {
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return 'light';
+}
+
+/**
  * Applies theme to DOM root element.
  */
 function applyThemeDOM(t: Theme) {
@@ -24,7 +34,7 @@ function applyThemeDOM(t: Theme) {
 }
 
 /**
- * Sets theme explicitly (e.g. on user click) and stores preference in localStorage cache.
+ * Sets theme explicitly (on physical user click) and persists to localStorage cache.
  */
 export function applyTheme(t: Theme) {
   applyThemeDOM(t);
@@ -33,8 +43,33 @@ export function applyTheme(t: Theme) {
   }
 }
 
+let mediaQueryListenerAttached = false;
+
 /**
- * Initializes theme state from localStorage cache, defaulting to 'light' mode always.
+ * Listens for live Windows OS dark/light mode setting changes.
+ */
+function setupSystemThemeListener() {
+  if (typeof window === 'undefined' || !window.matchMedia || mediaQueryListenerAttached) return;
+
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+    const saved = localStorage.getItem('lankford_hub_theme');
+    if (!saved) {
+      applyThemeDOM(e.matches ? 'dark' : 'light');
+    }
+  };
+
+  if (mediaQuery.addEventListener) {
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+  } else if ('addListener' in (mediaQuery as any)) {
+    (mediaQuery as any).addListener(handleSystemThemeChange);
+  }
+
+  mediaQueryListenerAttached = true;
+}
+
+/**
+ * Initializes theme state from cached user preference or Windows OS dark/light setting.
  */
 export function initTheme() {
   if (typeof window !== 'undefined') {
@@ -42,8 +77,11 @@ export function initTheme() {
     if (saved === 'dark' || saved === 'light') {
       applyThemeDOM(saved);
     } else {
-      applyThemeDOM('light');
+      // Pull Windows OS preference (if Windows is Dark, set Dark; otherwise Light)
+      const windowsTheme = getWindowsSystemTheme();
+      applyThemeDOM(windowsTheme);
     }
+    setupSystemThemeListener();
   }
 }
 
@@ -64,7 +102,9 @@ export function useTheme() {
     theme,
     toggleTheme,
     applyTheme,
+    getWindowsSystemTheme,
   };
 }
+
 
 
