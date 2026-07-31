@@ -6,10 +6,16 @@ const theme = ref<Theme>('light');
 
 /**
  * Checks Windows / OS system dark mode setting via media query.
+ * Returns 'dark' if Windows App Mode is set to Dark, otherwise 'light'.
  */
 export function getWindowsSystemTheme(): Theme {
   if (typeof window !== 'undefined' && window.matchMedia) {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+      return 'light';
+    }
   }
   return 'light';
 }
@@ -40,6 +46,17 @@ export function applyTheme(t: Theme) {
   applyThemeDOM(t);
   if (typeof window !== 'undefined') {
     localStorage.setItem('lankford_hub_theme', t);
+  }
+}
+
+/**
+ * Clears cached localStorage override and resets theme to current Windows OS setting.
+ */
+export function resetToSystemTheme() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('lankford_hub_theme');
+    const systemTheme = getWindowsSystemTheme();
+    applyThemeDOM(systemTheme);
   }
 }
 
@@ -102,9 +119,11 @@ export function useTheme() {
     theme,
     toggleTheme,
     applyTheme,
+    resetToSystemTheme,
     getWindowsSystemTheme,
   };
 }
+
 
 
 
