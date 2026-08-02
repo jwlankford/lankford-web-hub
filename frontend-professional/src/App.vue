@@ -789,7 +789,7 @@ onUnmounted(() => {
           <!-- Direct Feed Render (Simplified List) -->
           <div v-else class="flex flex-col gap-4 animate-fadeIn">
             <div class="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Available Feeds</div>
-            <div class="grid grid-cols-1 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div 
                 v-for="notebook in jupyterNotebooks"
                 :key="notebook.id"
