@@ -852,28 +852,7 @@ onUnmounted(() => {
                   </a>
                 </div>
 
-                <!-- Iframe Viewport Container -->
-                <div class="relative bg-slate-50 dark:bg-slate-950 p-4 flex flex-col space-y-4">
-                  <!-- Fallback Alert Box -->
-                  <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-800 dark:text-amber-300 flex items-start space-x-3 text-xs leading-relaxed">
-                    <svg class="w-5 h-5 text-amber-650 dark:text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                    <div>
-                      <span class="font-bold">Colab Iframe Notice:</span> Due to Google's strict browser security headers (`X-Frame-Options: deny`), this direct feed represents a live container reference. If the content below displays a connection error or remains blank, click <a :href="activeFeedNotebook.notebook_url" target="_blank" rel="noopener noreferrer" class="font-bold underline hover:text-amber-900 dark:hover:text-amber-250">Open in New Tab</a> to launch it directly in Google Colab.
-                    </div>
-                  </div>
 
-                  <!-- Actual Frame -->
-                  <div class="w-full h-[650px] rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-inner relative">
-                    <iframe 
-                      :src="activeFeedNotebook.notebook_url"
-                      class="w-full h-full border-none"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-                    ></iframe>
-                  </div>
-                </div>
               </div>
               <div v-else class="h-[400px] flex items-center justify-center border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl text-slate-400 text-sm font-mono">
                 Select a notebook from the sidebar to load the feed.
