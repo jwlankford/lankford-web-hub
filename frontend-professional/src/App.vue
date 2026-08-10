@@ -17,7 +17,6 @@ import { useAuth } from './composables/useAuth';
 
 import logoUrl from './assets/logo.png';
 import logoDarkUrl from './assets/logo-dark.png';
-import iconUrl from './assets/icon.svg';
 
 // Components
 import AuthorSection from './components/AuthorSection.vue';
@@ -274,11 +273,6 @@ onUnmounted(() => {
         
         <!-- High-Tech Brand Icon & Title -->
         <div class="flex items-center space-x-3.5 group cursor-pointer py-1" @click="activeTab = 'courses'" title="Jeremy Lankford - Home">
-          <img
-            :src="iconUrl"
-            alt="Jeremy Lankford Icon"
-            class="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(56,189,248,0.35)] group-hover:scale-105 transition-transform duration-300"
-          />
           <div>
             <div class="flex items-center space-x-1.5">
               <span class="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">
