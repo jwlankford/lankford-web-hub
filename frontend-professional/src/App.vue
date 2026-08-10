@@ -17,7 +17,6 @@ import { useAuth } from './composables/useAuth';
 
 import logoUrl from './assets/logo.png';
 import logoDarkUrl from './assets/logo-dark.png';
-import iconUrl from './assets/icon.svg';
 
 // Components
 import AuthorSection from './components/AuthorSection.vue';
@@ -274,11 +273,6 @@ onUnmounted(() => {
         
         <!-- High-Tech Brand Icon & Title -->
         <div class="flex items-center space-x-3.5 group cursor-pointer py-1" @click="activeTab = 'courses'" title="Jeremy Lankford - Home">
-          <img
-            :src="iconUrl"
-            alt="Jeremy Lankford Icon"
-            class="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(56,189,248,0.35)] group-hover:scale-105 transition-transform duration-300"
-          />
           <div>
             <div class="flex items-center space-x-1.5">
               <span class="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">
@@ -786,76 +780,35 @@ onUnmounted(() => {
             />
           </div>
 
-          <!-- Direct Feed Render (Split Panel Layout) -->
-          <div v-else class="flex flex-col lg:flex-row gap-6 animate-fadeIn">
-            <!-- Left Sidebar: Feed List Selector -->
-            <div class="w-full lg:w-1/4 flex flex-col space-y-2 lg:max-h-[690px] lg:overflow-y-auto pr-1">
-              <div class="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 pl-1">Available Feeds</div>
-              <button 
+          <!-- Direct Feed Render (Simplified List) -->
+          <div v-else class="flex flex-col gap-4 animate-fadeIn">
+            <div class="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Available Feeds</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div 
                 v-for="notebook in jupyterNotebooks"
                 :key="notebook.id"
-                @click="activeFeedNotebook = notebook"
-                type="button"
-                :class="[
-                  'w-full text-left p-4 rounded-xl border transition-all duration-300 flex flex-col space-y-2 cursor-pointer relative overflow-hidden group',
-                  activeFeedNotebook?.id === notebook.id 
-                    ? 'bg-gradient-to-r from-amber-50 to-orange-55/50 dark:from-amber-950/30 dark:to-orange-950/10 border-amber-500 dark:border-amber-400 shadow-md ring-1 ring-amber-500/20' 
-                    : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800/80 hover:border-amber-500/40 hover:bg-slate-50/50 dark:hover:bg-slate-850/50'
-                ]"
+                class="flex flex-col bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-lg p-5 gap-3 hover:border-amber-500/40 transition-colors duration-300"
               >
-                <!-- Active Indicator Border -->
-                <div v-if="activeFeedNotebook?.id === notebook.id" class="absolute left-0 top-0 bottom-0 w-1 bg-amber-600 dark:bg-amber-500"></div>
-
-                <div class="flex items-center justify-between">
-                  <span class="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded bg-slate-105 dark:bg-slate-800/80 text-[9px] font-mono font-bold text-slate-500 dark:text-slate-400">
-                    <svg class="w-2.5 h-2.5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M13.8 12.6C12.9 9.6 10.2 7.5 7.1 7.5 3.1 7.5 0 10.6 0 14.5s3.1 7 7.1 7c3.1 0 5.8-2.1 6.7-5.1L13.8 12.6z" fill="#F9AB00" />
-                      <path d="M20.5 7.5c-3.1 0-5.8 2.1-6.7 5.1l0.1 3.8c0.9 3 3.6 5.1 6.7 5.1 4 0 7.1-3.1 7.1-7s-3.1-7-7.1-7z" fill="#E8710A" />
-                    </svg>
-                    <span>Colab Link</span>
-                  </span>
-                </div>
-                
-                <h5 class="text-sm font-bold text-slate-900 dark:text-white leading-snug group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-1">
-                  {{ notebook.title }}
-                </h5>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">
-                  {{ notebook.description }}
-                </p>
-              </button>
-            </div>
-
-            <!-- Right Area: Embedded Iframe & Detail Info -->
-            <div class="w-full lg:w-3/4 flex flex-col space-y-4">
-              <div v-if="activeFeedNotebook" class="flex flex-col bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-lg">
-                <!-- Viewport Top Header -->
-                <div class="p-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div class="space-y-1">
-                    <h4 class="text-base font-serif font-black text-slate-900 dark:text-white leading-tight">
-                      {{ activeFeedNotebook.title }}
-                    </h4>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 leading-normal">
-                      {{ activeFeedNotebook.description }}
-                    </p>
-                  </div>
-
-                  <a 
-                    :href="activeFeedNotebook.notebook_url" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    class="px-4 py-2 font-bold text-xs rounded-xl bg-amber-600 hover:bg-amber-500 dark:bg-amber-550 dark:hover:bg-amber-450 text-white shadow-md active:scale-95 transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 self-end sm:self-auto cursor-pointer"
-                  >
-                    <span>Open in New Tab</span>
-                    <svg class="w-3.5 h-3.5 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                    </svg>
-                  </a>
+                <div class="space-y-1 mb-2">
+                  <h4 class="text-base font-serif font-black text-slate-900 dark:text-white leading-tight">
+                    {{ notebook.title }}
+                  </h4>
+                  <p class="text-xs text-slate-500 dark:text-slate-400 leading-normal">
+                    {{ notebook.description }}
+                  </p>
                 </div>
 
-
-              </div>
-              <div v-else class="h-[400px] flex items-center justify-center border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl text-slate-400 text-sm font-mono">
-                Select a notebook from the sidebar to load the feed.
+                <a 
+                  :href="notebook.notebook_url" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="px-4 py-2.5 font-bold text-xs rounded-xl bg-amber-600 hover:bg-amber-500 dark:bg-amber-550 dark:hover:bg-amber-450 text-white shadow-md active:scale-95 transition-all flex items-center justify-center space-x-1.5 w-full cursor-pointer mt-auto"
+                >
+                  <span>Open in New Tab</span>
+                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  </svg>
+                </a>
               </div>
             </div>
           </div>
