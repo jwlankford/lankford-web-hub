@@ -65,7 +65,7 @@
         </div>
 
         <a 
-          href="https://paypal.me/jwlankford"
+          :href="paypalLinkAcademic"
           target="_blank"
           rel="noopener noreferrer"
           class="w-full mt-8 bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-500/30 transform hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center space-x-2 cursor-pointer"
