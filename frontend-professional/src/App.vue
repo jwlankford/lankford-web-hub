@@ -39,7 +39,7 @@ import AddNotebookModal from './components/AddNotebookModal.vue';
 
 
 // Navigation State
-const activeTab = ref<'research' | 'taxonomy' | 'matrix' | 'courses' | 'about' | 'articles'>('courses');
+const activeTab = ref<'research' | 'taxonomy' | 'matrix' | 'courses' | 'about' | 'articles'>('about');
 
 // Technologies Known
 const technologies = [
@@ -269,7 +269,7 @@ onUnmounted(() => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         
         <!-- High-Tech Brand Icon & Title -->
-        <div class="flex items-center space-x-3.5 group cursor-pointer py-1" @click="activeTab = 'courses'" title="Jeremy Lankford - Home">
+        <div class="flex items-center space-x-3.5 group cursor-pointer py-1" @click="activeTab = 'about'" title="Jeremy Lankford - Home">
           <div>
             <div class="flex items-center space-x-1.5">
               <span class="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">
