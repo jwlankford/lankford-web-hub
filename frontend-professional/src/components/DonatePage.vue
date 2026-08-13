@@ -65,7 +65,7 @@
         </div>
 
         <a 
-          href="https://paypal.me/jwlankford"
+          :href="paypalLinkAcademic"
           target="_blank"
           rel="noopener noreferrer"
           class="w-full mt-8 bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-500/30 transform hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center space-x-2 cursor-pointer"
@@ -121,7 +121,7 @@
         </div>
 
         <a 
-          href="https://paypal.me/jwlankford"
+          :href="paypalLinkCKD"
           target="_blank"
           rel="noopener noreferrer"
           class="w-full mt-8 bg-gradient-to-r from-rose-500 via-pink-600 to-rose-600 hover:from-rose-600 hover:to-pink-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-rose-500/30 transform hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center space-x-2 cursor-pointer"
@@ -190,5 +190,31 @@ const displayCKD = computed(() => {
     return `($${parsed.toFixed(2)})`;
   }
   return '';
+});
+
+const paypalLinkAcademic = computed(() => {
+  let amount = 0;
+  if (selectedAcademic.value !== null) {
+    amount = selectedAcademic.value;
+  } else {
+    const parsed = parseFloat(customAcademic.value);
+    if (!isNaN(parsed) && parsed > 0) {
+      amount = parsed;
+    }
+  }
+  return amount > 0 ? `https://paypal.me/jwlankford/${amount}` : 'https://paypal.me/jwlankford';
+});
+
+const paypalLinkCKD = computed(() => {
+  let amount = 0;
+  if (selectedCKD.value !== null) {
+    amount = selectedCKD.value;
+  } else {
+    const parsed = parseFloat(customCKD.value);
+    if (!isNaN(parsed) && parsed > 0) {
+      amount = parsed;
+    }
+  }
+  return amount > 0 ? `https://paypal.me/jwlankford/${amount}` : 'https://paypal.me/jwlankford';
 });
 </script>
