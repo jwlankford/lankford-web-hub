@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import logoUrl from '../assets/logo.png';
-import logoDarkUrl from '../assets/logo-dark.png';
 import { useAuth } from '../composables/useAuth';
 
 defineProps<{
@@ -45,16 +43,6 @@ function handleSubmit() {
         <!-- Header -->
         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 mb-4">
           <div class="flex items-center space-x-2.5">
-            <img 
-              :src="logoUrl" 
-              alt="Jeremy Lankford Logo" 
-              class="h-10 sm:h-12 w-auto object-contain dark:hidden filter drop-shadow-sm"
-            />
-            <img 
-              :src="logoDarkUrl" 
-              alt="Jeremy Lankford Logo" 
-              class="h-10 sm:h-12 w-auto object-contain hidden dark:block filter drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]"
-            />
             <div>
               <h3 class="text-sm font-bold text-slate-900 dark:text-white font-serif">Author Authentication</h3>
               <p class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Unlock study indexing & admin controls</p>
