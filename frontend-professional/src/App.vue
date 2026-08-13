@@ -22,6 +22,7 @@ import logoDarkUrl from './assets/logo-dark.png';
 import AuthorSection from './components/AuthorSection.vue';
 import UdemyCourses from './components/UdemyCourses.vue';
 import ContactForm from './components/ContactForm.vue';
+import DonatePage from './components/DonatePage.vue';
 
 // Ported Academic Components
 import ResearchPaperCard from './components/ResearchPaperCard.vue';
@@ -42,7 +43,8 @@ import AddNotebookModal from './components/AddNotebookModal.vue';
 
 
 // Navigation State
-const activeTab = ref<'research' | 'taxonomy' | 'matrix' | 'courses' | 'about' | 'articles'>('courses');
+const activeTab = ref<'research' | 'matrix' | 'courses' | 'about' | 'articles' | 'donate'>('courses');
+const isTaxonomyExpanded = ref(false);
 
 // Technologies Known
 const technologies = [
@@ -312,18 +314,6 @@ onUnmounted(() => {
             Udemy Courses
           </button>
           <button
-            @click="activeTab = 'taxonomy'"
-            :class="[
-              'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 flex items-center space-x-1.5',
-              activeTab === 'taxonomy'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-600/30 border border-blue-400/30'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800/80'
-            ]"
-          >
-            <span>Taxonomy</span>
-            <span class="px-1.5 py-0.2 text-[9px] font-mono rounded bg-blue-50 dark:bg-slate-950/60 text-blue-800 dark:text-cyan-300 border border-blue-300 dark:border-blue-500/30">{{ allTags.length }}</span>
-          </button>
-          <button
             @click="activeTab = 'articles'"
             :class="[
               'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 flex items-center space-x-1.5',
@@ -393,6 +383,18 @@ onUnmounted(() => {
 
           <!-- Grouped Icons: Dark/Light Toggle, Backend Status Icon, Avatar Icon with Dropdown Menu -->
           <div class="flex items-center space-x-1.5 pl-1 border-l border-slate-200 dark:border-slate-800">
+            <!-- Donate Header Button -->
+            <button
+              @click="activeTab = 'donate'"
+              class="flex items-center space-x-1 px-2.5 py-1.5 rounded-full border border-rose-200 dark:border-rose-800/60 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-all shadow-sm cursor-pointer"
+              title="Donate to support the Hub"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              <span class="text-[11px] font-bold hidden sm:inline">Donate</span>
+            </button>
+
             <!-- Dark / Light Theme Toggle Button -->
             <button
               @click="toggleTheme"
@@ -568,15 +570,6 @@ onUnmounted(() => {
           Udemy Courses
         </button>
         <button
-          @click="activeTab = 'taxonomy'"
-          :class="[
-            'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
-            activeTab === 'taxonomy' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
-          ]"
-        >
-          Taxonomy ({{ allTags.length }})
-        </button>
-        <button
           @click="activeTab = 'articles'"
           :class="[
             'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
@@ -602,6 +595,35 @@ onUnmounted(() => {
       
       <!-- TAB 2: RESEARCH INDEX VIEW -->
       <div v-if="activeTab === 'research'" class="space-y-6 animate-fadeIn">
+        <!-- Expandable Taxonomy Section -->
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden transition-colors">
+          <button
+            @click="isTaxonomyExpanded = !isTaxonomyExpanded"
+            class="w-full flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+          >
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+              <h2 class="text-lg font-bold font-serif text-slate-900 dark:text-white">
+                Browse Taxonomy ({{ allTags.length }} Tags)
+              </h2>
+            </div>
+            <svg
+              class="w-5 h-5 text-slate-400 transform transition-transform duration-300"
+              :class="isTaxonomyExpanded ? 'rotate-180' : ''"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div v-show="isTaxonomyExpanded" class="border-t border-slate-200 dark:border-slate-800">
+            <TaxonomyView
+              :papers="papers"
+              @selectTag="handleFilterTag"
+            />
+          </div>
+        </div>
         <!-- Dashboard Widgets Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <!-- Google NotebookLM Card Widget -->
@@ -923,12 +945,6 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- TAB 3: TAXONOMY VIEW -->
-      <TaxonomyView
-        v-else-if="activeTab === 'taxonomy'"
-        :papers="papers"
-        @selectTag="handleFilterTag"
-      />
 
       <!-- TAB 4: SYNTHESIS MATRIX VIEW -->
       <div v-else-if="activeTab === 'matrix'" class="space-y-6 animate-fadeIn">
@@ -1018,6 +1034,9 @@ onUnmounted(() => {
       <UdemyCourses
         v-else-if="activeTab === 'courses'"
       />
+
+      <!-- TAB 7: DONATE VIEW -->
+      <DonatePage v-else-if="activeTab === 'donate'" />
 
       <!-- TAB 6: ABOUT & BIO VIEW (Unified biography section with contact) -->
       <div v-else-if="activeTab === 'about'" class="space-y-6 animate-fadeIn">
