@@ -191,30 +191,4 @@ const displayCKD = computed(() => {
   }
   return '';
 });
-
-const paypalLinkAcademic = computed(() => {
-  let amount = 0;
-  if (selectedAcademic.value !== null) {
-    amount = selectedAcademic.value;
-  } else {
-    const parsed = parseFloat(customAcademic.value);
-    if (!isNaN(parsed) && parsed > 0) {
-      amount = parsed;
-    }
-  }
-  return amount > 0 ? `https://paypal.me/jwlankford/${amount}` : 'https://paypal.me/jwlankford';
-});
-
-const paypalLinkCKD = computed(() => {
-  let amount = 0;
-  if (selectedCKD.value !== null) {
-    amount = selectedCKD.value;
-  } else {
-    const parsed = parseFloat(customCKD.value);
-    if (!isNaN(parsed) && parsed > 0) {
-      amount = parsed;
-    }
-  }
-  return amount > 0 ? `https://paypal.me/jwlankford/${amount}` : 'https://paypal.me/jwlankford';
-});
 </script>
