@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import logoUrl from '../assets/logo.png';
-import logoDarkUrl from '../assets/logo-dark.png';
 </script>
 
 <template>
@@ -21,16 +19,6 @@ import logoDarkUrl from '../assets/logo-dark.png';
         <!-- Author Bio Details -->
         <div class="md:col-span-8 p-8 sm:p-10 space-y-4 text-center md:text-left">
           <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3">
-            <img 
-              :src="logoUrl" 
-              alt="Jeremy Lankford - Creative Visionary | Digital Innovator" 
-              class="h-12 sm:h-14 w-auto object-contain dark:hidden filter drop-shadow-sm" 
-            />
-            <img 
-              :src="logoDarkUrl" 
-              alt="Jeremy Lankford - Creative Visionary | Digital Innovator" 
-              class="h-12 sm:h-14 w-auto object-contain hidden dark:block filter drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]" 
-            />
             <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-400 text-xs font-mono border border-blue-300 dark:border-blue-500/30">
               <span>ABOUT THE INSTRUCTOR</span>
             </div>
