@@ -94,6 +94,18 @@ function formatDate(dateStr?: string) {
               </svg>
               <span>LinkedIn Pulse</span>
             </a>
+            <a 
+              v-else-if="article.substack_url"
+              :href="article.substack_url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-xs text-orange-600 dark:text-orange-400 hover:underline flex items-center space-x-1.5 font-medium"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/>
+              </svg>
+              <span>Substack</span>
+            </a>
           </div>
 
           <div class="flex items-center space-x-3">

@@ -14,7 +14,9 @@ const emit = defineEmits<{
 const title = ref('');
 const summary = ref('');
 const content = ref('');
+const platform = ref<'linkedin' | 'substack'>('linkedin');
 const linkedin_url = ref('');
+const substack_url = ref('');
 const image_url = ref('');
 
 const isSubmitting = ref(false);
@@ -27,7 +29,8 @@ function handleSubmit() {
     title: title.value.trim(),
     summary: summary.value.trim(),
     content: content.value.trim() || undefined,
-    linkedin_url: linkedin_url.value.trim() || undefined,
+    linkedin_url: platform.value === 'linkedin' ? (linkedin_url.value.trim() || undefined) : undefined,
+    substack_url: platform.value === 'substack' ? (substack_url.value.trim() || undefined) : undefined,
     image_url: image_url.value.trim() || undefined,
     is_published: true
   });
@@ -36,7 +39,9 @@ function handleSubmit() {
   title.value = '';
   summary.value = '';
   content.value = '';
+  platform.value = 'linkedin';
   linkedin_url.value = '';
+  substack_url.value = '';
   image_url.value = '';
   isSubmitting.value = false;
 }
@@ -94,7 +99,7 @@ function handleSubmit() {
             ></textarea>
           </div>
 
-          <!-- Cover Image & LinkedIn Links Row -->
+          <!-- Cover Image & Platform Links Row -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Cover Image Link (URL)</label>
@@ -106,11 +111,29 @@ function handleSubmit() {
               />
             </div>
             <div>
-              <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">LinkedIn Pulse Link (URL)</label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold">Publish Platform</label>
+                <div class="flex items-center space-x-2 text-xs">
+                  <label class="flex items-center cursor-pointer text-slate-700 dark:text-slate-300">
+                    <input type="radio" v-model="platform" value="linkedin" class="mr-1 accent-blue-600" /> LinkedIn
+                  </label>
+                  <label class="flex items-center cursor-pointer text-slate-700 dark:text-slate-300">
+                    <input type="radio" v-model="platform" value="substack" class="mr-1 accent-orange-500" /> Substack
+                  </label>
+                </div>
+              </div>
               <input 
+                v-if="platform === 'linkedin'"
                 v-model="linkedin_url"
                 type="url"
                 placeholder="https://www.linkedin.com/pulse/..."
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700/80 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500"
+              />
+              <input 
+                v-if="platform === 'substack'"
+                v-model="substack_url"
+                type="url"
+                placeholder="https://your.substack.com/p/..."
                 class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700/80 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500"
               />
             </div>

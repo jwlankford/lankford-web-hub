@@ -135,6 +135,7 @@ class Article(TenantBase, table=True):
     summary: str = Field(nullable=False)
     content: Optional[str] = Field(default=None, nullable=True) # Full content/markdown for web
     linkedin_url: Optional[str] = Field(default=None, nullable=True) # Optional link to LinkedIn post
+    substack_url: Optional[str] = Field(default=None, nullable=True) # Optional link to Substack post
     image_url: Optional[str] = Field(default=None, nullable=True) # Cover image URL
     published_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     is_published: bool = Field(default=True)
