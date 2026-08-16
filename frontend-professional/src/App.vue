@@ -23,7 +23,6 @@ import DonatePage from './components/DonatePage.vue';
 
 // Ported Academic Components
 import ResearchPaperCard from './components/ResearchPaperCard.vue';
-import TaxonomyView from './components/TaxonomyView.vue';
 import PaperDetailModal from './components/PaperDetailModal.vue';
 import AddPaperModal from './components/AddPaperModal.vue';
 import AdminLoginModal from './components/AdminLoginModal.vue';
@@ -41,7 +40,6 @@ import AddNotebookModal from './components/AddNotebookModal.vue';
 
 // Navigation State
 const activeTab = ref<'research' | 'matrix' | 'courses' | 'about' | 'articles' | 'donate'>('courses');
-const isTaxonomyExpanded = ref(false);
 
 // Technologies Known
 const technologies = [
@@ -179,6 +177,14 @@ const filteredArticles = computed(() => {
            article.summary.toLowerCase().includes(q) || 
            (article.content?.toLowerCase().includes(q) ?? false);
   });
+});
+
+const linkedinArticles = computed(() => {
+  return filteredArticles.value.filter(article => !!article.linkedin_url);
+});
+
+const substackArticles = computed(() => {
+  return filteredArticles.value.filter(article => !article.linkedin_url);
 });
 
 async function loadData() {
@@ -592,35 +598,7 @@ onUnmounted(() => {
       
       <!-- TAB 2: RESEARCH INDEX VIEW -->
       <div v-if="activeTab === 'research'" class="space-y-6 animate-fadeIn">
-        <!-- Expandable Taxonomy Section -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden transition-colors">
-          <button
-            @click="isTaxonomyExpanded = !isTaxonomyExpanded"
-            class="w-full flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
-          >
-            <div class="flex items-center space-x-3">
-              <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-              </svg>
-              <h2 class="text-lg font-bold font-serif text-slate-900 dark:text-white">
-                Browse Taxonomy ({{ allTags.length }} Tags)
-              </h2>
-            </div>
-            <svg
-              class="w-5 h-5 text-slate-400 transform transition-transform duration-300"
-              :class="isTaxonomyExpanded ? 'rotate-180' : ''"
-              fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          <div v-show="isTaxonomyExpanded" class="border-t border-slate-200 dark:border-slate-800">
-            <TaxonomyView
-              :papers="papers"
-              @selectTag="handleFilterTag"
-            />
-          </div>
-        </div>
+
         <!-- Dashboard Widgets Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <!-- Google NotebookLM Card Widget -->
@@ -931,7 +909,7 @@ onUnmounted(() => {
           </button>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <ResearchPaperCard
             v-for="paper in filteredPapers"
             :key="paper.id || paper.title"
@@ -1017,13 +995,30 @@ onUnmounted(() => {
           </button>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <ArticleCard
-            v-for="article in filteredArticles"
-            :key="article.id || article.title"
-            :article="article"
-            @select="selectedArticle = $event"
-          />
+        <div v-else class="space-y-10">
+          <div v-if="linkedinArticles.length > 0" class="space-y-4">
+            <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">LinkedIn Articles</h2>
+            <div class="grid grid-cols-1 gap-6">
+              <ArticleCard
+                v-for="article in linkedinArticles"
+                :key="article.id || article.title"
+                :article="article"
+                @select="selectedArticle = $event"
+              />
+            </div>
+          </div>
+          
+          <div v-if="substackArticles.length > 0" class="space-y-4">
+            <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">Substack Articles</h2>
+            <div class="grid grid-cols-1 gap-6">
+              <ArticleCard
+                v-for="article in substackArticles"
+                :key="article.id || article.title"
+                :article="article"
+                @select="selectedArticle = $event"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
