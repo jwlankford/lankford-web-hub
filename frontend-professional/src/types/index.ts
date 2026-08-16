@@ -46,6 +46,7 @@ export interface Article {
   summary: string;
   content?: string;
   linkedin_url?: string;
+  substack_url?: string;
   image_url?: string;
   published_at?: string;
   is_published?: boolean;
@@ -57,6 +58,7 @@ export interface NewArticleInput {
   summary: string;
   content?: string;
   linkedin_url?: string;
+  substack_url?: string;
   image_url?: string;
   is_published?: boolean;
 }
