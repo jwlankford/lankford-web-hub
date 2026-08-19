@@ -15,12 +15,15 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 connect_args = {}
 if settings.ASYNC_DATABASE_URL and "neon.tech" in settings.ASYNC_DATABASE_URL:
     connect_args["ssl"] = "require"
+    # Disable prepared statement cache for PgBouncer/Neon pooler compatibility
+    connect_args["statement_cache_size"] = 0
 
 # 1. Create the asynchronous database engine
 engine = create_async_engine(
     settings.ASYNC_DATABASE_URL,
     echo=False, # Set to False for clean console output
     future=True,
+    pool_pre_ping=True,
     connect_args=connect_args
 )
 
@@ -56,15 +59,6 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         # Automatically generate missing tables safely
         await conn.run_sync(SQLModel.metadata.create_all)
-        
-        # Migrate existing academic tenant rows to professional tenant context
-        from sqlalchemy import text
-        for table in ["book_mailing_list", "research_papers", "research_tags", "articles", "google_notebooks", "jupyter_notebooks", "contact_messages"]:
-            await conn.execute(text(f"UPDATE {table} SET tenant = 'professional' WHERE tenant = 'academic'"))
-            try:
-                await conn.execute(text(f"SELECT setval(pg_get_serial_sequence('{table}', 'id'), coalesce(max(id), 1)) FROM {table}"))
-            except Exception:
-                pass
 
     # Seed initial academic research papers if table is empty
     async with async_session_maker() as session:
