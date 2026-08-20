@@ -28,7 +28,7 @@ function copyToClipboard(text: string) {
     class="group relative bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900/90 rounded-xl p-6 border border-slate-200 dark:border-slate-800 hover:border-blue-500/40 transition-all duration-300 shadow-md hover:shadow-xl dark:hover:shadow-blue-950/40 overflow-hidden"
   >
     <!-- Content -->
-    <div class="flex flex-col justify-between h-full w-full">`n        <div class="flex items-center justify-between text-xs mb-3 text-slate-500 dark:text-slate-400 font-mono">
+    <div class="flex flex-col justify-between h-full w-full">        <div class="flex items-center justify-between text-xs mb-3 text-slate-500 dark:text-slate-400 font-mono">
           <span class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/80 border border-blue-300 dark:border-blue-500/30 text-blue-800 dark:text-cyan-300 font-semibold">
             <span>{{ paper.publication_year }}</span>
           </span>
@@ -56,7 +56,7 @@ function copyToClipboard(text: string) {
           class="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 mb-4 leading-relaxed"
         >
           {{ paper.abstract }}
-        </p>`n`n      <!-- Card Bottom: Tags & Action Button -->
+        </p>      <!-- Card Bottom: Tags & Action Button -->
       <div>
         <!-- Tags list -->
         <div v-if="paper.tags && paper.tags.length" class="flex flex-wrap gap-1.5 mb-4">
