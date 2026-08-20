@@ -152,22 +152,59 @@ const allTags = computed(() => {
 });
 
 const filteredPapers = computed(() => {
-  return papers.value.filter(paper => {
-    if (selectedTagSlug.value) {
-      const hasTag = paper.tags?.some(t => (t.slug || t.name.toLowerCase().replace(/\s+/g, '-')) === selectedTagSlug.value);
-      if (!hasTag) return false;
-    }
-    if (searchQuery.value.trim()) {
-      const q = searchQuery.value.toLowerCase().trim();
-      const titleMatch = paper.title.toLowerCase().includes(q);
-      const authorsMatch = paper.authors.toLowerCase().includes(q);
-      const abstractMatch = paper.abstract?.toLowerCase().includes(q) ?? false;
-      const methodologyMatch = paper.methodology?.toLowerCase().includes(q) ?? false;
-      return titleMatch || authorsMatch || abstractMatch || methodologyMatch;
-    }
-    return true;
-  });
+return papers.value.filter(paper => {
+  if (selectedTagSlug.value) {
+    const hasTag = paper.tags?.some(t => (t.slug || t.name.toLowerCase().replace(/\s+/g, '-')) === selectedTagSlug.value);
+    if (!hasTag) return false;
+  }
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.toLowerCase().trim();
+    const titleMatch = paper.title.toLowerCase().includes(q);
+    const authorsMatch = paper.authors.toLowerCase().includes(q);
+    const abstractMatch = paper.abstract?.toLowerCase().includes(q) ?? false;
+    const methodologyMatch = paper.methodology?.toLowerCase().includes(q) ?? false;
+    return titleMatch || authorsMatch || abstractMatch || methodologyMatch;
+  }
+  return true;
 });
+});
+
+const isBibtexCopied = ref(false);
+const isCollectionKeyCopied = ref(false);
+
+function copyCollectionKey() {
+  const collectionKey = filteredPapers.value
+    .map(p => p.zotero_key)
+    .filter(Boolean)
+    .join(', ');
+    
+  navigator.clipboard.writeText(collectionKey).then(() => {
+    isCollectionKeyCopied.value = true;
+    setTimeout(() => {
+      isCollectionKeyCopied.value = false;
+    }, 2000);
+  });
+}
+  function copyBibtex() {
+const bibtexString = filteredPapers.value.map(paper => {
+  const key = paper.zotero_key || `paper_${paper.id || Math.random().toString(36).substr(2, 9)}`;
+  return `@article{${key},
+title={${paper.title || ''}},
+author={${paper.authors || ''}},
+journal={${paper.journal_or_conf || ''}},
+year={${paper.publication_year || ''}},
+url={${paper.url || ''}},
+abstract={${paper.abstract || ''}}
+}`;
+}).join('\n\n');
+
+navigator.clipboard.writeText(bibtexString).then(() => {
+  isBibtexCopied.value = true;
+  setTimeout(() => {
+    isBibtexCopied.value = false;
+  }, 2000);
+});
+}
 
 const filteredArticles = computed(() => {
   if (!searchQuery.value.trim()) return articles.value;
@@ -835,12 +872,40 @@ onUnmounted(() => {
             </div>
 
             <!-- Active Tag Filter Badge / Counter -->
-            <div class="flex items-center space-x-3 text-xs font-mono text-slate-500 dark:text-slate-400">
+            <div class="flex flex-wrap items-center gap-3 text-xs font-mono text-slate-500 dark:text-slate-400">
               <span>Showing <strong class="text-blue-600 dark:text-cyan-400">{{ filteredPapers.length }}</strong> of {{ papers.length }} Studies</span>
-              
+                  
               <button 
                 type="button"
-                @click="showTaxonomyFilters = !showTaxonomyFilters"
+                @click="copyBibtex"
+                class="px-2 py-1 rounded text-[11px] border transition-colors flex items-center gap-1 font-mono bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900"
+                title="Copy BibTex for Zotero"
+              >
+                <svg v-if="!isBibtexCopied" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                </svg>
+                <svg v-else class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>{{ isBibtexCopied ? 'Copied BibTex' : 'Copy BibTex' }}</span>
+              </button>
+
+              <div class="flex items-center space-x-1.5 bg-slate-100/50 dark:bg-slate-800/40 px-2 py-1 rounded border border-slate-200/60 dark:border-slate-800/60 font-mono text-[10px] text-slate-600 dark:text-slate-400">
+                <svg class="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                </svg>
+                <span class="truncate max-w-[130px]" title="Filtered Zotero Keys">{{ filteredPapers.filter(p => p.zotero_key).length }} Zotero Keys</span>
+                <button type="button" @click="copyCollectionKey" class="text-slate-400 hover:text-blue-600 dark:hover:text-cyan-400 p-0.5 rounded transition-colors flex items-center justify-center cursor-pointer ml-1" title="Copy Zotero Keys">
+                  <svg v-if="!isCollectionKeyCopied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                  </svg>
+                  <svg v-else class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </button>
+              </div>
+
+              <button type="button" @click="showTaxonomyFilters = !showTaxonomyFilters"
                 class="px-2 py-1 rounded text-[11px] border transition-colors flex items-center gap-1 font-mono"
                 :class="[
                   showTaxonomyFilters || selectedTagSlug
@@ -909,7 +974,7 @@ onUnmounted(() => {
           </button>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div v-else class="grid grid-cols-1 gap-6">
           <ResearchPaperCard
             v-for="paper in filteredPapers"
             :key="paper.id || paper.title"
