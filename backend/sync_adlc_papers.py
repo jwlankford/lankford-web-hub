@@ -52,7 +52,9 @@ def fetch_crossref_papers(query, max_results=10):
         url = "https://api.crossref.org/works"
         params = {
             "query": query,
-            "rows": max_results
+            "rows": max_results,
+            "sort": "published",
+            "order": "desc"
         }
         headers = {
             "User-Agent": "LankfordWebHub/1.0 (mailto:jwlan@example.com)"
@@ -383,7 +385,7 @@ async def sync_one_paper():
     
     # 1. Fetch papers from Crossref (representing a wide variety of journals and conferences)
     crossref_query = '"Agentic Development Life Cycle" OR "ADLC" OR "Agentic Software Engineering"'
-    crossref_papers = fetch_crossref_papers(crossref_query, max_results=10)
+    crossref_papers = fetch_crossref_papers(crossref_query, max_results=50)
     
     # Enrich papers with abstracts from OpenAlex if missing/placeholder
     for paper in crossref_papers:
@@ -399,7 +401,7 @@ async def sync_one_paper():
 
     # 2. Fetch papers from ArXiv (representing preprints)
     arxiv_query = "all:\"Agentic Development Life Cycle\" OR all:\"ADLC\" OR all:\"Agentic Software Engineering\""
-    arxiv_papers = fetch_arxiv_papers(arxiv_query, max_results=10)
+    arxiv_papers = fetch_arxiv_papers(arxiv_query, max_results=50)
     
     # 3. Merge and deduplicate the sources
     papers = merge_and_normalize_papers([crossref_papers, arxiv_papers])
