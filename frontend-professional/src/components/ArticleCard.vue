@@ -23,35 +23,8 @@ function formatDate(dateStr?: string) {
   <div 
     class="group relative bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900/90 rounded-xl p-6 border border-slate-200 dark:border-slate-800 hover:border-blue-500/40 transition-all duration-300 shadow-md hover:shadow-xl dark:hover:shadow-blue-950/40 overflow-hidden"
   >
-    <div class="flex flex-col md:flex-row gap-6 h-full">
-      <!-- Left side: Image -->
-      <div class="md:w-1/3 shrink-0">
-        <div 
-          v-if="article.image_url" 
-          @click="emit('select', article)"
-          class="relative overflow-hidden rounded-lg cursor-pointer border border-slate-200 dark:border-slate-800 group/img h-full min-h-[12rem] max-h-48 md:max-h-none"
-        >
-          <img 
-            :src="article.image_url" 
-            :alt="article.title"
-            class="w-full h-full object-cover absolute inset-0 group-hover/img:scale-105 transition-transform duration-500"
-          />
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity"></div>
-        </div>
-        
-        <div 
-          v-else 
-          @click="emit('select', article)"
-          class="relative overflow-hidden rounded-lg cursor-pointer bg-gradient-to-br from-blue-600/10 via-indigo-600/5 to-cyan-600/10 dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-cyan-950/30 border border-slate-200 dark:border-slate-800 flex items-center justify-center group/img h-full min-h-[12rem] max-h-48 md:max-h-none"
-        >
-          <svg class="w-10 h-10 text-slate-300 dark:text-slate-700 group-hover/img:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 4a2 2 0 0 0-2-2v3m2-3V9m0 0a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2m-4-7a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9h.01M9 13h.01"/>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Right side: Content -->
-      <div class="flex-1 flex flex-col justify-between">
+    <div class="flex flex-col justify-between h-full w-full">
+      <!-- Content -->
         <div>
           <!-- Card Top: Published Date -->
           <div class="flex items-center justify-between text-xs mb-3 text-slate-500 dark:text-slate-400 font-mono">
@@ -120,7 +93,6 @@ function formatDate(dateStr?: string) {
             </button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</template>
+    </div>`n  </div>`n</template>
+
+
