@@ -25,8 +25,21 @@ import google.generativeai as genai
 from database import init_db, get_async_session
 from config import settings
 from sqlalchemy.orm import selectinload
+import time
 # Import our new data models alongside the tenant helpers
 from models import TenantDomain, BookMailingList, ResearchPaper, ResearchTag, ResearchPaperRead, Article, GoogleNotebook, JupyterNotebook, ContactMessage
+
+# Simple in-memory TTL cache to reduce database round-trips
+_api_cache = {}
+def get_cached_response(key: str, ttl: int = 300):
+    if key in _api_cache:
+        data, ts = _api_cache[key]
+        if time.time() - ts < ttl:
+            return data
+    return None
+
+def set_cached_response(key: str, data):
+    _api_cache[key] = (data, time.time())
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -159,6 +172,11 @@ async def get_research_papers(
             detail="Academic assets are restricted outside of valid domain contexts."
         )
         
+    cache_key = f"papers_{request.state.tenant}"
+    cached = get_cached_response(cache_key)
+    if cached is not None:
+        return cached
+        
     # Enforce row-level multi-tenancy inside the query select statement
     statement = (
         select(ResearchPaper)
@@ -166,7 +184,9 @@ async def get_research_papers(
         .options(selectinload(ResearchPaper.tags))
     )
     results = await db.execute(statement)
-    return results.scalars().all()
+    papers = results.scalars().all()
+    set_cached_response(cache_key, papers)
+    return papers
 
 
 class AutoExtractRequest(BaseModel):
@@ -368,6 +388,12 @@ async def add_research_paper(
             
     await db.commit()
     await db.refresh(paper)
+    
+    # Invalidate cache
+    cache_key = f"papers_{request.state.tenant}"
+    if cache_key in _api_cache:
+        del _api_cache[cache_key]
+        
     return paper
 
 
@@ -383,12 +409,19 @@ async def get_articles(
     """
     Fetches articles linked ONLY to the active tenant environment.
     """
+    cache_key = f"articles_{request.state.tenant}"
+    cached = get_cached_response(cache_key)
+    if cached is not None:
+        return cached
+
     statement = select(Article).where(
         Article.tenant == request.state.tenant,
         Article.is_published == True
     ).order_by(Article.published_at.desc())
     results = await db.execute(statement)
-    return results.scalars().all()
+    articles = results.scalars().all()
+    set_cached_response(cache_key, articles)
+    return articles
 
 
 @app.post("/api/v1/articles", status_code=status.HTTP_201_CREATED, response_model=Article)
@@ -411,6 +444,12 @@ async def add_article(
     db.add(article)
     await db.commit()
     await db.refresh(article)
+    
+    # Invalidate cache
+    cache_key = f"articles_{request.state.tenant}"
+    if cache_key in _api_cache:
+        del _api_cache[cache_key]
+        
     return article
 
 
@@ -431,12 +470,20 @@ async def get_google_notebooks(
             status_code=403,
             detail="Domain context is required to query Google Notebooks."
         )
+        
+    cache_key = f"google_notebooks_{request.state.tenant}"
+    cached = get_cached_response(cache_key)
+    if cached is not None:
+        return cached
+        
     statement = select(GoogleNotebook).where(
         GoogleNotebook.tenant == request.state.tenant,
         GoogleNotebook.is_public == True
     ).order_by(GoogleNotebook.created_at.desc())
     results = await db.execute(statement)
-    return results.scalars().all()
+    notebooks = results.scalars().all()
+    set_cached_response(cache_key, notebooks)
+    return notebooks
 
 
 @app.post("/api/v1/notebooks/google", status_code=status.HTTP_201_CREATED, response_model=GoogleNotebook)
@@ -457,6 +504,12 @@ async def add_google_notebook(
     db.add(notebook)
     await db.commit()
     await db.refresh(notebook)
+    
+    # Invalidate cache
+    cache_key = f"google_notebooks_{request.state.tenant}"
+    if cache_key in _api_cache:
+        del _api_cache[cache_key]
+        
     return notebook
 
 
@@ -477,11 +530,19 @@ async def get_jupyter_notebooks(
             status_code=403,
             detail="Domain context is required to query Jupyter Notebooks."
         )
+        
+    cache_key = f"jupyter_notebooks_{request.state.tenant}"
+    cached = get_cached_response(cache_key)
+    if cached is not None:
+        return cached
+        
     statement = select(JupyterNotebook).where(
         JupyterNotebook.tenant == request.state.tenant
     ).order_by(JupyterNotebook.created_at.desc())
     results = await db.execute(statement)
-    return results.scalars().all()
+    notebooks = results.scalars().all()
+    set_cached_response(cache_key, notebooks)
+    return notebooks
 
 
 @app.post("/api/v1/notebooks/jupyter", status_code=status.HTTP_201_CREATED, response_model=JupyterNotebook)
@@ -502,4 +563,10 @@ async def add_jupyter_notebook(
     db.add(notebook)
     await db.commit()
     await db.refresh(notebook)
+    
+    # Invalidate cache
+    cache_key = f"jupyter_notebooks_{request.state.tenant}"
+    if cache_key in _api_cache:
+        del _api_cache[cache_key]
+        
     return notebook
