@@ -1,5 +1,6 @@
 import os
 import sys
+import bibtexparser
 from dotenv import load_dotenv
 
 # Load environment variables before setting up app config
@@ -20,7 +21,7 @@ import json
 from typing import Optional, List
 from pydantic import BaseModel
 from bs4 import BeautifulSoup
-import google.generativeai as genai
+
 
 from database import init_db, get_async_session
 from config import settings
@@ -188,9 +189,95 @@ async def get_research_papers(
     set_cached_response(cache_key, papers)
     return papers
 
+from datetime import datetime
+from models import ResearchTag
 
-class AutoExtractRequest(BaseModel):
-    url: str
+class BibtexImportRequest(BaseModel):
+    bibtex: str
+
+@app.post("/api/v1/research/papers/bibtex")
+async def import_bibtex(
+    payload: BibtexImportRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_async_session)
+):
+    if request.state.tenant not in ["professional", "academic"]:
+        raise HTTPException(status_code=403, detail="Tenant context required")
+
+    try:
+        bib_database = bibtexparser.loads(payload.bibtex)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid BibTeX format")
+
+    added = 0
+    skipped = 0
+    for entry in bib_database.entries:
+        title = entry.get('title', '').replace('{', '').replace('}', '').strip()
+        if not title:
+            continue
+            
+        stmt = select(ResearchPaper).where(
+            (ResearchPaper.title == title) & (ResearchPaper.tenant == request.state.tenant)
+        )
+        res = await db.execute(stmt)
+        if res.scalars().first():
+            skipped += 1
+            continue
+            
+        authors = entry.get('author', '').replace(' and ', '; ').replace('{', '').replace('}', '')
+        year_str = entry.get('year', str(datetime.now().year))
+        try:
+            year = int(year_str)
+        except ValueError:
+            year = datetime.now().year
+            
+        journal = entry.get('journal', entry.get('booktitle', ''))
+        abstract = entry.get('abstract', '')
+        url = entry.get('url', '')
+        zotero_key = entry.get('ID', '')
+
+        paper = ResearchPaper(
+            title=title,
+            authors=authors,
+            publication_year=year,
+            journal_or_conf=journal,
+            abstract=abstract,
+            zotero_key=zotero_key,
+            url=url,
+            tenant=request.state.tenant
+        )
+        db.add(paper)
+        await db.flush()
+        
+        keywords = entry.get('keywords', '')
+        if keywords:
+            tag_list = [k.strip() for k in keywords.split(',')]
+            for t_name in tag_list:
+                if not t_name: continue
+                t_slug = t_name.lower().replace(' ', '-')
+                t_slug = "".join(c for c in t_slug if (c.isalnum() or c == '-'))
+                
+                tag_stmt = select(ResearchTag).where(ResearchTag.slug == t_slug)
+                tag_res = await db.execute(tag_stmt)
+                db_tag = tag_res.scalars().first()
+                if not db_tag:
+                    db_tag = ResearchTag(name=t_name, slug=t_slug, tenant=request.state.tenant)
+                    db.add(db_tag)
+                    await db.flush()
+                    
+                from models import ResearchPaperTagLink
+                link = ResearchPaperTagLink(paper_id=paper.id, tag_id=db_tag.id)
+                db.add(link)
+                
+        added += 1
+
+    await db.commit()
+    
+    cache_key = f"papers_{request.state.tenant}"
+    if cache_key in _api_cache:
+        del _api_cache[cache_key]
+        
+    return {"added": added, "skipped": skipped}
 
 class ResearchPaperCreateSchema(BaseModel):
     title: str
@@ -205,121 +292,6 @@ class ResearchPaperCreateSchema(BaseModel):
     image_url: Optional[str] = None
     tags: Optional[List[str]] = None
 
-@app.post("/api/v1/research/auto-extract")
-async def auto_extract_paper_metadata(
-    payload: AutoExtractRequest,
-    request: Request
-):
-    """
-    Downloads article content from URL, uses Gemini to extract structured metadata,
-    and returns it to pre-fill the index paper form.
-    """
-    if request.state.tenant not in ["professional", "academic"]:
-        raise HTTPException(
-            status_code=403, 
-            detail="Metadata extraction requires an active domain context."
-        )
-
-    url = payload.url.strip()
-    if not url:
-        raise HTTPException(status_code=400, detail="URL cannot be empty")
-        
-    try:
-        req = urllib.request.Request(
-            url, 
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        )
-        with urllib.request.urlopen(req, timeout=15) as response:
-            html = response.read()
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to fetch content from URL: {str(e)}")
-        
-    try:
-        soup = BeautifulSoup(html, 'html.parser')
-        for script in soup(["script", "style"]):
-            script.decompose()
-        clean_text = soup.get_text(separator=' ')
-        clean_text = " ".join(clean_text.split())
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to parse article content: {str(e)}")
-        
-    gemini_key = settings.GEMINI_API_KEY or os.environ.get("GEMINI_API_KEY")
-    if not gemini_key:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not configured on the server. Please add it to your local backend/.env file.")
-        
-    try:
-        genai.configure(api_key=gemini_key)
-        model = genai.GenerativeModel('gemini-2.5-flash')
-        
-        prompt = f"""
-        You are an expert academic research assistant.
-        Analyze the following text scraped from a research article URL. Extract:
-        1. Title of the article.
-        2. Authors (formatted as a semicolon-separated list of author names, e.g. "Lankford, J. W.; Chen, M.").
-        3. Publication Year (as an integer).
-        4. Journal or Conference name (e.g., "arXiv Preprint", "ACM", "LinkedIn Pulse", or fallback to 'Web Publication' if not specified).
-        5. Abstract/Summary of the article (comprehensive summary).
-        6. Key empirical findings of the article (1-2 sentences).
-        7. Methodology used in the article (1-2 sentences).
-        8. A list of exactly 8 to 12 highly relevant taxonomy tags/keywords.
-
-        URL: {url}
-        Content Snippet:
-        {clean_text[:10000]}
-
-        Provide the output strictly in the following JSON format:
-        {{
-          "title": "...",
-          "authors": "...",
-          "publication_year": 2026,
-          "journal_or_conf": "...",
-          "abstract": "...",
-          "key_findings": "...",
-          "methodology": "...",
-          "tags": ["tag1", "tag2", ...]
-        }}
-        Do not include any other markdown formatting, wrap code blocks, or write conversational text besides the JSON object.
-        """
-        
-        response = model.generate_content(prompt)
-        text = response.text.strip()
-        
-        if text.startswith("```json"):
-            text = text[7:]
-        if text.endswith("```"):
-            text = text[:-3]
-        text = text.strip()
-        
-        extracted = json.loads(text)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI extraction failed: {str(e)}")
-        
-    # Calculate Zotero Key: LASTNAME_YEAR_FIRST_TWO_WORDS
-    try:
-        authors_str = extracted.get("authors", "Unknown")
-        authors = [a.strip() for a in authors_str.split(';') if a.strip()]
-        last_name = "Unknown"
-        if authors:
-            first_author = authors[0]
-            if ',' in first_author:
-                last_name = first_author.split(',')[0].strip()
-            else:
-                last_name = first_author.split(' ')[-1].strip()
-        last_name = "".join(c for c in last_name if c.isalnum())
-        
-        title_val = extracted.get("title", "")
-        clean_title = "".join(c if (c.isalnum() or c.isspace()) else "" for c in title_val)
-        words = [w.strip() for w in clean_title.split() if w.strip()]
-        first_two_words = words[:2]
-        first_two_words_str = "_".join(first_two_words)
-        
-        year_val = extracted.get("publication_year", 2026)
-        zotero_key = f"{last_name.upper()}_{year_val}_{first_two_words_str.upper()}"
-        extracted["zotero_key"] = zotero_key
-    except Exception:
-        extracted["zotero_key"] = "UNKNOWN_KEY"
-        
-    return extracted
 
 @app.post("/api/v1/research/papers", status_code=status.HTTP_201_CREATED)
 async def add_research_paper(

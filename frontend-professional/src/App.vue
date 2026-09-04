@@ -10,7 +10,8 @@ import {
   fetchGoogleNotebooks,
   createGoogleNotebook,
   fetchJupyterNotebooks,
-  createJupyterNotebook
+  createJupyterNotebook,
+  importBibtex
 } from './services/api';
 import { useTheme } from './composables/useTheme';
 import { useAuth } from './composables/useAuth';
@@ -271,6 +272,18 @@ async function handleAddPaper(input: NewResearchPaperInput) {
   papers.value.unshift(result.paper);
   isAddModalOpen.value = false;
   selectedPaper.value = result.paper;
+}
+
+async function handleBibtexImport(bibtexString: string) {
+  try {
+    const result = await importBibtex(bibtexString);
+    const updated = await fetchResearchPapers();
+    papers.value = updated.papers;
+    isAddModalOpen.value = false;
+    alert(`Imported ${result.added} papers. Skipped ${result.skipped} duplicates.`);
+  } catch (err: any) {
+    alert(err.message || "Failed to import BibTeX");
+  }
 }
 
 async function handleAddArticle(input: NewArticleInput) {
@@ -1267,6 +1280,7 @@ onUnmounted(() => {
       :isOpen="isAddModalOpen"
       @close="isAddModalOpen = false"
       @submit="handleAddPaper"
+      @bibtexSubmit="handleBibtexImport"
     />
 
     <AdminLoginModal

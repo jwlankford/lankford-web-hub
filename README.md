@@ -17,7 +17,6 @@ A high-performance **FastAPI** application serving as the Dual-Domain Core API. 
 *   [models.py](file:///d:/lankford-web-hub/backend/models.py): SQLModel schemas defining database structures for research papers, notebook references, mailing list entries, contact messages, and articles.
 *   [database.py](file:///d:/lankford-web-hub/backend/database.py): Handles SQLite and PostgreSQL engines, async sessions, schema creation, and database initialization/seeding.
 *   [config.py](file:///d:/lankford-web-hub/backend/config.py): System configurations utilizing `pydantic-settings` to manage environments, credentials, and API endpoints.
-*   [sync_adlc_papers.py](file:///d:/lankford-web-hub/backend/sync_adlc_papers.py): Background script running queries against the ArXiv API to fetch and automatically insert the latest papers matching the "Agentic Development Life Cycle (ADLC)" search constraints.
 *   [update_db.py](file:///d:/lankford-web-hub/backend/update_db.py): Database maintenance utility script to force database synchronization.
 *   [Dockerfile](file:///d:/lankford-web-hub/backend/Dockerfile) & [docker-compose.yml](file:///d:/lankford-web-hub/backend/docker-compose.yml): Set up containerization settings for isolated dev/prod execution environments.
 *   [Test.py](file:///d:/lankford-web-hub/backend/Test.py) & [scratch_test.py](file:///d:/lankford-web-hub/backend/scratch_test.py): Local sandbox testing scripts.
@@ -83,4 +82,5 @@ A **Vue 3 + TypeScript + Vite** Single Page Application (SPA) designed to build 
 *   **Secured Author Authentication UI:** Removed references to default credentials (`lankford2026`) from the `AdminLoginModal.vue` helper label and text placeholder.
 *   **GitHub Pages Custom Domain Persistence:** Added a `CNAME` file to `frontend-professional/public` mapping to `jeremylankford.com` to prevent the deploy action from stripping the custom domain configuration and breaking SSL provisioning on pushes.
 *   **Persistent Contact Form Database Integration:** Created `ContactMessage` model in backend, added a POST endpoint `/api/v1/contact` to write submissions to the Neon database (or local SQLite), and updated `ContactForm.vue` to dynamically dispatch submissions to the backend API instead of using mock simulations.
-
+*   **Bulk Import via Zotero BibTeX:** Implemented a new bulk-import feature in `AddPaperModal.vue` allowing administrators to paste raw BibTeX strings exported from Zotero to batch-load the database efficiently, complete with deduplication checks.
+*   **Cost Optimization (Google API & Automations):** Decommissioned the automated background polling script (`sync_adlc_papers.py`) and all `google-generativeai` endpoints (Gemini API) to eliminate unnecessary Google Cloud infrastructure expenses.
