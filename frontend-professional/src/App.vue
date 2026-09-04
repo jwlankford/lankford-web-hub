@@ -994,7 +994,9 @@ onUnmounted(() => {
             :paper="paper"
             @select="selectedPaper = $event"
             @filterTag="handleFilterTag"
+            @updated="handlePaperUpdated"
           />
+
         </div>
       </div>
 
