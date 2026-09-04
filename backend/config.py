@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int = 5432
     
     # Gemini API configuration
-    GEMINI_API_KEY: str | None = None
+    # (Removed to save costs)
 
     @property
     def ASYNC_DATABASE_URL(self) -> str:

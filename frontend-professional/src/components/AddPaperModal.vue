@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import type { NewResearchPaperInput } from '../types';
-import { autoExtractPaper } from '../services/api';
+
 import RichTextEditor from './RichTextEditor.vue';
 
 defineProps<{
@@ -11,6 +11,7 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void;
   (e: 'submit', input: NewResearchPaperInput): void;
+  (e: 'bibtexSubmit', bibtex: string): void;
 }>();
 
 const title = ref('');
@@ -24,34 +25,28 @@ const zotero_key = ref('');
 const url = ref('');
 
 const isSubmitting = ref(false);
-const isExtracting = ref(false);
-const extractionError = ref('');
 const tagsString = ref('');
 
-async function handleAutoExtract() {
-  if (!url.value.trim()) {
-    extractionError.value = 'Please enter a URL first.';
+const bibtexInput = ref('');
+const isImporting = ref(false);
+const importMessage = ref('');
+const importError = ref(false);
+
+function handleBibtexImport() {
+  if (!bibtexInput.value.trim()) {
+    importError.value = true;
+    importMessage.value = 'Please paste BibTeX first.';
     return;
   }
+  isImporting.value = true;
+  importError.value = false;
+  importMessage.value = '';
+  emit('bibtexSubmit', bibtexInput.value);
   
-  isExtracting.value = true;
-  extractionError.value = '';
-  try {
-    const data = await autoExtractPaper(url.value.trim());
-    title.value = data.title;
-    authors.value = data.authors;
-    publication_year.value = data.publication_year;
-    journal_or_conf.value = data.journal_or_conf || '';
-    abstract.value = data.abstract || '';
-    key_findings.value = data.key_findings || '';
-    methodology.value = data.methodology || '';
-    zotero_key.value = data.zotero_key || '';
-    tagsString.value = data.tags ? data.tags.map(t => `#${t.replace(/\s+/g, '')}`).join(' ') : '';
-  } catch (err: any) {
-    extractionError.value = err.message || 'Auto-extraction failed. Please verify the URL or enter details manually.';
-  } finally {
-    isExtracting.value = false;
-  }
+  // Fake a small delay to simulate processing so UI feels responsive
+  setTimeout(() => {
+    isImporting.value = false;
+  }, 500);
 }
 
 function handleSubmit() {
@@ -117,39 +112,39 @@ function handleSubmit() {
         </div>
 
         <form @submit.prevent="handleSubmit" class="space-y-4 text-sm max-h-[70vh] overflow-y-auto pr-1">
-          <!-- Auto-Fill Section -->
+          <!-- Bulk Import BibTeX -->
           <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 space-y-3 mb-4">
             <div class="flex items-center justify-between">
-              <span class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono font-bold">Auto-Fill from URL</span>
-              <span class="text-[10px] text-blue-650 dark:text-cyan-400 font-mono font-semibold">Gemini Extraction</span>
+              <span class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono font-bold">Bulk Import (BibTeX)</span>
+              <span class="text-[10px] text-blue-650 dark:text-cyan-400 font-mono font-semibold">Zotero Support</span>
             </div>
-            <div class="flex space-x-2">
-              <input 
-                v-model="url"
-                type="url"
-                placeholder="Paste article URL (ArXiv, LinkedIn, PDF, blog...)"
-                class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 text-xs"
-              />
+            <div class="flex flex-col space-y-2">
+              <textarea 
+                v-model="bibtexInput"
+                rows="4"
+                placeholder="Paste BibTeX entries here to import multiple papers..."
+                class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 text-xs font-mono"
+              ></textarea>
               <button
                 type="button"
-                @click="handleAutoExtract"
-                :disabled="isExtracting"
-                class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold shadow-sm transition-colors text-xs flex items-center justify-center min-w-[120px] disabled:bg-blue-600/60 cursor-pointer"
+                @click="handleBibtexImport"
+                :disabled="isImporting"
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold shadow-sm transition-colors text-xs flex items-center justify-center min-w-[120px] disabled:bg-emerald-600/60 self-end"
               >
-                <svg v-if="isExtracting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span v-if="isExtracting">Analyzing...</span>
-                <span v-else>Auto-Fill Form</span>
+                <span v-if="isImporting">Importing...</span>
+                <span v-else>Parse & Import</span>
               </button>
+              <p v-if="importMessage" :class="importError ? 'text-red-500 dark:text-red-400' : 'text-emerald-500 dark:text-emerald-400'" class="text-xs font-medium font-sans">
+                {{ importMessage }}
+              </p>
             </div>
-            <p v-if="extractionError" class="text-xs text-red-500 dark:text-red-400 font-medium font-sans">
-              {{ extractionError }}
-            </p>
           </div>
-
-          <!-- Title -->
+          
+          <div class="relative flex py-2 items-center">
+             <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+             <span class="flex-shrink-0 mx-4 text-slate-400 text-xs font-mono">OR MANUAL ENTRY</span>
+             <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+          </div>
           <div>
             <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Paper Title *</label>
             <input 

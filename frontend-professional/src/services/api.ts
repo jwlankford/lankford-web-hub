@@ -216,31 +216,21 @@ export async function fetchResearchPapers(): Promise<{ papers: ResearchPaper[]; 
   }
 }
 
-export interface AutoExtractResponse {
-  title: string;
-  authors: string;
-  publication_year: number;
-  journal_or_conf?: string;
-  abstract?: string;
-  key_findings?: string;
-  methodology?: string;
-  zotero_key: string;
-  tags: string[];
-}
 
-export async function autoExtractPaper(url: string): Promise<AutoExtractResponse> {
-  const res = await fetch(`${API_RESEARCH_BASE}/auto-extract`, {
+
+export async function importBibtex(bibtex: string): Promise<{ added: number; skipped: number }> {
+  const res = await fetch(`${API_RESEARCH_BASE}/papers/bibtex`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Host': 'professional.localhost',
       'X-Tenant': 'professional'
     },
-    body: JSON.stringify({ url })
+    body: JSON.stringify({ bibtex })
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: 'Failed to extract paper data' }));
-    throw new Error(err.detail || 'Failed to extract paper data');
+    const err = await res.json().catch(() => ({ detail: 'Failed to import BibTeX' }));
+    throw new Error(err.detail || 'Failed to import BibTeX');
   }
   return res.json();
 }
