@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Article } from '../types';
 
-defineProps<{
+const props = defineProps<{
   article: Article;
 }>();
 
@@ -17,6 +17,15 @@ function formatDate(dateStr?: string) {
     day: 'numeric'
   });
 }
+
+function handleSelect() {
+  const url = props.article.linkedin_url || props.article.substack_url;
+  if (url) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  } else {
+    emit('select', props.article);
+  }
+}
 </script>
 
 <template>
@@ -24,7 +33,7 @@ function formatDate(dateStr?: string) {
     class="group relative bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900/90 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/40 transition-all duration-300 shadow-md hover:shadow-xl dark:hover:shadow-blue-950/40 overflow-hidden flex flex-col h-full"
   >
     <!-- Image Header -->
-    <div v-if="article.image_url" class="w-full h-48 sm:h-52 overflow-hidden flex-shrink-0 cursor-pointer" @click="emit('select', article)">
+    <div v-if="article.image_url" class="w-full h-48 sm:h-52 overflow-hidden flex-shrink-0 cursor-pointer" @click="handleSelect">
       <img :src="article.image_url" :alt="article.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
     </div>
 
@@ -43,7 +52,7 @@ function formatDate(dateStr?: string) {
 
           <!-- Title -->
           <h3 
-            @click="emit('select', article)"
+            @click="handleSelect"
             class="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-cyan-300 cursor-pointer transition-colors leading-snug mb-3 font-serif"
           >
             {{ article.title }}
@@ -88,7 +97,7 @@ function formatDate(dateStr?: string) {
 
           <div class="flex items-center space-x-3">
             <button 
-              @click="emit('select', article)"
+              @click="handleSelect"
               class="text-xs font-semibold text-blue-600 dark:text-cyan-400 hover:text-blue-700 dark:hover:text-cyan-300 bg-blue-50 dark:bg-blue-950/80 hover:bg-blue-100 dark:hover:bg-blue-900 border border-blue-300 dark:border-blue-500/40 px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors cursor-pointer"
             >
               <span>Read Article</span>
