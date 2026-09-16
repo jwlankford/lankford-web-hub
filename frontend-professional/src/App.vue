@@ -40,7 +40,7 @@ import AddNotebookModal from './components/AddNotebookModal.vue';
 
 
 // Navigation State
-const activeTab = ref<'research' | 'matrix' | 'courses' | 'about' | 'articles' | 'donate'>('courses');
+const activeTab = ref<'research' | 'matrix' | 'courses' | 'about' | 'articles' | 'donate'>('about');
 
 // Technologies Known
 const technologies = [
@@ -358,6 +358,17 @@ onUnmounted(() => {
         <nav class="hidden lg:flex items-center space-x-1 bg-slate-100 dark:bg-slate-900/90 p-1 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner">
 
           <button
+            @click="activeTab = 'about'"
+            :class="[
+              'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200',
+              activeTab === 'about'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-600/30 border border-blue-400/30'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800/80'
+            ]"
+          >
+            About & Bio
+          </button>
+          <button
             @click="activeTab = 'research'"
             :class="[
               'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 flex items-center space-x-1.5',
@@ -368,17 +379,6 @@ onUnmounted(() => {
           >
             <span>Research Index</span>
             <span class="px-1.5 py-0.2 text-[9px] font-mono rounded bg-blue-50 dark:bg-slate-950/60 text-blue-800 dark:text-cyan-300 border border-blue-300 dark:border-blue-500/30">{{ papers.length }}</span>
-          </button>
-          <button
-            @click="activeTab = 'courses'"
-            :class="[
-              'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200',
-              activeTab === 'courses'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-600/30 border border-blue-400/30'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800/80'
-            ]"
-          >
-            Udemy Courses
           </button>
           <button
             @click="activeTab = 'articles'"
@@ -393,15 +393,15 @@ onUnmounted(() => {
             <span class="px-1.5 py-0.2 text-[9px] font-mono rounded bg-blue-50 dark:bg-slate-950/60 text-blue-800 dark:text-cyan-300 border border-blue-300 dark:border-blue-500/30">{{ articles.length }}</span>
           </button>
           <button
-            @click="activeTab = 'about'"
+            @click="activeTab = 'courses'"
             :class="[
               'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200',
-              activeTab === 'about'
+              activeTab === 'courses'
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-600/30 border border-blue-400/30'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800/80'
             ]"
           >
-            About & Bio
+            Udemy Courses
           </button>
         </nav>
 
@@ -619,6 +619,15 @@ onUnmounted(() => {
       <div class="flex lg:hidden overflow-x-auto py-2 px-4 border-t border-slate-200 dark:border-slate-800/80 space-x-2">
 
         <button
+          @click="activeTab = 'about'"
+          :class="[
+            'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
+            activeTab === 'about' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
+          ]"
+        >
+          About & Bio
+        </button>
+        <button
           @click="activeTab = 'research'"
           :class="[
             'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
@@ -626,15 +635,6 @@ onUnmounted(() => {
           ]"
         >
           Research Index ({{ papers.length }})
-        </button>
-        <button
-          @click="activeTab = 'courses'"
-          :class="[
-            'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
-            activeTab === 'courses' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
-          ]"
-        >
-          Udemy Courses
         </button>
         <button
           @click="activeTab = 'articles'"
@@ -646,13 +646,13 @@ onUnmounted(() => {
           Articles ({{ articles.length }})
         </button>
         <button
-          @click="activeTab = 'about'"
+          @click="activeTab = 'courses'"
           :class="[
             'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
-            activeTab === 'about' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
+            activeTab === 'courses' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
           ]"
         >
-          Bio
+          Udemy Courses
         </button>
       </div>
     </header>
