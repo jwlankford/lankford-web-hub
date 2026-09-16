@@ -96,6 +96,7 @@ const articles = ref<Article[]>([]);
 const isLoadingArticles = ref(true);
 const selectedArticle = ref<Article | null>(null);
 const isAddArticleModalOpen = ref(false);
+const articlePlatformFilter = ref<'all' | 'linkedin' | 'substack'>('all');
 
 // Academic Research State
 const papers = ref<ResearchPaper[]>([]);
@@ -209,9 +210,18 @@ navigator.clipboard.writeText(bibtexString).then(() => {
 }
 
 const filteredArticles = computed(() => {
-  if (!searchQuery.value.trim()) return articles.value;
+  let result = articles.value;
+  
+  if (articlePlatformFilter.value === 'linkedin') {
+    result = result.filter(a => !!a.linkedin_url);
+  } else if (articlePlatformFilter.value === 'substack') {
+    result = result.filter(a => !a.linkedin_url);
+  }
+
+  if (!searchQuery.value.trim()) return result;
+  
   const q = searchQuery.value.toLowerCase().trim();
-  return articles.value.filter(article => {
+  return result.filter(article => {
     return article.title.toLowerCase().includes(q) || 
            article.summary.toLowerCase().includes(q) || 
            (article.content?.toLowerCase().includes(q) ?? false);
@@ -1040,6 +1050,24 @@ onUnmounted(() => {
       <!-- TAB 5: ARTICLES VIEW -->
       <div v-else-if="activeTab === 'articles'" class="space-y-6 animate-fadeIn">
         <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-xl space-y-4 transition-colors">
+          <!-- Filter Buttons -->
+          <div class="flex flex-row items-center gap-4">
+            <button
+              @click="articlePlatformFilter = articlePlatformFilter === 'linkedin' ? 'all' : 'linkedin'"
+              :class="['flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-colors', articlePlatformFilter === 'linkedin' ? 'bg-[#0077b5] text-white border-[#0077b5]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800']"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              LinkedIn
+            </button>
+            <button
+              @click="articlePlatformFilter = articlePlatformFilter === 'substack' ? 'all' : 'substack'"
+              :class="['flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-colors', articlePlatformFilter === 'substack' ? 'bg-[#ff6719] text-white border-[#ff6719]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800']"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/></svg>
+              Substack
+            </button>
+          </div>
+
           <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
             <!-- Search Bar -->
             <div class="relative w-full sm:max-w-md">
