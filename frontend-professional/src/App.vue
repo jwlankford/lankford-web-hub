@@ -109,7 +109,7 @@ const selectedPaper = ref<ResearchPaper | null>(null);
 const isAddModalOpen = ref(false);
 
 // Matrix Sort State
-const matrixSortColumn = ref<'title' | 'authors' | 'methodology' | 'findings' | null>(null);
+const matrixSortColumn = ref<'title' | 'authors' | 'used_for' | 'methodology' | 'findings' | null>(null);
 const matrixSortDirection = ref<'asc' | 'desc'>('asc');
 const matrixSearchQuery = ref('');
 
@@ -122,7 +122,8 @@ const sortedPapersMatrix = computed(() => {
       const authorsMatch = paper.authors?.toLowerCase().includes(q) ?? false;
       const methodologyMatch = paper.methodology?.toLowerCase().includes(q) ?? false;
       const findingsMatch = paper.key_findings?.toLowerCase().includes(q) ?? false;
-      return titleMatch || authorsMatch || methodologyMatch || findingsMatch;
+      const usedForMatch = paper.used_for?.toLowerCase().includes(q) ?? false;
+      return titleMatch || authorsMatch || methodologyMatch || findingsMatch || usedForMatch;
     });
   }
 
@@ -140,6 +141,10 @@ const sortedPapersMatrix = computed(() => {
       case 'authors':
         valA = a.authors || '';
         valB = b.authors || '';
+        break;
+      case 'used_for':
+        valA = a.used_for || '';
+        valB = b.used_for || '';
         break;
       case 'methodology':
         valA = a.methodology || '';
@@ -160,7 +165,7 @@ const sortedPapersMatrix = computed(() => {
   });
 });
 
-function toggleMatrixSort(column: 'title' | 'authors' | 'methodology' | 'findings') {
+function toggleMatrixSort(column: 'title' | 'authors' | 'used_for' | 'methodology' | 'findings') {
   if (matrixSortColumn.value === column) {
     if (matrixSortDirection.value === 'desc') {
       matrixSortColumn.value = null; // Clear sort
@@ -1117,11 +1122,41 @@ onUnmounted(() => {
             <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300">
               <thead class="bg-slate-100 dark:bg-slate-950 font-mono text-blue-700 dark:text-cyan-400 uppercase border-b border-slate-200 dark:border-slate-800">
                 <tr>
-                  <th class="p-3 w-1/4">Paper Title & Year</th>
-                  <th class="p-3 w-1/6">Authors</th>
-                  <th class="p-3 w-1/6">Used For</th>
-                  <th class="p-3">Methodology</th>
-                  <th class="p-3">Key Empirical Findings</th>
+                  <th class="p-3 w-1/4 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none group" @click="toggleMatrixSort('title')">
+                    <div class="flex items-center space-x-1">
+                      <span>Paper Title & Year</span>
+                      <svg v-if="matrixSortColumn === 'title'" class="w-3.5 h-3.5" :class="matrixSortDirection === 'desc' ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                    </div>
+                  </th>
+                  <th class="p-3 w-1/6 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none group" @click="toggleMatrixSort('authors')">
+                    <div class="flex items-center space-x-1">
+                      <span>Authors</span>
+                      <svg v-if="matrixSortColumn === 'authors'" class="w-3.5 h-3.5" :class="matrixSortDirection === 'desc' ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                    </div>
+                  </th>
+                  <th class="p-3 w-1/6 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none group" @click="toggleMatrixSort('used_for')">
+                    <div class="flex items-center space-x-1">
+                      <span>Used For</span>
+                      <svg v-if="matrixSortColumn === 'used_for'" class="w-3.5 h-3.5" :class="matrixSortDirection === 'desc' ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                    </div>
+                  </th>
+                  <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none group" @click="toggleMatrixSort('methodology')">
+                    <div class="flex items-center space-x-1">
+                      <span>Methodology</span>
+                      <svg v-if="matrixSortColumn === 'methodology'" class="w-3.5 h-3.5" :class="matrixSortDirection === 'desc' ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                    </div>
+                  </th>
+                  <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none group" @click="toggleMatrixSort('findings')">
+                    <div class="flex items-center space-x-1">
+                      <span>Key Empirical Findings</span>
+                      <svg v-if="matrixSortColumn === 'findings'" class="w-3.5 h-3.5" :class="matrixSortDirection === 'desc' ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
