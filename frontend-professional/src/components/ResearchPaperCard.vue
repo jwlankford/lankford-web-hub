@@ -47,9 +47,9 @@ async function saveKeyFindings() {
 
 <template>
   <div 
-    class="group relative bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900/90 rounded-xl p-6 border border-slate-200 dark:border-slate-800 hover:border-blue-500/40 transition-all duration-300 shadow-md hover:shadow-xl dark:hover:shadow-blue-950/40 overflow-hidden flex flex-col justify-between h-full w-full"
+    class="group relative bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900/90 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/40 transition-all duration-300 shadow-md hover:shadow-xl dark:hover:shadow-blue-950/40 overflow-hidden flex flex-col h-full w-full"
   >
-    <div class="relative">
+    <div class="relative flex-grow p-6 flex flex-col">
       <div class="flex items-center justify-between text-xs mb-3 text-slate-500 dark:text-slate-400 font-mono">
         <span class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/80 border border-blue-300 dark:border-blue-500/30 text-blue-800 dark:text-cyan-300 font-semibold">
           <span>{{ paper.publication_year }}</span>
@@ -60,7 +60,7 @@ async function saveKeyFindings() {
       </div>
 
       <!-- Expand Arrow -->
-      <button @click.stop="toggleExpand" class="absolute top-8 right-0 p-1 text-slate-400 hover:text-blue-600 dark:hover:text-cyan-400 transition-colors z-10" title="Expand card">
+      <button @click.stop="toggleExpand" class="absolute top-6 right-6 p-1 text-slate-400 hover:text-blue-600 dark:hover:text-cyan-400 transition-colors z-10" title="Expand card">
         <svg :class="{'rotate-180': isExpanded}" class="w-6 h-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
         </svg>
@@ -120,13 +120,12 @@ async function saveKeyFindings() {
       </div>
       
       <!-- Used For Display at Bottom -->
-      <div v-if="!isExpanded && paper.used_for" class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/50">
-        <h4 class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Used For</h4>
-        <p class="text-xs font-medium text-slate-700 dark:text-slate-300">
-          {{ paper.used_for }}
+      <div v-if="!isExpanded" class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800/50">
+        <h4 class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Used for</h4>
+        <p class="text-xs font-medium" :class="paper.used_for ? 'text-slate-700 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500 italic'">
+          {{ paper.used_for || 'Not specified' }}
         </p>
       </div>
     </div>
-
   </div>
 </template>

@@ -11,7 +11,6 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void;
   (e: 'submit', input: NewResearchPaperInput): void;
-  (e: 'bibtexSubmit', bibtex: string): void;
 }>();
 
 const title = ref('');
@@ -28,27 +27,6 @@ const used_for = ref('');
 const isSubmitting = ref(false);
 const tagsString = ref('');
 
-const bibtexInput = ref('');
-const isImporting = ref(false);
-const importMessage = ref('');
-const importError = ref(false);
-
-function handleBibtexImport() {
-  if (!bibtexInput.value.trim()) {
-    importError.value = true;
-    importMessage.value = 'Please paste BibTeX first.';
-    return;
-  }
-  isImporting.value = true;
-  importError.value = false;
-  importMessage.value = '';
-  emit('bibtexSubmit', bibtexInput.value);
-  
-  // Fake a small delay to simulate processing so UI feels responsive
-  setTimeout(() => {
-    isImporting.value = false;
-  }, 500);
-}
 
 function handleSubmit() {
   if (!title.value.trim() || !authors.value.trim()) return;
@@ -115,39 +93,6 @@ function handleSubmit() {
         </div>
 
         <form @submit.prevent="handleSubmit" class="space-y-4 text-sm max-h-[70vh] overflow-y-auto pr-1">
-          <!-- Bulk Import BibTeX -->
-          <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 space-y-3 mb-4">
-            <div class="flex items-center justify-between">
-              <span class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-mono font-bold">Bulk Import (BibTeX)</span>
-              <span class="text-[10px] text-blue-650 dark:text-cyan-400 font-mono font-semibold">Zotero Support</span>
-            </div>
-            <div class="flex flex-col space-y-2">
-              <textarea 
-                v-model="bibtexInput"
-                rows="4"
-                placeholder="Paste BibTeX entries here to import multiple papers..."
-                class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 text-xs font-mono"
-              ></textarea>
-              <button
-                type="button"
-                @click="handleBibtexImport"
-                :disabled="isImporting"
-                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold shadow-sm transition-colors text-xs flex items-center justify-center min-w-[120px] disabled:bg-emerald-600/60 self-end"
-              >
-                <span v-if="isImporting">Importing...</span>
-                <span v-else>Parse & Import</span>
-              </button>
-              <p v-if="importMessage" :class="importError ? 'text-red-500 dark:text-red-400' : 'text-emerald-500 dark:text-emerald-400'" class="text-xs font-medium font-sans">
-                {{ importMessage }}
-              </p>
-            </div>
-          </div>
-          
-          <div class="relative flex py-2 items-center">
-             <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-             <span class="flex-shrink-0 mx-4 text-slate-400 text-xs font-mono">OR MANUAL ENTRY</span>
-             <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-          </div>
           <div>
             <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Paper Title *</label>
             <input 

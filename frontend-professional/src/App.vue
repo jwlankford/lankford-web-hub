@@ -10,8 +10,7 @@ import {
   fetchGoogleNotebooks,
   createGoogleNotebook,
   fetchJupyterNotebooks,
-  createJupyterNotebook,
-  importBibtex
+  createJupyterNotebook
 } from './services/api';
 import { useTheme } from './composables/useTheme';
 import { useAuth } from './composables/useAuth';
@@ -40,7 +39,7 @@ import AddNotebookModal from './components/AddNotebookModal.vue';
 
 
 // Navigation State
-const activeTab = ref<'research' | 'matrix' | 'courses' | 'about' | 'articles' | 'donate'>('courses');
+const activeTab = ref<'research' | 'matrix' | 'courses' | 'about' | 'articles' | 'donate'>('about');
 
 // Technologies Known
 const technologies = [
@@ -232,7 +231,9 @@ return papers.value.filter(paper => {
     const authorsMatch = paper.authors.toLowerCase().includes(q);
     const abstractMatch = paper.abstract?.toLowerCase().includes(q) ?? false;
     const methodologyMatch = paper.methodology?.toLowerCase().includes(q) ?? false;
-    return titleMatch || authorsMatch || abstractMatch || methodologyMatch;
+    const usedForMatch = paper.used_for?.toLowerCase().includes(q) ?? false;
+    const keyFindingsMatch = paper.key_findings?.toLowerCase().includes(q) ?? false;
+    return titleMatch || authorsMatch || abstractMatch || methodologyMatch || usedForMatch || keyFindingsMatch;
   }
   return true;
 });
@@ -365,17 +366,7 @@ function handlePaperUpdated(updatedPaper: ResearchPaper) {
   }
 }
 
-async function handleBibtexImport(bibtexString: string) {
-  try {
-    const result = await importBibtex(bibtexString);
-    const updated = await fetchResearchPapers();
-    papers.value = updated.papers;
-    isAddModalOpen.value = false;
-    alert(`Imported ${result.added} papers. Skipped ${result.skipped} duplicates.`);
-  } catch (err: any) {
-    alert(err.message || "Failed to import BibTeX");
-  }
-}
+
 
 async function handleAddArticle(input: NewArticleInput) {
   const result = await createArticle(input);
@@ -435,6 +426,17 @@ onUnmounted(() => {
         <nav class="hidden lg:flex items-center space-x-1 bg-slate-100 dark:bg-slate-900/90 p-1 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner">
 
           <button
+            @click="activeTab = 'about'"
+            :class="[
+              'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200',
+              activeTab === 'about'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-600/30 border border-blue-400/30'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800/80'
+            ]"
+          >
+            About & Bio
+          </button>
+          <button
             @click="activeTab = 'research'"
             :class="[
               'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 flex items-center space-x-1.5',
@@ -443,19 +445,8 @@ onUnmounted(() => {
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800/80'
             ]"
           >
-            <span>Research Index</span>
+            <span>Research Papers</span>
             <span class="px-1.5 py-0.2 text-[9px] font-mono rounded bg-blue-50 dark:bg-slate-950/60 text-blue-800 dark:text-cyan-300 border border-blue-300 dark:border-blue-500/30">{{ papers.length }}</span>
-          </button>
-          <button
-            @click="activeTab = 'courses'"
-            :class="[
-              'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200',
-              activeTab === 'courses'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-600/30 border border-blue-400/30'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800/80'
-            ]"
-          >
-            Udemy Courses
           </button>
           <button
             @click="activeTab = 'articles'"
@@ -470,15 +461,15 @@ onUnmounted(() => {
             <span class="px-1.5 py-0.2 text-[9px] font-mono rounded bg-blue-50 dark:bg-slate-950/60 text-blue-800 dark:text-cyan-300 border border-blue-300 dark:border-blue-500/30">{{ articles.length }}</span>
           </button>
           <button
-            @click="activeTab = 'about'"
+            @click="activeTab = 'courses'"
             :class="[
               'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200',
-              activeTab === 'about'
+              activeTab === 'courses'
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-600/30 border border-blue-400/30'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800/80'
             ]"
           >
-            About & Bio
+            Udemy Courses
           </button>
         </nav>
 
@@ -696,22 +687,22 @@ onUnmounted(() => {
       <div class="flex lg:hidden overflow-x-auto py-2 px-4 border-t border-slate-200 dark:border-slate-800/80 space-x-2">
 
         <button
+          @click="activeTab = 'about'"
+          :class="[
+            'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
+            activeTab === 'about' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
+          ]"
+        >
+          About & Bio
+        </button>
+        <button
           @click="activeTab = 'research'"
           :class="[
             'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
             activeTab === 'research' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
           ]"
         >
-          Research Index ({{ papers.length }})
-        </button>
-        <button
-          @click="activeTab = 'courses'"
-          :class="[
-            'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
-            activeTab === 'courses' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
-          ]"
-        >
-          Udemy Courses
+          Research Papers ({{ papers.length }})
         </button>
         <button
           @click="activeTab = 'articles'"
@@ -723,13 +714,13 @@ onUnmounted(() => {
           Articles ({{ articles.length }})
         </button>
         <button
-          @click="activeTab = 'about'"
+          @click="activeTab = 'courses'"
           :class="[
             'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
-            activeTab === 'about' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
+            activeTab === 'courses' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
           ]"
         >
-          Bio
+          Udemy Courses
         </button>
       </div>
     </header>
@@ -737,7 +728,7 @@ onUnmounted(() => {
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
       
-      <!-- TAB 2: RESEARCH INDEX VIEW -->
+      <!-- TAB 2: RESEARCH PAPERS VIEW -->
       <div v-if="activeTab === 'research'" class="space-y-6 animate-fadeIn">
 
         <!-- Dashboard Widgets Grid -->
@@ -963,7 +954,7 @@ onUnmounted(() => {
               <input 
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search by title, author, findings, or methodology..."
+                placeholder="Search by title, author, description, or used for..."
                 class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
               />
               <button 
@@ -1126,40 +1117,18 @@ onUnmounted(() => {
             <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300">
               <thead class="bg-slate-100 dark:bg-slate-950 font-mono text-blue-700 dark:text-cyan-400 uppercase border-b border-slate-200 dark:border-slate-800">
                 <tr>
-                  <th class="p-3 w-1/3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none" @click="toggleMatrixSort('title')">
-                    <div class="flex items-center space-x-1">
-                      <span>Paper Title & Year</span>
-                      <span v-if="matrixSortColumn === 'title'" class="text-[10px]">{{ matrixSortDirection === 'asc' ? '▲' : '▼' }}</span>
-                      <span v-else class="text-[10px] opacity-30">↕</span>
-                    </div>
-                  </th>
-                  <th class="p-3 w-1/6 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none" @click="toggleMatrixSort('authors')">
-                    <div class="flex items-center space-x-1">
-                      <span>Authors</span>
-                      <span v-if="matrixSortColumn === 'authors'" class="text-[10px]">{{ matrixSortDirection === 'asc' ? '▲' : '▼' }}</span>
-                      <span v-else class="text-[10px] opacity-30">↕</span>
-                    </div>
-                  </th>
-                  <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none" @click="toggleMatrixSort('methodology')">
-                    <div class="flex items-center space-x-1">
-                      <span>Methodology</span>
-                      <span v-if="matrixSortColumn === 'methodology'" class="text-[10px]">{{ matrixSortDirection === 'asc' ? '▲' : '▼' }}</span>
-                      <span v-else class="text-[10px] opacity-30">↕</span>
-                    </div>
-                  </th>
-                  <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none" @click="toggleMatrixSort('findings')">
-                    <div class="flex items-center space-x-1">
-                      <span>Key Empirical Findings</span>
-                      <span v-if="matrixSortColumn === 'findings'" class="text-[10px]">{{ matrixSortDirection === 'asc' ? '▲' : '▼' }}</span>
-                      <span v-else class="text-[10px] opacity-30">↕</span>
-                    </div>
-                  </th>
+                  <th class="p-3 w-1/4">Paper Title & Year</th>
+                  <th class="p-3 w-1/6">Authors</th>
+                  <th class="p-3 w-1/6">Used For</th>
+                  <th class="p-3">Methodology</th>
+                  <th class="p-3">Key Empirical Findings</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
                 <tr v-for="paper in sortedPapersMatrix" :key="paper.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors align-top">
                   <td class="p-3 font-semibold text-slate-900 dark:text-white font-serif">{{ paper.title }} ({{ paper.publication_year }})</td>
                   <td class="p-3 font-mono text-blue-700 dark:text-cyan-400/90">{{ paper.authors }}</td>
+                  <td class="p-3 text-slate-600 dark:text-slate-400">{{ paper.used_for || 'N/A' }}</td>
                   <td class="p-3 text-slate-600 dark:text-slate-400">{{ paper.methodology || 'Empirical Study' }}</td>
                   <td class="p-3 text-slate-700 dark:text-slate-300">{{ paper.key_findings || 'N/A' }}</td>
                 </tr>
@@ -1439,7 +1408,6 @@ onUnmounted(() => {
       :isOpen="isAddModalOpen"
       @close="isAddModalOpen = false"
       @submit="handleAddPaper"
-      @bibtexSubmit="handleBibtexImport"
     />
 
     <AdminLoginModal

@@ -1,6 +1,6 @@
 import os
 import sys
-import bibtexparser
+
 from dotenv import load_dotenv
 
 # Load environment variables before setting up app config
@@ -191,93 +191,6 @@ async def get_research_papers(
 
 from datetime import datetime
 from models import ResearchTag
-
-class BibtexImportRequest(BaseModel):
-    bibtex: str
-
-@app.post("/api/v1/research/papers/bibtex")
-async def import_bibtex(
-    payload: BibtexImportRequest,
-    request: Request,
-    db: AsyncSession = Depends(get_async_session)
-):
-    if request.state.tenant not in ["professional", "academic"]:
-        raise HTTPException(status_code=403, detail="Tenant context required")
-
-    try:
-        bib_database = bibtexparser.loads(payload.bibtex)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail="Invalid BibTeX format")
-
-    added = 0
-    skipped = 0
-    for entry in bib_database.entries:
-        title = entry.get('title', '').replace('{', '').replace('}', '').strip()
-        if not title:
-            continue
-            
-        stmt = select(ResearchPaper).where(
-            (ResearchPaper.title == title) & (ResearchPaper.tenant == request.state.tenant)
-        )
-        res = await db.execute(stmt)
-        if res.scalars().first():
-            skipped += 1
-            continue
-            
-        authors = entry.get('author', '').replace(' and ', '; ').replace('{', '').replace('}', '')
-        year_str = entry.get('year', str(datetime.now().year))
-        try:
-            year = int(year_str)
-        except ValueError:
-            year = datetime.now().year
-            
-        journal = entry.get('journal', entry.get('booktitle', ''))
-        abstract = entry.get('abstract', '')
-        url = entry.get('url', '')
-        zotero_key = entry.get('ID', '')
-
-        paper = ResearchPaper(
-            title=title,
-            authors=authors,
-            publication_year=year,
-            journal_or_conf=journal,
-            abstract=abstract,
-            zotero_key=zotero_key,
-            url=url,
-            tenant=request.state.tenant
-        )
-        db.add(paper)
-        await db.flush()
-        
-        keywords = entry.get('keywords', '')
-        if keywords:
-            tag_list = [k.strip() for k in keywords.split(',')]
-            for t_name in tag_list:
-                if not t_name: continue
-                t_slug = t_name.lower().replace(' ', '-')
-                t_slug = "".join(c for c in t_slug if (c.isalnum() or c == '-'))
-                
-                tag_stmt = select(ResearchTag).where(ResearchTag.slug == t_slug)
-                tag_res = await db.execute(tag_stmt)
-                db_tag = tag_res.scalars().first()
-                if not db_tag:
-                    db_tag = ResearchTag(name=t_name, slug=t_slug, tenant=request.state.tenant)
-                    db.add(db_tag)
-                    await db.flush()
-                    
-                from models import ResearchPaperTagLink
-                link = ResearchPaperTagLink(paper_id=paper.id, tag_id=db_tag.id)
-                db.add(link)
-                
-        added += 1
-
-    await db.commit()
-    
-    cache_key = f"papers_{request.state.tenant}"
-    if cache_key in _api_cache:
-        del _api_cache[cache_key]
-        
-    return {"added": added, "skipped": skipped}
 
 class ResearchPaperCreateSchema(BaseModel):
     title: str

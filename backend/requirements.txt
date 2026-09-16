@@ -7,4 +7,4 @@ pydantic-settings>=2.2.1
 requests>=2.32.0
 python-dotenv>=1.0.0
 scholarly>=1.7.11
-bibtexparser>=1.4.1
+
