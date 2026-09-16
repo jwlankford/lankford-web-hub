@@ -118,9 +118,8 @@ function copyToClipboard(text: string) {
             <h3 class="text-xs font-mono uppercase tracking-wider text-blue-700 dark:text-cyan-400 mb-2 font-semibold">
               Abstract & Context
             </h3>
-            <p class="text-slate-700 dark:text-slate-300 leading-relaxed text-base font-sans bg-slate-50 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80">
-              {{ paper.abstract }}
-            </p>
+            <div class="text-slate-700 dark:text-slate-300 leading-relaxed text-base font-sans bg-slate-50 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 prose dark:prose-invert max-w-none" v-html="paper.abstract">
+            </div>
           </div>
 
           <!-- Key Findings -->
@@ -131,9 +130,8 @@ function copyToClipboard(text: string) {
               </svg>
               <span>Key Analytical Findings</span>
             </h3>
-            <p class="text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
-              {{ paper.key_findings }}
-            </p>
+            <div class="text-slate-800 dark:text-slate-200 leading-relaxed font-medium prose dark:prose-invert prose-sm max-w-none" v-html="paper.key_findings">
+            </div>
           </div>
 
           <!-- Methodology -->
@@ -141,9 +139,8 @@ function copyToClipboard(text: string) {
             <h3 class="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-semibold">
               Methodology & Design Framework
             </h3>
-            <p class="text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border border-slate-200 dark:border-slate-700/40">
-              {{ paper.methodology }}
-            </p>
+            <div class="text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border border-slate-200 dark:border-slate-700/40 prose dark:prose-invert prose-sm max-w-none" v-html="paper.methodology">
+            </div>
           </div>
 
           <!-- Used For -->
