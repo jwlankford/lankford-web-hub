@@ -293,6 +293,82 @@ class ResearchPaperCreateSchema(BaseModel):
     tags: Optional[List[str]] = None
 
 
+
+class ResearchPaperUpdateSchema(BaseModel):
+    title: Optional[str] = None
+    authors: Optional[str] = None
+    publication_year: Optional[int] = None
+    journal_or_conf: Optional[str] = None
+    abstract: Optional[str] = None
+    key_findings: Optional[str] = None
+    methodology: Optional[str] = None
+    zotero_key: Optional[str] = None
+    url: Optional[str] = None
+    tags: Optional[List[str]] = None
+
+@app.patch("/api/v1/research/papers/{paper_id}", response_model=ResearchPaperRead)
+async def update_research_paper(
+    paper_id: int,
+    payload: ResearchPaperUpdateSchema,
+    request: Request,
+    db: AsyncSession = Depends(get_async_session)
+):
+    if request.state.tenant not in ["professional", "academic"]:
+        raise HTTPException(
+            status_code=403, 
+            detail="Modifying academic records requires an active domain context."
+        )
+        
+    stmt = select(ResearchPaper).where(
+        (ResearchPaper.id == paper_id) & (ResearchPaper.tenant == request.state.tenant)
+    ).options(selectinload(ResearchPaper.tags))
+    res = await db.execute(stmt)
+    paper = res.scalars().first()
+    
+    if not paper:
+        raise HTTPException(status_code=404, detail="Paper not found")
+        
+    update_data = payload.model_dump(exclude_unset=True)
+    
+    if "tags" in update_data:
+        tags_input = update_data.pop("tags")
+        if tags_input is not None:
+            # clear existing tags
+            paper.tags = []
+            for t_name in tags_input:
+                t_slug = t_name.lower().strip().replace(' ', '-')
+                t_slug = "".join(c for c in t_slug if (c.isalnum() or c == '-'))
+                
+                tag_stmt = select(ResearchTag).where(ResearchTag.slug == t_slug)
+                tag_res = await db.execute(tag_stmt)
+                db_tag = tag_res.scalars().first()
+                
+                if not db_tag:
+                    db_tag = ResearchTag(
+                        name=t_name,
+                        slug=t_slug,
+                        tenant=request.state.tenant
+                    )
+                    db.add(db_tag)
+                    await db.flush()
+                paper.tags.append(db_tag)
+        else:
+            paper.tags = []
+            
+    for key, value in update_data.items():
+        setattr(paper, key, value)
+        
+    db.add(paper)
+    await db.commit()
+    await db.refresh(paper)
+    
+    cache_key = f"papers_{request.state.tenant}"
+    if cache_key in _api_cache:
+        del _api_cache[cache_key]
+        
+    return paper
+
+
 @app.post("/api/v1/research/papers", status_code=status.HTTP_201_CREATED)
 async def add_research_paper(
     payload: ResearchPaperCreateSchema,
@@ -541,4 +617,4 @@ async def add_jupyter_notebook(
     if cache_key in _api_cache:
         del _api_cache[cache_key]
         
-    return notebook
+    return notebook

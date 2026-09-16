@@ -21,9 +21,14 @@ function formatDate(dateStr?: string) {
 
 <template>
   <div 
-    class="group relative bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900/90 rounded-xl p-6 border border-slate-200 dark:border-slate-800 hover:border-blue-500/40 transition-all duration-300 shadow-md hover:shadow-xl dark:hover:shadow-blue-950/40 overflow-hidden"
+    class="group relative bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900/90 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/40 transition-all duration-300 shadow-md hover:shadow-xl dark:hover:shadow-blue-950/40 overflow-hidden flex flex-col h-full"
   >
-    <div class="flex flex-col justify-between h-full w-full">
+    <!-- Image Header -->
+    <div v-if="article.image_url" class="w-full h-48 sm:h-52 overflow-hidden flex-shrink-0 cursor-pointer" @click="emit('select', article)">
+      <img :src="article.image_url" :alt="article.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+    </div>
+
+    <div class="flex flex-col justify-between h-full w-full p-6 flex-grow">
       <!-- Content -->
         <div>
           <!-- Card Top: Published Date -->
@@ -44,9 +49,9 @@ function formatDate(dateStr?: string) {
             {{ article.title }}
           </h3>
 
-          <!-- Summary -->
+          <!-- Summary (Hidden per user request) -->
           <p 
-            class="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 mb-6 leading-relaxed"
+            class="hidden text-sm text-slate-600 dark:text-slate-400 line-clamp-3 mb-6 leading-relaxed"
           >
             {{ article.summary }}
           </p>

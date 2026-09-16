@@ -994,7 +994,9 @@ onUnmounted(() => {
             :paper="paper"
             @select="selectedPaper = $event"
             @filterTag="handleFilterTag"
+            @updated="handlePaperUpdated"
           />
+
         </div>
       </div>
 
@@ -1076,7 +1078,7 @@ onUnmounted(() => {
         <div v-else class="space-y-10">
           <div v-if="linkedinArticles.length > 0" class="space-y-4">
             <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">LinkedIn Articles</h2>
-            <div class="grid grid-cols-1 gap-6">
+            <div class="grid grid-cols-3 gap-6">
               <ArticleCard
                 v-for="article in linkedinArticles"
                 :key="article.id || article.title"
@@ -1088,7 +1090,7 @@ onUnmounted(() => {
           
           <div v-if="substackArticles.length > 0" class="space-y-4">
             <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">Substack Articles</h2>
-            <div class="grid grid-cols-1 gap-6">
+            <div class="grid grid-cols-3 gap-6">
               <ArticleCard
                 v-for="article in substackArticles"
                 :key="article.id || article.title"

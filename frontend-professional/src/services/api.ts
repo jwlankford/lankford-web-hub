@@ -270,6 +270,34 @@ export async function createResearchPaper(input: NewResearchPaperInput): Promise
   }
 }
 
+
+export async function updateResearchPaper(id: number, input: Partial<NewResearchPaperInput>): Promise<{ paper: ResearchPaper; isLiveBackend: boolean }> {
+  try {
+    const res = await fetch(`${API_RESEARCH_BASE}/papers/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Host': 'professional.localhost',
+        'X-Tenant': 'professional'
+      },
+      body: JSON.stringify(input)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return { paper: data, isLiveBackend: true };
+    }
+    throw new Error('Failed to update');
+  } catch {
+    // If offline, just mock the return
+    const mockPaper: any = {
+      ...input,
+      id,
+      tenant: 'professional'
+    };
+    return { paper: mockPaper as ResearchPaper, isLiveBackend: false };
+  }
+}
+
 // ==========================================
 // ARTICLES API CALLS (Dual-Domain Context)
 // ==========================================
