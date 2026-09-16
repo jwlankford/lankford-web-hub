@@ -109,6 +109,73 @@ const showTaxonomyFilters = ref(false);
 const selectedPaper = ref<ResearchPaper | null>(null);
 const isAddModalOpen = ref(false);
 
+// Matrix Sort State
+const matrixSortColumn = ref<'title' | 'authors' | 'methodology' | 'findings' | null>(null);
+const matrixSortDirection = ref<'asc' | 'desc'>('asc');
+const matrixSearchQuery = ref('');
+
+const sortedPapersMatrix = computed(() => {
+  let filtered = papers.value;
+  if (matrixSearchQuery.value.trim()) {
+    const q = matrixSearchQuery.value.toLowerCase().trim();
+    filtered = filtered.filter(paper => {
+      const titleMatch = paper.title?.toLowerCase().includes(q) ?? false;
+      const authorsMatch = paper.authors?.toLowerCase().includes(q) ?? false;
+      const methodologyMatch = paper.methodology?.toLowerCase().includes(q) ?? false;
+      const findingsMatch = paper.key_findings?.toLowerCase().includes(q) ?? false;
+      return titleMatch || authorsMatch || methodologyMatch || findingsMatch;
+    });
+  }
+
+  if (!matrixSortColumn.value) return filtered;
+  
+  return [...filtered].sort((a, b) => {
+    let valA = '';
+    let valB = '';
+    
+    switch (matrixSortColumn.value) {
+      case 'title':
+        valA = `${a.title || ''} ${a.publication_year || ''}`;
+        valB = `${b.title || ''} ${b.publication_year || ''}`;
+        break;
+      case 'authors':
+        valA = a.authors || '';
+        valB = b.authors || '';
+        break;
+      case 'methodology':
+        valA = a.methodology || '';
+        valB = b.methodology || '';
+        break;
+      case 'findings':
+        valA = a.key_findings || '';
+        valB = b.key_findings || '';
+        break;
+    }
+    
+    valA = valA.toLowerCase();
+    valB = valB.toLowerCase();
+    
+    if (valA < valB) return matrixSortDirection.value === 'asc' ? -1 : 1;
+    if (valA > valB) return matrixSortDirection.value === 'asc' ? 1 : -1;
+    return 0;
+  });
+});
+
+function toggleMatrixSort(column: 'title' | 'authors' | 'methodology' | 'findings') {
+  if (matrixSortColumn.value === column) {
+    if (matrixSortDirection.value === 'desc') {
+      matrixSortColumn.value = null; // Clear sort
+      matrixSortDirection.value = 'asc';
+    } else {
+      matrixSortDirection.value = 'desc';
+    }
+  } else {
+    matrixSortColumn.value = column;
+    matrixSortDirection.value = 'asc';
+  }
+}
+
+
 // Notebooks State
 const googleNotebooks = ref<GoogleNotebook[]>([]);
 const jupyterNotebooks = ref<JupyterNotebook[]>([]);
@@ -1031,18 +1098,66 @@ onUnmounted(() => {
           <h2 class="text-2xl font-bold font-serif text-slate-900 dark:text-white mb-2">Literature Synthesis Matrix</h2>
           <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Cross-paper methodology comparison and empirical findings breakdown.</p>
           
+          <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="relative w-full sm:max-w-md">
+              <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <input 
+                v-model="matrixSearchQuery"
+                type="text"
+                placeholder="Search matrix by title, author, methodology, or findings..."
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors shadow-inner"
+              />
+              <button 
+                v-if="matrixSearchQuery"
+                @click="matrixSearchQuery = ''"
+                class="absolute right-3 top-3 text-slate-400 hover:text-slate-700 dark:hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            <div class="flex items-center space-x-3 text-xs font-mono text-slate-500 dark:text-slate-400">
+              <span>Showing <strong class="text-cyan-600 dark:text-cyan-400">{{ sortedPapersMatrix.length }}</strong> of {{ papers.length }} Rows</span>
+            </div>
+          </div>
+          
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300">
               <thead class="bg-slate-100 dark:bg-slate-950 font-mono text-blue-700 dark:text-cyan-400 uppercase border-b border-slate-200 dark:border-slate-800">
                 <tr>
-                  <th class="p-3 w-1/3">Paper Title & Year</th>
-                  <th class="p-3 w-1/6">Authors</th>
-                  <th class="p-3">Methodology</th>
-                  <th class="p-3">Key Empirical Findings</th>
+                  <th class="p-3 w-1/3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none" @click="toggleMatrixSort('title')">
+                    <div class="flex items-center space-x-1">
+                      <span>Paper Title & Year</span>
+                      <span v-if="matrixSortColumn === 'title'" class="text-[10px]">{{ matrixSortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      <span v-else class="text-[10px] opacity-30">↕</span>
+                    </div>
+                  </th>
+                  <th class="p-3 w-1/6 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none" @click="toggleMatrixSort('authors')">
+                    <div class="flex items-center space-x-1">
+                      <span>Authors</span>
+                      <span v-if="matrixSortColumn === 'authors'" class="text-[10px]">{{ matrixSortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      <span v-else class="text-[10px] opacity-30">↕</span>
+                    </div>
+                  </th>
+                  <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none" @click="toggleMatrixSort('methodology')">
+                    <div class="flex items-center space-x-1">
+                      <span>Methodology</span>
+                      <span v-if="matrixSortColumn === 'methodology'" class="text-[10px]">{{ matrixSortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      <span v-else class="text-[10px] opacity-30">↕</span>
+                    </div>
+                  </th>
+                  <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none" @click="toggleMatrixSort('findings')">
+                    <div class="flex items-center space-x-1">
+                      <span>Key Empirical Findings</span>
+                      <span v-if="matrixSortColumn === 'findings'" class="text-[10px]">{{ matrixSortDirection === 'asc' ? '▲' : '▼' }}</span>
+                      <span v-else class="text-[10px] opacity-30">↕</span>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                <tr v-for="paper in papers" :key="paper.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors align-top">
+                <tr v-for="paper in sortedPapersMatrix" :key="paper.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors align-top">
                   <td class="p-3 font-semibold text-slate-900 dark:text-white font-serif">{{ paper.title }} ({{ paper.publication_year }})</td>
                   <td class="p-3 font-mono text-blue-700 dark:text-cyan-400/90">{{ paper.authors }}</td>
                   <td class="p-3 text-slate-600 dark:text-slate-400">{{ paper.methodology || 'Empirical Study' }}</td>
