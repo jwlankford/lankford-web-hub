@@ -146,6 +146,16 @@ function copyToClipboard(text: string) {
             </p>
           </div>
 
+          <!-- Used For -->
+          <div v-if="paper.used_for">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-semibold">
+              Used For
+            </h3>
+            <p class="text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border border-slate-200 dark:border-slate-700/40">
+              {{ paper.used_for }}
+            </p>
+          </div>
+
           <!-- Associated Tags -->
           <div v-if="paper.tags && paper.tags.length">
             <h3 class="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 font-semibold">

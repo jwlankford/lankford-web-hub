@@ -23,6 +23,7 @@ export interface ResearchPaper {
   image_url?: string;
   created_at?: string;
   tenant?: string;
+  used_for?: string;
   tags?: ResearchTag[];
 }
 
@@ -37,6 +38,7 @@ export interface NewResearchPaperInput {
   zotero_key?: string;
   url?: string;
   image_url?: string;
+  used_for?: string;
   tags?: string[];
 }
 

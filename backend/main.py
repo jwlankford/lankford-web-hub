@@ -287,6 +287,7 @@ class ResearchPaperCreateSchema(BaseModel):
     abstract: Optional[str] = None
     key_findings: Optional[str] = None
     methodology: Optional[str] = None
+    used_for: Optional[str] = None
     zotero_key: Optional[str] = None
     url: Optional[str] = None
     image_url: Optional[str] = None
@@ -302,6 +303,7 @@ class ResearchPaperUpdateSchema(BaseModel):
     abstract: Optional[str] = None
     key_findings: Optional[str] = None
     methodology: Optional[str] = None
+    used_for: Optional[str] = None
     zotero_key: Optional[str] = None
     url: Optional[str] = None
     tags: Optional[List[str]] = None
@@ -393,6 +395,7 @@ async def add_research_paper(
         abstract=payload.abstract,
         key_findings=payload.key_findings,
         methodology=payload.methodology,
+        used_for=payload.used_for,
         zotero_key=payload.zotero_key,
         url=payload.url,
         image_url=payload.image_url,

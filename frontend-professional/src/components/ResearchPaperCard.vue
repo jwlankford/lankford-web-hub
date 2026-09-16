@@ -18,11 +18,13 @@ const { isAdmin } = useAuth();
 const isExpanded = ref(false);
 const isSaving = ref(false);
 const localKeyFindings = ref(props.paper.key_findings || '');
+const localUsedFor = ref(props.paper.used_for || '');
 
 function toggleExpand() {
   isExpanded.value = !isExpanded.value;
   if (isExpanded.value) {
     localKeyFindings.value = props.paper.key_findings || '';
+    localUsedFor.value = props.paper.used_for || '';
   }
 }
 
@@ -30,7 +32,8 @@ async function saveKeyFindings() {
   try {
     isSaving.value = true;
     const { paper } = await updateResearchPaper(props.paper.id!, {
-      key_findings: localKeyFindings.value
+      key_findings: localKeyFindings.value,
+      used_for: localUsedFor.value
     });
     emit('updated', paper);
     isExpanded.value = false;
@@ -76,7 +79,7 @@ async function saveKeyFindings() {
         {{ paper.authors }}
       </p>
 
-      <!-- Extra info when expanded (Editable Key Findings) -->
+      <!-- Extra info when expanded (Editable Fields) -->
       <div v-if="isExpanded" class="mb-4 space-y-4 pt-2 border-t border-slate-100 dark:border-slate-800/50">
         <div>
           <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-2">Key Findings</h4>
@@ -91,6 +94,22 @@ async function saveKeyFindings() {
             {{ paper.key_findings || 'No key findings recorded yet.' }}
           </p>
         </div>
+
+        <div v-if="isAdmin">
+          <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-2">Used For</h4>
+          <input 
+            type="text"
+            v-model="localUsedFor"
+            class="w-full px-3 py-2 text-sm border rounded-lg dark:bg-slate-800/50 dark:border-slate-700 outline-none focus:border-blue-500 transition-colors text-slate-800 dark:text-slate-200"
+            placeholder="Where did you use this resource? (e.g. Chapter 3, App feature)"
+          />
+        </div>
+        <div v-else-if="paper.used_for">
+          <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-2">Used For</h4>
+          <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 whitespace-pre-wrap">
+            {{ paper.used_for }}
+          </p>
+        </div>
         
         <div v-if="isAdmin" class="flex justify-end pt-2">
           <button @click.stop="saveKeyFindings" :disabled="isSaving" class="text-xs bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 px-4 py-2 rounded-lg transition-colors font-semibold flex items-center space-x-2">
@@ -98,6 +117,14 @@ async function saveKeyFindings() {
             <span>{{ isSaving ? 'Saving...' : 'Save Updates' }}</span>
           </button>
         </div>
+      </div>
+      
+      <!-- Used For Display at Bottom -->
+      <div v-if="!isExpanded && paper.used_for" class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/50">
+        <h4 class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Used For</h4>
+        <p class="text-xs font-medium text-slate-700 dark:text-slate-300">
+          {{ paper.used_for }}
+        </p>
       </div>
     </div>
 
