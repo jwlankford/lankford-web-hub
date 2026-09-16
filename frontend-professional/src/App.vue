@@ -1091,7 +1091,7 @@ onUnmounted(() => {
 
         <div v-else class="space-y-10">
           <div v-if="linkedinArticles.length > 0" class="space-y-4">
-            <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">LinkedIn Articles</h2>
+            <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">LinkedIn Articles ({{ linkedinArticles.length }} available)</h2>
             <div class="grid grid-cols-3 gap-6">
               <ArticleCard
                 v-for="article in linkedinArticles"
@@ -1103,7 +1103,7 @@ onUnmounted(() => {
           </div>
           
           <div v-if="substackArticles.length > 0" class="space-y-4">
-            <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">Substack Articles</h2>
+            <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">Substack Articles ({{ substackArticles.length }} available)</h2>
             <div class="grid grid-cols-3 gap-6">
               <ArticleCard
                 v-for="article in substackArticles"
