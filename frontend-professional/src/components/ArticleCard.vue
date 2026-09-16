@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Article } from '../types';
 
-defineProps<{
+const props = defineProps<{
   article: Article;
 }>();
 
@@ -17,6 +17,15 @@ function formatDate(dateStr?: string) {
     day: 'numeric'
   });
 }
+
+function handleSelect() {
+  const url = props.article.linkedin_url || props.article.substack_url;
+  if (url) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  } else {
+    emit('select', props.article);
+  }
+}
 </script>
 
 <template>
@@ -24,8 +33,16 @@ function formatDate(dateStr?: string) {
     class="group relative bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900/90 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/40 transition-all duration-300 shadow-md hover:shadow-xl dark:hover:shadow-blue-950/40 overflow-hidden flex flex-col h-full"
   >
     <!-- Image Header -->
-    <div v-if="article.image_url" class="w-full h-48 sm:h-52 overflow-hidden flex-shrink-0 cursor-pointer" @click="emit('select', article)">
+    <div v-if="article.image_url" class="w-full h-48 sm:h-52 overflow-hidden flex-shrink-0 cursor-pointer" @click="handleSelect">
       <img :src="article.image_url" :alt="article.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+    </div>
+    <div v-else class="w-full h-48 sm:h-52 flex items-center justify-center bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 flex-shrink-0 cursor-pointer" @click="handleSelect">
+      <div class="flex flex-col items-center space-y-2 opacity-60 group-hover:opacity-80 transition-opacity">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+        <span class="text-sm font-medium tracking-wide">No Image</span>
+      </div>
     </div>
 
     <div class="flex flex-col justify-between h-full w-full p-6 flex-grow">
@@ -43,7 +60,7 @@ function formatDate(dateStr?: string) {
 
           <!-- Title -->
           <h3 
-            @click="emit('select', article)"
+            @click="handleSelect"
             class="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-cyan-300 cursor-pointer transition-colors leading-snug mb-3 font-serif"
           >
             {{ article.title }}
@@ -88,7 +105,7 @@ function formatDate(dateStr?: string) {
 
           <div class="flex items-center space-x-3">
             <button 
-              @click="emit('select', article)"
+              @click="handleSelect"
               class="text-xs font-semibold text-blue-600 dark:text-cyan-400 hover:text-blue-700 dark:hover:text-cyan-300 bg-blue-50 dark:bg-blue-950/80 hover:bg-blue-100 dark:hover:bg-blue-900 border border-blue-300 dark:border-blue-500/40 px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition-colors cursor-pointer"
             >
               <span>Read Article</span>

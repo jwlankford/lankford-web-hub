@@ -10,8 +10,7 @@ import {
   fetchGoogleNotebooks,
   createGoogleNotebook,
   fetchJupyterNotebooks,
-  createJupyterNotebook,
-  importBibtex
+  createJupyterNotebook
 } from './services/api';
 import { useTheme } from './composables/useTheme';
 import { useAuth } from './composables/useAuth';
@@ -97,6 +96,7 @@ const articles = ref<Article[]>([]);
 const isLoadingArticles = ref(true);
 const selectedArticle = ref<Article | null>(null);
 const isAddArticleModalOpen = ref(false);
+const articlePlatformFilter = ref<'all' | 'linkedin' | 'substack'>('all');
 
 // Academic Research State
 const papers = ref<ResearchPaper[]>([]);
@@ -107,6 +107,78 @@ const selectedTagSlug = ref<string | null>(null);
 const showTaxonomyFilters = ref(false);
 const selectedPaper = ref<ResearchPaper | null>(null);
 const isAddModalOpen = ref(false);
+
+// Matrix Sort State
+const matrixSortColumn = ref<'title' | 'authors' | 'used_for' | 'methodology' | 'findings' | null>(null);
+const matrixSortDirection = ref<'asc' | 'desc'>('asc');
+const matrixSearchQuery = ref('');
+
+const sortedPapersMatrix = computed(() => {
+  let filtered = papers.value;
+  if (matrixSearchQuery.value.trim()) {
+    const q = matrixSearchQuery.value.toLowerCase().trim();
+    filtered = filtered.filter(paper => {
+      const titleMatch = paper.title?.toLowerCase().includes(q) ?? false;
+      const authorsMatch = paper.authors?.toLowerCase().includes(q) ?? false;
+      const methodologyMatch = paper.methodology?.toLowerCase().includes(q) ?? false;
+      const findingsMatch = paper.key_findings?.toLowerCase().includes(q) ?? false;
+      const usedForMatch = paper.used_for?.toLowerCase().includes(q) ?? false;
+      return titleMatch || authorsMatch || methodologyMatch || findingsMatch || usedForMatch;
+    });
+  }
+
+  if (!matrixSortColumn.value) return filtered;
+  
+  return [...filtered].sort((a, b) => {
+    let valA = '';
+    let valB = '';
+    
+    switch (matrixSortColumn.value) {
+      case 'title':
+        valA = `${a.title || ''} ${a.publication_year || ''}`;
+        valB = `${b.title || ''} ${b.publication_year || ''}`;
+        break;
+      case 'authors':
+        valA = a.authors || '';
+        valB = b.authors || '';
+        break;
+      case 'used_for':
+        valA = a.used_for || '';
+        valB = b.used_for || '';
+        break;
+      case 'methodology':
+        valA = a.methodology || '';
+        valB = b.methodology || '';
+        break;
+      case 'findings':
+        valA = a.key_findings || '';
+        valB = b.key_findings || '';
+        break;
+    }
+    
+    valA = valA.toLowerCase();
+    valB = valB.toLowerCase();
+    
+    if (valA < valB) return matrixSortDirection.value === 'asc' ? -1 : 1;
+    if (valA > valB) return matrixSortDirection.value === 'asc' ? 1 : -1;
+    return 0;
+  });
+});
+
+function toggleMatrixSort(column: 'title' | 'authors' | 'used_for' | 'methodology' | 'findings') {
+  if (matrixSortColumn.value === column) {
+    if (matrixSortDirection.value === 'desc') {
+      matrixSortColumn.value = null; // Clear sort
+      matrixSortDirection.value = 'asc';
+    } else {
+      matrixSortDirection.value = 'desc';
+    }
+  } else {
+    matrixSortColumn.value = column;
+    matrixSortDirection.value = 'asc';
+  }
+}
+
 
 // Notebooks State
 const googleNotebooks = ref<GoogleNotebook[]>([]);
@@ -164,7 +236,9 @@ return papers.value.filter(paper => {
     const authorsMatch = paper.authors.toLowerCase().includes(q);
     const abstractMatch = paper.abstract?.toLowerCase().includes(q) ?? false;
     const methodologyMatch = paper.methodology?.toLowerCase().includes(q) ?? false;
-    return titleMatch || authorsMatch || abstractMatch || methodologyMatch;
+    const usedForMatch = paper.used_for?.toLowerCase().includes(q) ?? false;
+    const keyFindingsMatch = paper.key_findings?.toLowerCase().includes(q) ?? false;
+    return titleMatch || authorsMatch || abstractMatch || methodologyMatch || usedForMatch || keyFindingsMatch;
   }
   return true;
 });
@@ -208,9 +282,18 @@ navigator.clipboard.writeText(bibtexString).then(() => {
 }
 
 const filteredArticles = computed(() => {
-  if (!searchQuery.value.trim()) return articles.value;
+  let result = articles.value;
+  
+  if (articlePlatformFilter.value === 'linkedin') {
+    result = result.filter(a => !!a.linkedin_url);
+  } else if (articlePlatformFilter.value === 'substack') {
+    result = result.filter(a => !a.linkedin_url);
+  }
+
+  if (!searchQuery.value.trim()) return result;
+  
   const q = searchQuery.value.toLowerCase().trim();
-  return articles.value.filter(article => {
+  return result.filter(article => {
     return article.title.toLowerCase().includes(q) || 
            article.summary.toLowerCase().includes(q) || 
            (article.content?.toLowerCase().includes(q) ?? false);
@@ -288,17 +371,7 @@ function handlePaperUpdated(updatedPaper: ResearchPaper) {
   }
 }
 
-async function handleBibtexImport(bibtexString: string) {
-  try {
-    const result = await importBibtex(bibtexString);
-    const updated = await fetchResearchPapers();
-    papers.value = updated.papers;
-    isAddModalOpen.value = false;
-    alert(`Imported ${result.added} papers. Skipped ${result.skipped} duplicates.`);
-  } catch (err: any) {
-    alert(err.message || "Failed to import BibTeX");
-  }
-}
+
 
 async function handleAddArticle(input: NewArticleInput) {
   const result = await createArticle(input);
@@ -377,7 +450,7 @@ onUnmounted(() => {
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-slate-800/80'
             ]"
           >
-            <span>Research Index</span>
+            <span>Research Papers</span>
             <span class="px-1.5 py-0.2 text-[9px] font-mono rounded bg-blue-50 dark:bg-slate-950/60 text-blue-800 dark:text-cyan-300 border border-blue-300 dark:border-blue-500/30">{{ papers.length }}</span>
           </button>
           <button
@@ -634,7 +707,7 @@ onUnmounted(() => {
             activeTab === 'research' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
           ]"
         >
-          Research Index ({{ papers.length }})
+          Research Papers ({{ papers.length }})
         </button>
         <button
           @click="activeTab = 'articles'"
@@ -660,7 +733,7 @@ onUnmounted(() => {
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
       
-      <!-- TAB 2: RESEARCH INDEX VIEW -->
+      <!-- TAB 2: RESEARCH PAPERS VIEW -->
       <div v-if="activeTab === 'research'" class="space-y-6 animate-fadeIn">
 
         <!-- Dashboard Widgets Grid -->
@@ -886,7 +959,7 @@ onUnmounted(() => {
               <input 
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search by title, author, findings, or methodology..."
+                placeholder="Search by title, author, description, or used for..."
                 class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors shadow-inner"
               />
               <button 
@@ -1021,22 +1094,78 @@ onUnmounted(() => {
           <h2 class="text-2xl font-bold font-serif text-slate-900 dark:text-white mb-2">Literature Synthesis Matrix</h2>
           <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Cross-paper methodology comparison and empirical findings breakdown.</p>
           
+          <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="relative w-full sm:max-w-md">
+              <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <input 
+                v-model="matrixSearchQuery"
+                type="text"
+                placeholder="Search matrix by title, author, methodology, or findings..."
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors shadow-inner"
+              />
+              <button 
+                v-if="matrixSearchQuery"
+                @click="matrixSearchQuery = ''"
+                class="absolute right-3 top-3 text-slate-400 hover:text-slate-700 dark:hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            <div class="flex items-center space-x-3 text-xs font-mono text-slate-500 dark:text-slate-400">
+              <span>Showing <strong class="text-cyan-600 dark:text-cyan-400">{{ sortedPapersMatrix.length }}</strong> of {{ papers.length }} Rows</span>
+            </div>
+          </div>
+          
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300">
               <thead class="bg-slate-100 dark:bg-slate-950 font-mono text-blue-700 dark:text-cyan-400 uppercase border-b border-slate-200 dark:border-slate-800">
                 <tr>
-                  <th class="p-3 w-1/3">Paper Title & Year</th>
-                  <th class="p-3 w-1/6">Authors</th>
-                  <th class="p-3">Methodology</th>
-                  <th class="p-3">Key Empirical Findings</th>
+                  <th class="p-3 w-1/4 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none group" @click="toggleMatrixSort('title')">
+                    <div class="flex items-center space-x-1">
+                      <span>Paper Title & Year</span>
+                      <svg v-if="matrixSortColumn === 'title'" class="w-3.5 h-3.5" :class="matrixSortDirection === 'desc' ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                    </div>
+                  </th>
+                  <th class="p-3 w-1/6 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none group" @click="toggleMatrixSort('authors')">
+                    <div class="flex items-center space-x-1">
+                      <span>Authors</span>
+                      <svg v-if="matrixSortColumn === 'authors'" class="w-3.5 h-3.5" :class="matrixSortDirection === 'desc' ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                    </div>
+                  </th>
+                  <th class="p-3 w-1/6 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none group" @click="toggleMatrixSort('used_for')">
+                    <div class="flex items-center space-x-1">
+                      <span>Used For</span>
+                      <svg v-if="matrixSortColumn === 'used_for'" class="w-3.5 h-3.5" :class="matrixSortDirection === 'desc' ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                    </div>
+                  </th>
+                  <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none group" @click="toggleMatrixSort('methodology')">
+                    <div class="flex items-center space-x-1">
+                      <span>Methodology</span>
+                      <svg v-if="matrixSortColumn === 'methodology'" class="w-3.5 h-3.5" :class="matrixSortDirection === 'desc' ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                    </div>
+                  </th>
+                  <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none group" @click="toggleMatrixSort('findings')">
+                    <div class="flex items-center space-x-1">
+                      <span>Key Empirical Findings</span>
+                      <svg v-if="matrixSortColumn === 'findings'" class="w-3.5 h-3.5" :class="matrixSortDirection === 'desc' ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                      <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                <tr v-for="paper in papers" :key="paper.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors align-top">
+                <tr v-for="paper in sortedPapersMatrix" :key="paper.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors align-top">
                   <td class="p-3 font-semibold text-slate-900 dark:text-white font-serif">{{ paper.title }} ({{ paper.publication_year }})</td>
                   <td class="p-3 font-mono text-blue-700 dark:text-cyan-400/90">{{ paper.authors }}</td>
-                  <td class="p-3 text-slate-600 dark:text-slate-400">{{ paper.methodology || 'Empirical Study' }}</td>
-                  <td class="p-3 text-slate-700 dark:text-slate-300">{{ paper.key_findings || 'N/A' }}</td>
+                  <td class="p-3 text-slate-600 dark:text-slate-400">{{ paper.used_for || 'N/A' }}</td>
+                  <td class="p-3 text-slate-600 dark:text-slate-400 prose dark:prose-invert prose-sm" v-html="paper.methodology || 'Empirical Study'"></td>
+                  <td class="p-3 text-slate-700 dark:text-slate-300 prose dark:prose-invert prose-sm" v-html="paper.key_findings || 'N/A'"></td>
                 </tr>
               </tbody>
             </table>
@@ -1047,6 +1176,24 @@ onUnmounted(() => {
       <!-- TAB 5: ARTICLES VIEW -->
       <div v-else-if="activeTab === 'articles'" class="space-y-6 animate-fadeIn">
         <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-xl space-y-4 transition-colors">
+          <!-- Filter Buttons -->
+          <div class="flex flex-row items-center gap-4">
+            <button
+              @click="articlePlatformFilter = articlePlatformFilter === 'linkedin' ? 'all' : 'linkedin'"
+              :class="['flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-colors', articlePlatformFilter === 'linkedin' ? 'bg-[#0077b5] text-white border-[#0077b5]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800']"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              LinkedIn
+            </button>
+            <button
+              @click="articlePlatformFilter = articlePlatformFilter === 'substack' ? 'all' : 'substack'"
+              :class="['flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-colors', articlePlatformFilter === 'substack' ? 'bg-[#ff6719] text-white border-[#ff6719]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800']"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/></svg>
+              Substack
+            </button>
+          </div>
+
           <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
             <!-- Search Bar -->
             <div class="relative w-full sm:max-w-md">
@@ -1091,7 +1238,7 @@ onUnmounted(() => {
 
         <div v-else class="space-y-10">
           <div v-if="linkedinArticles.length > 0" class="space-y-4">
-            <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">LinkedIn Articles</h2>
+            <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">LinkedIn Articles ({{ linkedinArticles.length }} available)</h2>
             <div class="grid grid-cols-3 gap-6">
               <ArticleCard
                 v-for="article in linkedinArticles"
@@ -1103,7 +1250,7 @@ onUnmounted(() => {
           </div>
           
           <div v-if="substackArticles.length > 0" class="space-y-4">
-            <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">Substack Articles</h2>
+            <h2 class="text-xl font-bold font-serif text-slate-900 dark:text-white">Substack Articles ({{ substackArticles.length }} available)</h2>
             <div class="grid grid-cols-3 gap-6">
               <ArticleCard
                 v-for="article in substackArticles"
@@ -1296,7 +1443,6 @@ onUnmounted(() => {
       :isOpen="isAddModalOpen"
       @close="isAddModalOpen = false"
       @submit="handleAddPaper"
-      @bibtexSubmit="handleBibtexImport"
     />
 
     <AdminLoginModal
