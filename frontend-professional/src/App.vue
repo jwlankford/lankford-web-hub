@@ -274,6 +274,22 @@ async function handleAddPaper(input: NewResearchPaperInput) {
   selectedPaper.value = result.paper;
 }
 
+function handlePaperUpdated(updatedPaper: ResearchPaper) {
+  papers.value = papers.value.map((paper) =>
+    paper.id === updatedPaper.id || (!paper.id && !updatedPaper.id && paper.title === updatedPaper.title)
+      ? updatedPaper
+      : paper
+  );
+
+  if (
+    selectedPaper.value &&
+    (selectedPaper.value.id === updatedPaper.id ||
+      (!selectedPaper.value.id && !updatedPaper.id && selectedPaper.value.title === updatedPaper.title))
+  ) {
+    selectedPaper.value = updatedPaper;
+  }
+}
+
 async function handleBibtexImport(bibtexString: string) {
   try {
     const result = await importBibtex(bibtexString);
