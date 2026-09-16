@@ -38,7 +38,7 @@ watch(() => props.modelValue, (newVal) => {
   if (!editor.value) return;
   const isSame = editor.value.getHTML() === newVal;
   if (!isSame) {
-    editor.value.commands.setContent(newVal || '', false);
+    editor.value.commands.setContent(newVal || '', { emitUpdate: false });
   }
 });
 
