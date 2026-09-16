@@ -59,6 +59,21 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         # Automatically generate missing tables safely
         await conn.run_sync(SQLModel.metadata.create_all)
+        
+        # Add used_for column if it doesn't exist
+        from sqlalchemy import text
+        try:
+            if engine.dialect.name == "postgresql":
+                await conn.execute(text("ALTER TABLE research_papers ADD COLUMN IF NOT EXISTS used_for VARCHAR;"))
+            else:
+                # SQLite doesn't support IF NOT EXISTS for ADD COLUMN
+                # We can just try to add it and catch the specific error
+                try:
+                    await conn.execute(text("ALTER TABLE research_papers ADD COLUMN used_for VARCHAR;"))
+                except Exception:
+                    pass # Probably already exists
+        except Exception as e:
+            print(f"[SYSTEM] Could not auto-migrate used_for column: {e}")
 
     # Seed initial academic research papers if table is empty
     async with async_session_maker() as session:
