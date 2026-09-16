@@ -275,17 +275,15 @@ async function handleAddPaper(input: NewResearchPaperInput) {
 }
 
 function handlePaperUpdated(updatedPaper: ResearchPaper) {
+  if (updatedPaper.id == null) {
+    return;
+  }
+
   papers.value = papers.value.map((paper) =>
-    paper.id === updatedPaper.id || (!paper.id && !updatedPaper.id && paper.title === updatedPaper.title)
-      ? updatedPaper
-      : paper
+    paper.id === updatedPaper.id ? updatedPaper : paper
   );
 
-  if (
-    selectedPaper.value &&
-    (selectedPaper.value.id === updatedPaper.id ||
-      (!selectedPaper.value.id && !updatedPaper.id && selectedPaper.value.title === updatedPaper.title))
-  ) {
+  if (selectedPaper.value?.id === updatedPaper.id) {
     selectedPaper.value = updatedPaper;
   }
 }
