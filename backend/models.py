@@ -70,6 +70,7 @@ class ResearchPaper(TenantBase, table=True):
     abstract: Optional[str] = None
     key_findings: Optional[str] = None
     methodology: Optional[str] = None
+    used_for: Optional[str] = None
     
     # Internal Organization
     zotero_key: Optional[str] = Field(default=None, index=True)
@@ -116,6 +117,7 @@ class ResearchPaperRead(SQLModel):
     abstract: Optional[str] = None
     key_findings: Optional[str] = None
     methodology: Optional[str] = None
+    used_for: Optional[str] = None
     zotero_key: Optional[str] = None
     url: Optional[str] = None
     created_at: Optional[datetime] = None

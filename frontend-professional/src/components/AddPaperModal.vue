@@ -23,6 +23,7 @@ const key_findings = ref('');
 const methodology = ref('');
 const zotero_key = ref('');
 const url = ref('');
+const used_for = ref('');
 
 const isSubmitting = ref(false);
 const tagsString = ref('');
@@ -68,6 +69,7 @@ function handleSubmit() {
     methodology: methodology.value.trim() || undefined,
     zotero_key: zotero_key.value.trim() || undefined,
     url: url.value.trim() || undefined,
+    used_for: used_for.value.trim() || undefined,
     tags: parsedTags.length ? parsedTags : undefined
   });
 
@@ -79,6 +81,7 @@ function handleSubmit() {
   journal_or_conf.value = '';
   zotero_key.value = '';
   url.value = '';
+  used_for.value = '';
   tagsString.value = '';
   isSubmitting.value = false;
 }
@@ -203,15 +206,26 @@ function handleSubmit() {
             </div>
           </div>
 
-          <!-- URL Link -->
-          <div>
-            <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Article / Publication Link (URL)</label>
-            <input 
-              v-model="url"
-              type="url"
-              placeholder="https://www.linkedin.com/pulse/..."
-              class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono text-xs"
-            />
+          <!-- URL Link & Used For -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Article / Publication Link (URL)</label>
+              <input 
+                v-model="url"
+                type="url"
+                placeholder="https://www.linkedin.com/pulse/..."
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono text-xs"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold mb-1">Used For</label>
+              <input 
+                v-model="used_for"
+                type="text"
+                placeholder="e.g. Chapter 3, App feature"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono text-xs"
+              />
+            </div>
           </div>
 
           <!-- Abstract Summary (Rich Text) -->
