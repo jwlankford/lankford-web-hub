@@ -82,5 +82,5 @@ A **Vue 3 + TypeScript + Vite** Single Page Application (SPA) designed to build 
 *   **Secured Author Authentication UI:** Removed references to default credentials (`lankford2026`) from the `AdminLoginModal.vue` helper label and text placeholder.
 *   **GitHub Pages Custom Domain Persistence:** Added a `CNAME` file to `frontend-professional/public` mapping to `jeremylankford.com` to prevent the deploy action from stripping the custom domain configuration and breaking SSL provisioning on pushes.
 *   **Persistent Contact Form Database Integration:** Created `ContactMessage` model in backend, added a POST endpoint `/api/v1/contact` to write submissions to the Neon database (or local SQLite), and updated `ContactForm.vue` to dynamically dispatch submissions to the backend API instead of using mock simulations.
-*   **Bulk Import via Zotero BibTeX:** Implemented a new bulk-import feature in `AddPaperModal.vue` allowing administrators to paste raw BibTeX strings exported from Zotero to batch-load the database efficiently, complete with deduplication checks.
+
 *   **Cost Optimization (Google API & Automations):** Decommissioned the automated background polling script (`sync_adlc_papers.py`) and all `google-generativeai` endpoints (Gemini API) to eliminate unnecessary Google Cloud infrastructure expenses.

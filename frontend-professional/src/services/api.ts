@@ -218,23 +218,6 @@ export async function fetchResearchPapers(): Promise<{ papers: ResearchPaper[]; 
 
 
 
-export async function importBibtex(bibtex: string): Promise<{ added: number; skipped: number }> {
-  const res = await fetch(`${API_RESEARCH_BASE}/papers/bibtex`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Host': 'professional.localhost',
-      'X-Tenant': 'professional'
-    },
-    body: JSON.stringify({ bibtex })
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: 'Failed to import BibTeX' }));
-    throw new Error(err.detail || 'Failed to import BibTeX');
-  }
-  return res.json();
-}
-
 export async function createResearchPaper(input: NewResearchPaperInput): Promise<{ paper: ResearchPaper; isLiveBackend: boolean }> {
   try {
     const res = await fetch(`${API_RESEARCH_BASE}/papers`, {
