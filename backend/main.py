@@ -318,8 +318,32 @@ async def add_research_paper(
     await db.flush() # Populate paper.id
     
     # 2. Add and link tags
-    if payload.tags:
-        for t_name in payload.tags:
+    all_tags = payload.tags or []
+    
+    # Auto-generate tags from title, abstract, key_findings
+    import re
+    combined_text = f"{payload.title or ''} {payload.abstract or ''} {payload.key_findings or ''}"
+    if combined_text.strip():
+        # Strip HTML tags
+        combined_text = BeautifulSoup(combined_text, "html.parser").get_text(separator=" ")
+        words = re.findall(r'\b[a-zA-Z]{4,}\b', combined_text.lower())
+        stopwords = {"this", "that", "with", "from", "your", "have", "more", "these", "were", "which", "also", "their", "they", "will", "would", "there", "could", "than", "been", "some", "other", "into", "only", "very", "even", "must", "such", "should", "about", "many", "what", "after", "when", "most", "through", "over", "between", "because", "using", "used", "based", "both", "each", "those", "does", "while", "where", "same", "then", "upon", "within", "without", "during", "however", "under", "well", "results", "analysis", "study", "paper", "research", "method", "approach", "model", "data"}
+        
+        freq = {}
+        for w in words:
+            if w not in stopwords:
+                freq[w] = freq.get(w, 0) + 1
+                
+        sorted_words = sorted(freq.items(), key=lambda x: x[1], reverse=True)
+        # Select up to 5 top words as tags
+        generated = [w[0].capitalize() for w in sorted_words[:5]]
+        
+        for g in generated:
+            if not any(t.lower() == g.lower() for t in all_tags):
+                all_tags.append(g)
+
+    if all_tags:
+        for t_name in all_tags:
             t_slug = t_name.lower().strip().replace(' ', '-')
             t_slug = "".join(c for c in t_slug if (c.isalnum() or c == '-'))
             
