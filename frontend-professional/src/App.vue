@@ -467,6 +467,7 @@ onUnmounted(() => {
           </button>
           <button
             @click="activeTab = 'courses'"
+            style="display: none;"
             :class="[
               'px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200',
               activeTab === 'courses'
@@ -720,6 +721,7 @@ onUnmounted(() => {
         </button>
         <button
           @click="activeTab = 'courses'"
+          style="display: none;"
           :class="[
             'px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all',
             activeTab === 'courses' ? 'bg-blue-600 text-white font-semibold' : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800'
