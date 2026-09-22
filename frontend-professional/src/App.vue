@@ -1152,13 +1152,6 @@ onUnmounted(() => {
                       <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
                     </div>
                   </th>
-                  <th class="p-3 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-900 transition-colors select-none group" @click="toggleMatrixSort('findings')">
-                    <div class="flex items-center space-x-1">
-                      <span>Key Empirical Findings</span>
-                      <svg v-if="matrixSortColumn === 'findings'" class="w-3.5 h-3.5" :class="matrixSortDirection === 'desc' ? 'transform rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
-                      <svg v-else class="w-3.5 h-3.5 opacity-0 group-hover:opacity-50 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
-                    </div>
-                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
@@ -1173,7 +1166,6 @@ onUnmounted(() => {
                   <td class="p-3 font-mono text-blue-700 dark:text-cyan-400/90">{{ paper.authors }}</td>
                   <td class="p-3 text-slate-600 dark:text-slate-400">{{ paper.used_for || 'N/A' }}</td>
                   <td class="p-3 text-slate-600 dark:text-slate-400 prose dark:prose-invert prose-sm" v-html="paper.methodology || 'Empirical Study'"></td>
-                  <td class="p-3 text-slate-700 dark:text-slate-300 prose dark:prose-invert prose-sm" v-html="paper.key_findings || 'N/A'"></td>
                 </tr>
               </tbody>
             </table>
