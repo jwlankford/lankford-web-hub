@@ -28,7 +28,6 @@ function copyToClipboard(text: string) {
     <div 
       v-if="paper"
       class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-fadeIn"
-      @click.self="emit('close')"
     >
       <div 
         class="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-2xl shadow-2xl max-w-3xl w-full p-6 sm:p-8 text-slate-900 dark:text-slate-100 overflow-hidden transition-colors"

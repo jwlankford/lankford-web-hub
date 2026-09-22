@@ -24,7 +24,6 @@ function formatDate(dateStr?: string) {
     <div 
       v-if="article"
       class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-fadeIn"
-      @click.self="emit('close')"
     >
       <div 
         class="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full p-6 sm:p-8 text-slate-900 dark:text-slate-100 overflow-hidden transition-colors flex flex-col max-h-[90vh]"
