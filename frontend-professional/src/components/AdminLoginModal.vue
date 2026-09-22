@@ -25,7 +25,6 @@ function handleSubmit() {
     <div 
       v-if="isOpen"
       class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4"
-      @click.self="emit('close')"
     >
       <div class="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-2xl shadow-2xl max-w-sm w-full p-6 text-slate-900 dark:text-slate-100 transition-colors">
         <!-- Header -->
