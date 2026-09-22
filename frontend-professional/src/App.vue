@@ -1163,7 +1163,13 @@ onUnmounted(() => {
               </thead>
               <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
                 <tr v-for="paper in sortedPapersMatrix" :key="paper.id" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors align-top">
-                  <td class="p-3 font-semibold text-slate-900 dark:text-white font-serif">{{ paper.title }} ({{ paper.publication_year }})</td>
+                  <td 
+                    class="p-3 font-semibold text-slate-900 dark:text-white font-serif cursor-pointer hover:text-blue-600 dark:hover:text-cyan-400 transition-colors underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-blue-600 dark:hover:decoration-cyan-400 underline-offset-2" 
+                    @click="selectedPaper = paper"
+                    title="View full study details"
+                  >
+                    {{ paper.title }} ({{ paper.publication_year }})
+                  </td>
                   <td class="p-3 font-mono text-blue-700 dark:text-cyan-400/90">{{ paper.authors }}</td>
                   <td class="p-3 text-slate-600 dark:text-slate-400">{{ paper.used_for || 'N/A' }}</td>
                   <td class="p-3 text-slate-600 dark:text-slate-400 prose dark:prose-invert prose-sm" v-html="paper.methodology || 'Empirical Study'"></td>
