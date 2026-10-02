@@ -124,10 +124,10 @@ function copyToClipboard(text: string) {
   <Teleport to="body">
     <div 
       v-if="paper"
-      class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center sm:p-4 animate-fadeIn"
+      class="fixed inset-0 z-50 bg-white dark:bg-slate-900 animate-fadeIn"
     >
       <div 
-        class="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 sm:rounded-2xl shadow-2xl w-full h-full sm:max-w-5xl sm:h-[95vh] p-6 sm:p-8 text-slate-900 dark:text-slate-100 overflow-hidden transition-colors flex flex-col"
+        class="relative bg-white dark:bg-slate-900 w-full h-full p-6 sm:p-10 text-slate-900 dark:text-slate-100 overflow-hidden transition-colors flex flex-col max-w-5xl mx-auto"
       >
         <!-- Background Decorative Gradient -->
         <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -z-0 pointer-events-none"></div>
