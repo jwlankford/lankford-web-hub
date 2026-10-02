@@ -121,16 +121,24 @@ function copyToClipboard(text: string) {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div 
-      v-if="paper"
-      class="fixed inset-0 z-50 bg-white dark:bg-slate-900 animate-fadeIn"
+  <div 
+    v-if="paper"
+    class="relative w-full max-w-5xl mx-auto text-slate-900 dark:text-slate-100 transition-colors flex flex-col animate-fadeIn"
+  >
+    <!-- Background Decorative Gradient -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -z-0 pointer-events-none"></div>
+
+    <!-- Back button -->
+    <button
+      @click="handleClose"
+      class="flex items-center space-x-2 text-sm font-mono text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-cyan-300 mb-4 cursor-pointer relative z-10 w-fit"
+      title="Back to research papers"
     >
-      <div 
-        class="relative bg-white dark:bg-slate-900 w-full h-full p-6 sm:p-10 text-slate-900 dark:text-slate-100 overflow-hidden transition-colors flex flex-col max-w-5xl mx-auto"
-      >
-        <!-- Background Decorative Gradient -->
-        <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -z-0 pointer-events-none"></div>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      <span>Back to Research Papers</span>
+    </button>
 
         <!-- Paper Cover Image (Above Title) -->
         <div v-if="!isEditing">
@@ -211,7 +219,7 @@ function copyToClipboard(text: string) {
           </div>
         </div>
 
-        <div class="space-y-6 text-sm relative z-10 overflow-y-auto pr-1 flex-1">
+        <div class="space-y-6 text-sm relative z-10 flex-1">
           <!-- Authors & Metadata -->
           <div v-if="!isEditing" class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700/50 space-y-2">
             <div>
@@ -418,7 +426,5 @@ function copyToClipboard(text: string) {
             </button>
           </template>
         </div>
-      </div>
-    </div>
-  </Teleport>
+  </div>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import type { ResearchPaper, NewResearchPaperInput, Article, NewArticleInput, GoogleNotebook, JupyterNotebook, NewGoogleNotebookInput, NewJupyterNotebookInput } from './types';
 import { 
   fetchResearchPapers, 
@@ -108,6 +108,13 @@ const selectedTagSlug = ref<string | null>(null);
 const showTaxonomyFilters = ref(false);
 const selectedPaper = ref<ResearchPaper | null>(null);
 const isAddModalOpen = ref(false);
+
+// Scroll to top whenever a full-page article/paper detail view opens.
+watch([selectedArticle, selectedPaper], ([article, paper], [prevArticle, prevPaper]) => {
+  if ((article && article !== prevArticle) || (paper && paper !== prevPaper)) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
 
 // Matrix Sort State
 const matrixSortColumn = ref<'title' | 'authors' | 'used_for' | 'methodology' | 'findings' | null>(null);
@@ -746,7 +753,23 @@ onUnmounted(() => {
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-      
+
+      <!-- FULL-PAGE DETAIL VIEWS (replace tab content, keep header/footer) -->
+      <ArticleDetailModal
+        v-if="selectedArticle"
+        :article="selectedArticle"
+        @close="selectedArticle = null"
+        @update="handleUpdateArticle"
+      />
+      <PaperDetailModal
+        v-else-if="selectedPaper"
+        :paper="selectedPaper"
+        @close="selectedPaper = null"
+        @filterTag="handleFilterTag"
+        @updated="handlePaperUpdated"
+      />
+
+      <template v-else>
       <!-- TAB 2: RESEARCH PAPERS VIEW -->
       <div v-if="activeTab === 'research'" class="space-y-6 animate-fadeIn">
 
@@ -1363,7 +1386,7 @@ onUnmounted(() => {
 
         <ContactForm />
       </div>
-
+      </template>
 
     </main>
 
@@ -1434,19 +1457,6 @@ onUnmounted(() => {
     </footer>
 
     <!-- Modals -->
-    <PaperDetailModal
-      :paper="selectedPaper"
-      @close="selectedPaper = null"
-      @filterTag="handleFilterTag"
-      @updated="handlePaperUpdated"
-    />
-
-    <ArticleDetailModal
-      :article="selectedArticle"
-      @close="selectedArticle = null"
-      @update="handleUpdateArticle"
-    />
-
     <AddArticleModal
       :isOpen="isAddArticleModalOpen"
       @close="isAddArticleModalOpen = false"
