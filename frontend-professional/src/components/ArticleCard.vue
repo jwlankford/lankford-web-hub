@@ -19,12 +19,7 @@ function formatDate(dateStr?: string) {
 }
 
 function handleSelect() {
-  const url = props.article.linkedin_url || props.article.substack_url;
-  if (url) {
-    window.open(url, '_blank', 'noopener,noreferrer');
-  } else {
-    emit('select', props.article);
-  }
+  emit('select', props.article);
 }
 </script>
 

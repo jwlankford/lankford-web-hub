@@ -219,6 +219,7 @@ class ResearchPaperUpdateSchema(BaseModel):
     used_for: Optional[str] = None
     zotero_key: Optional[str] = None
     url: Optional[str] = None
+    image_url: Optional[str] = None
     tags: Optional[List[str]] = None
 
 @app.patch("/api/v1/research/papers/{paper_id}", response_model=ResearchPaperRead)
@@ -438,6 +439,57 @@ async def add_article(
     if cache_key in _api_cache:
         del _api_cache[cache_key]
         
+    return article
+
+
+class ArticleUpdateSchema(BaseModel):
+    title: Optional[str] = None
+    summary: Optional[str] = None
+    content: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    substack_url: Optional[str] = None
+    image_url: Optional[str] = None
+    is_published: Optional[bool] = None
+
+
+@app.patch("/api/v1/articles/{article_id}", response_model=Article)
+async def update_article(
+    article_id: int,
+    payload: ArticleUpdateSchema,
+    request: Request,
+    db: AsyncSession = Depends(get_async_session)
+):
+    """
+    Edits an existing article. Restricted to the active tenant that owns the record.
+    """
+    if request.state.tenant not in ["professional", "academic"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Modifying articles requires a valid domain context."
+        )
+
+    stmt = select(Article).where(
+        (Article.id == article_id) & (Article.tenant == request.state.tenant)
+    )
+    res = await db.execute(stmt)
+    article = res.scalars().first()
+
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+
+    update_data = payload.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(article, key, value)
+
+    db.add(article)
+    await db.commit()
+    await db.refresh(article)
+
+    # Invalidate cache
+    cache_key = f"articles_{request.state.tenant}"
+    if cache_key in _api_cache:
+        del _api_cache[cache_key]
+
     return article
 
 

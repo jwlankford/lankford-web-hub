@@ -7,6 +7,7 @@ import {
   checkAcademicBackendHealth,
   fetchArticles,
   createArticle,
+  updateArticle,
   fetchGoogleNotebooks,
   createGoogleNotebook,
   fetchJupyterNotebooks,
@@ -378,6 +379,17 @@ async function handleAddArticle(input: NewArticleInput) {
   articles.value.unshift(result.article);
   isAddArticleModalOpen.value = false;
   selectedArticle.value = result.article;
+}
+
+async function handleUpdateArticle(id: number, input: Partial<NewArticleInput>) {
+  const result = await updateArticle(id, input);
+  const index = articles.value.findIndex(a => a.id === id);
+  if (index !== -1) {
+    articles.value[index] = { ...articles.value[index], ...result.article };
+  }
+  if (selectedArticle.value?.id === id) {
+    selectedArticle.value = { ...selectedArticle.value, ...result.article };
+  }
 }
 
 
@@ -1426,11 +1438,13 @@ onUnmounted(() => {
       :paper="selectedPaper"
       @close="selectedPaper = null"
       @filterTag="handleFilterTag"
+      @updated="handlePaperUpdated"
     />
 
     <ArticleDetailModal
       :article="selectedArticle"
       @close="selectedArticle = null"
+      @update="handleUpdateArticle"
     />
 
     <AddArticleModal
