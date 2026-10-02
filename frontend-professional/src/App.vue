@@ -34,8 +34,6 @@ import ArticleDetailModal from './components/ArticleDetailModal.vue';
 import AddArticleModal from './components/AddArticleModal.vue';
 
 // Notebook Components
-import GoogleNotebookCard from './components/GoogleNotebookCard.vue';
-import JupyterNotebookCard from './components/JupyterNotebookCard.vue';
 import AddNotebookModal from './components/AddNotebookModal.vue';
 
 
@@ -191,11 +189,8 @@ function toggleMatrixSort(column: 'title' | 'authors' | 'used_for' | 'methodolog
 // Notebooks State
 const googleNotebooks = ref<GoogleNotebook[]>([]);
 const jupyterNotebooks = ref<JupyterNotebook[]>([]);
-const isGoogleNotebooksExpanded = ref(false);
-const isJupyterNotebooksExpanded = ref(false);
 const isAddNotebookModalOpen = ref(false);
 const isLoadingNotebooks = ref(true);
-const jupyterViewMode = ref<'grid' | 'feed'>('grid');
 const activeFeedNotebook = ref<JupyterNotebook | null>(null);
 
 
@@ -773,218 +768,6 @@ onUnmounted(() => {
       <!-- TAB 2: RESEARCH PAPERS VIEW -->
       <div v-if="activeTab === 'research'" class="space-y-6 animate-fadeIn">
 
-        <!-- Dashboard Widgets Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Google NotebookLM Card Widget -->
-          <button 
-            @click="isGoogleNotebooksExpanded = !isGoogleNotebooksExpanded; if(isGoogleNotebooksExpanded) isJupyterNotebooksExpanded = false;"
-            :class="[
-              'text-left p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden group cursor-pointer shadow-md hover:shadow-lg',
-              isGoogleNotebooksExpanded 
-                ? 'bg-gradient-to-br from-blue-50 to-indigo-50/50 dark:from-blue-950/40 dark:to-indigo-950/20 border-blue-550 dark:border-blue-400 ring-2 ring-blue-500/20 shadow-blue-500/10' 
-                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800/80 hover:border-blue-500/40'
-            ]"
-          >
-            <div class="absolute -bottom-6 -right-6 w-16 h-16 bg-blue-600/5 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
-            <div class="flex items-start justify-between">
-              <div class="space-y-1">
-                <div class="text-[10px] font-mono font-bold text-blue-600 dark:text-cyan-300 uppercase tracking-widest">NotebookLM Deep-Dives</div>
-                <h4 class="text-base font-serif font-bold text-slate-905 dark:text-white">Google Notebooks</h4>
-                <p class="text-xs text-slate-500 dark:text-slate-400 leading-tight">AI summary overviews & podcast discussions.</p>
-              </div>
-              <span class="px-2.5 py-1 rounded bg-blue-100 dark:bg-blue-950 border border-blue-200 dark:border-blue-500/30 text-blue-800 dark:text-cyan-300 text-[10px] font-mono font-black shadow-inner">
-                {{ googleNotebooks.length }} Links
-              </span>
-            </div>
-            <div class="flex items-center justify-between pt-4 mt-3 border-t border-slate-105/50 dark:border-slate-800 text-[10px] font-mono text-slate-405 dark:text-slate-500">
-              <span>{{ isGoogleNotebooksExpanded ? 'Click to collapse grid' : 'Click to expand grid' }}</span>
-              <svg class="w-3.5 h-3.5 transform transition-transform" :class="isGoogleNotebooksExpanded ? 'rotate-180 text-blue-600' : 'rotate-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-              </svg>
-            </div>
-          </button>
-
-          <!-- Jupyter Notebooks Card Widget -->
-          <button 
-            @click="isJupyterNotebooksExpanded = !isJupyterNotebooksExpanded; if(isJupyterNotebooksExpanded) isGoogleNotebooksExpanded = false;"
-            :class="[
-              'text-left p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden group cursor-pointer shadow-md hover:shadow-lg',
-              isJupyterNotebooksExpanded 
-                ? 'bg-gradient-to-br from-amber-50 to-orange-50/50 dark:from-amber-950/40 dark:to-orange-950/20 border-amber-550 dark:border-amber-400 ring-2 ring-amber-500/20 shadow-amber-500/10' 
-                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800/80 hover:border-amber-500/40'
-            ]"
-          >
-            <div class="absolute -bottom-6 -right-6 w-16 h-16 bg-amber-500/5 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
-            <div class="flex items-start justify-between">
-              <div class="space-y-1">
-                <div class="text-[10px] font-mono font-bold text-amber-600 dark:text-amber-350 uppercase tracking-widest">Interactive Code</div>
-                <h4 class="text-base font-serif font-bold text-slate-905 dark:text-white">Jupyter Notebooks</h4>
-                <p class="text-xs text-slate-500 dark:text-slate-400 leading-tight">Python simulations, calculations & tests.</p>
-              </div>
-              <span class="px-2.5 py-1 rounded bg-amber-100 dark:bg-amber-950 border border-amber-200 dark:border-amber-500/30 text-amber-800 dark:text-amber-350 text-[10px] font-mono font-black shadow-inner">
-                {{ jupyterNotebooks.length }} Files
-              </span>
-            </div>
-            <div class="flex items-center justify-between pt-4 mt-3 border-t border-slate-105/50 dark:border-slate-800 text-[10px] font-mono text-slate-405 dark:text-slate-500">
-              <span>{{ isJupyterNotebooksExpanded ? 'Click to collapse grid' : 'Click to expand grid' }}</span>
-              <svg class="w-3.5 h-3.5 transform transition-transform" :class="isJupyterNotebooksExpanded ? 'rotate-180 text-amber-600' : 'rotate-0'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-              </svg>
-            </div>
-          </button>
-
-          <!-- Synthesis Matrix Card Widget -->
-          <button 
-            @click="activeTab = 'matrix'"
-            class="text-left p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 hover:border-cyan-500/40 transition-all duration-300 relative overflow-hidden group cursor-pointer shadow-md hover:shadow-lg"
-          >
-            <div class="absolute -bottom-6 -right-6 w-16 h-16 bg-cyan-600/5 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
-            <div class="flex items-start justify-between">
-              <div class="space-y-1">
-                <div class="text-[10px] font-mono font-bold text-cyan-600 dark:text-cyan-300 uppercase tracking-widest">Cross-Reference Literature</div>
-                <h4 class="text-base font-serif font-bold text-slate-905 dark:text-white">Synthesis Matrix</h4>
-                <p class="text-xs text-slate-500 dark:text-slate-400 leading-tight">Comparative analysis grid of findings & metrics.</p>
-              </div>
-              <span class="px-2.5 py-1 rounded bg-cyan-50 dark:bg-slate-950 border border-cyan-200 dark:border-cyan-500/30 text-cyan-800 dark:text-cyan-300 text-[10px] font-mono font-black shadow-inner">
-                View Matrix
-              </span>
-            </div>
-            <div class="flex items-center justify-between pt-4 mt-3 border-t border-slate-105/50 dark:border-slate-800 text-[10px] font-mono text-slate-405 dark:text-slate-500">
-              <span>Go to Matrix page</span>
-              <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-              </svg>
-            </div>
-          </button>
-        </div>
-
-        <!-- Expansion 1: Google Notebooks Grid -->
-        <div 
-          v-if="isGoogleNotebooksExpanded" 
-          class="p-6 bg-slate-100/40 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800/80 rounded-3xl space-y-4 animate-fadeIn"
-        >
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-serif font-bold text-slate-900 dark:text-white">Public Google Notebooks</h3>
-            <button @click="isGoogleNotebooksExpanded = false" class="text-xs text-blue-600 dark:text-cyan-400 hover:underline">Collapse Section</button>
-          </div>
-          <div v-if="isLoadingNotebooks" class="py-8 text-center text-slate-400 text-xs font-mono">
-            Loading Google Notebooks...
-          </div>
-          <div v-else-if="googleNotebooks.length === 0" class="py-8 text-center text-slate-400 text-xs font-mono">
-            No public Google Notebooks found.
-          </div>
-          <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <GoogleNotebookCard 
-              v-for="notebook in googleNotebooks" 
-              :key="notebook.id" 
-              :notebook="notebook" 
-            />
-          </div>
-        </div>
-
-        <!-- Expansion 2: Jupyter Notebooks Grid & Direct Feed -->
-        <div 
-          v-if="isJupyterNotebooksExpanded" 
-          class="p-6 bg-slate-100/40 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800/80 rounded-3xl space-y-6 animate-fadeIn"
-        >
-          <!-- Header and Toggle Controls -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/60 dark:border-slate-800 pb-4">
-            <div class="space-y-1">
-              <h3 class="text-lg font-serif font-bold text-slate-900 dark:text-white">Interactive Google Colab Notebooks</h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Run code, evaluate models, and verify orchestration loop logic.</p>
-            </div>
-            
-            <div class="flex items-center space-x-3 self-end sm:self-auto">
-              <!-- View Mode Toggle -->
-              <div class="flex items-center bg-slate-200/80 dark:bg-slate-800 p-0.5 rounded-xl text-xs font-mono border border-slate-300/40 dark:border-slate-700/30">
-                <button 
-                  @click="jupyterViewMode = 'grid'"
-                  type="button"
-                  :class="[
-                    'px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 cursor-pointer',
-                    jupyterViewMode === 'grid' 
-                      ? 'bg-white dark:bg-slate-900 shadow-sm text-amber-755 dark:text-amber-400 font-bold' 
-                      : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-205'
-                  ]"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                  </svg>
-                  <span>Grid View</span>
-                </button>
-                <button 
-                  @click="jupyterViewMode = 'feed'"
-                  type="button"
-                  :class="[
-                    'px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 cursor-pointer',
-                    jupyterViewMode === 'feed' 
-                      ? 'bg-white dark:bg-slate-900 shadow-sm text-amber-755 dark:text-amber-400 font-bold' 
-                      : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-205'
-                  ]"
-                >
-                  <!-- Google Colab Infinity Logo -->
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M13.8 12.6C12.9 9.6 10.2 7.5 7.1 7.5 3.1 7.5 0 10.6 0 14.5s3.1 7 7.1 7c3.1 0 5.8-2.1 6.7-5.1L13.8 12.6z" fill="#F9AB00" />
-                    <path d="M20.5 7.5c-3.1 0-5.8 2.1-6.7 5.1l0.1 3.8c0.9 3 3.6 5.1 6.7 5.1 4 0 7.1-3.1 7.1-7s-3.1-7-7.1-7z" fill="#E8710A" />
-                  </svg>
-                  <span>Direct Feed</span>
-                </button>
-              </div>
-              <button @click="isJupyterNotebooksExpanded = false" class="text-xs text-amber-600 dark:text-amber-400 hover:underline">Collapse</button>
-            </div>
-          </div>
-
-          <!-- Loading & Empty States -->
-          <div v-if="isLoadingNotebooks" class="py-12 text-center text-slate-400 text-xs font-mono">
-            Loading Google Colab Notebooks...
-          </div>
-          <div v-else-if="jupyterNotebooks.length === 0" class="py-12 text-center text-slate-400 text-xs font-mono">
-            No interactive Google Colab Notebooks found.
-          </div>
-
-          <!-- Grid View Render -->
-          <div v-else-if="jupyterViewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
-            <JupyterNotebookCard 
-              v-for="notebook in jupyterNotebooks" 
-              :key="notebook.id" 
-              :notebook="notebook" 
-            />
-          </div>
-
-          <!-- Direct Feed Render (Simplified List) -->
-          <div v-else class="flex flex-col gap-4 animate-fadeIn">
-            <div class="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Available Feeds</div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div 
-                v-for="notebook in jupyterNotebooks"
-                :key="notebook.id"
-                class="flex flex-col bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-lg p-5 gap-3 hover:border-amber-500/40 transition-colors duration-300"
-              >
-                <div class="space-y-1 mb-2">
-                  <h4 class="text-base font-serif font-black text-slate-900 dark:text-white leading-tight">
-                    {{ notebook.title }}
-                  </h4>
-                  <p class="text-xs text-slate-500 dark:text-slate-400 leading-normal">
-                    {{ notebook.description }}
-                  </p>
-                </div>
-
-                <a 
-                  :href="notebook.notebook_url" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  class="px-4 py-2.5 font-bold text-xs rounded-xl bg-amber-600 hover:bg-amber-500 dark:bg-amber-550 dark:hover:bg-amber-450 text-white shadow-md active:scale-95 transition-all flex items-center justify-center space-x-1.5 w-full cursor-pointer mt-auto"
-                >
-                  <span>Open in New Tab</span>
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Search & Tag Chips Bar -->
         <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 p-4 sm:p-6 rounded-2xl shadow-xl space-y-4 transition-colors">
           <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -1121,6 +904,19 @@ onUnmounted(() => {
             @updated="handlePaperUpdated"
           />
 
+        </div>
+
+        <!-- Synthesis Matrix Link -->
+        <div class="flex justify-center pt-2">
+          <button
+            @click="activeTab = 'matrix'"
+            class="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 hover:border-cyan-500/40 text-sm font-mono font-bold text-cyan-700 dark:text-cyan-300 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer"
+          >
+            <span>View the Literature Synthesis Matrix</span>
+            <svg class="w-4 h-4 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
         </div>
       </div>
 
