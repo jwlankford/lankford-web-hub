@@ -350,6 +350,27 @@ export async function createArticle(input: NewArticleInput): Promise<{ article: 
   }
 }
 
+export async function updateArticle(id: number, input: Partial<NewArticleInput>): Promise<{ article: Article; isLiveBackend: boolean }> {
+  try {
+    const res = await fetch(`${API_ARTICLE_BASE}/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Host': 'professional.localhost',
+        'X-Tenant': 'professional'
+      },
+      body: JSON.stringify(input)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return { article: data, isLiveBackend: true };
+    }
+    return { article: { id, ...input } as Article, isLiveBackend: false };
+  } catch {
+    return { article: { id, ...input } as Article, isLiveBackend: false };
+  }
+}
+
 
 export const INITIAL_GOOGLE_NOTEBOOKS: GoogleNotebook[] = [
   {
