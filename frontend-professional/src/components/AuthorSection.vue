@@ -20,7 +20,7 @@
         <div class="md:col-span-8 p-8 sm:p-10 space-y-4 text-center md:text-left">
           <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3">
             <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-400 text-xs font-mono border border-blue-300 dark:border-blue-500/30">
-              <span>ABOUT THE INSTRUCTOR</span>
+              <span>ABOUT & BIO</span>
             </div>
           </div>
 
@@ -100,7 +100,9 @@
           </div>
 
           <div class="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-mono">
-            <span class="text-slate-500 dark:text-slate-400">Domain: <strong class="text-slate-900 dark:text-white">jeremylankford.com</strong></span>
+            <span class="text-slate-500 dark:text-slate-400">Domain: <strong class="text-slate-900dark:text-white"><a href="https://jeremylankford.com" target="_blank" rel="noopener noreferrer">jeremylankford.com</a></strong>, <strong class="text-slate-900dark:text-white"><a href="https://jwlankford.com" target="_blank" rel="noopener noreferrer">jwlankford.com</a></strong>, <strong class="text-slate-900dark:text-white"><a href="https://lankfordstudios.com" target="_blank" rel="noopener noreferrer">lankfordstudios.com</a></strong>, 
+            <strong class="text-slate-900dark:text-white"><a href="https://todayssoftwaredeveloper.com" target="_blank" rel="noopener noreferrer">todayssoftwaredeveloper.com</a></strong>
+            </span>
           </div>
         </div>
       </div>
