@@ -64,6 +64,14 @@ const githubRepos = [
     stars: 124
   },
   {
+    name: 'fluid-guardian',
+    description: 'Fluid Guardian is a microservices-based application built with a Vue frontend and seven distinct Python FastAPI backends to monitor and manage clinical fluid intake.',
+    url: 'https://github.com/jwlankford/fluid-guardian',
+    language: 'Vue',
+    languageColor: 'bg-emerald-500',
+    stars: 1
+  },
+  {
     name: 'lankford-web-hub',
     description: 'Frontend professional portfolio showcasing academic research, courses, and interactive experiences.',
     url: 'https://github.com/jwlankford/lankford-web-hub',
