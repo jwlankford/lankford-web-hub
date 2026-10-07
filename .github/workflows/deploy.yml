@@ -31,6 +31,7 @@ jobs:
         run: |
           cd frontend-professional
           npm install
+          npm install --no-save @rolldown/binding-linux-x64-gnu
 
       - name: Build Frontend
         env:
