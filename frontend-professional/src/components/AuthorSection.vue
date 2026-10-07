@@ -20,7 +20,7 @@
         <div class="md:col-span-8 p-8 sm:p-10 space-y-4 text-center md:text-left">
           <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3">
             <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-400 text-xs font-mono border border-blue-300 dark:border-blue-500/30">
-              <span>ABOUT & BIO</span>
+              <span>ABOUT THE INSTRUCTOR</span>
             </div>
           </div>
 
@@ -99,9 +99,34 @@
             </a>
           </div>
 
-          <div class="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-mono">
-            <span class="text-slate-500 dark:text-slate-400">Domain: <strong class="text-slate-900dark:text-white"><a href="https://jeremylankford.com" target="_blank" rel="noopener noreferrer">jeremylankford.com</a></strong>, <strong class="text-slate-900dark:text-white"><a href="https://jwlankford.com" target="_blank" rel="noopener noreferrer">jwlankford.com</a></strong>, <strong class="text-slate-900dark:text-white"><a href="https://lankfordstudios.com" target="_blank" rel="noopener noreferrer">lankfordstudios.com</a></strong>, 
-            <strong class="text-slate-900dark:text-white"><a href="https://todayssoftwaredeveloper.com" target="_blank" rel="noopener noreferrer">todayssoftwaredeveloper.com</a></strong>
+          <!-- Email Contact Links -->
+          <div class="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs font-mono">
+            <span class="text-slate-500 dark:text-slate-400 mr-1">Email:</span>
+            <a 
+              href="mailto:jwlankford@gmail.com" 
+              class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30 hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors"
+              title="Personal Email"
+            >
+              <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              <span>jwlankford@gmail.com</span>
+            </a>
+            <a 
+              href="mailto:jlankford63119@ucumberlands.edu" 
+              class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 hover:bg-cyan-100 dark:hover:bg-cyan-900 transition-colors"
+              title="Academic Email (University of the Cumberlands)"
+            >
+              <svg class="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              <span>jlankford63119@ucumberlands.edu</span>
+            </a>
+          </div>
+
+          <div class="pt-1 flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-mono">
+            <span class="text-slate-500 dark:text-slate-400">Domain: <strong class="text-slate-900 dark:text-white"><a href="https://jeremylankford.com" target="_blank" rel="noopener noreferrer">jeremylankford.com</a></strong>, <strong class="text-slate-900 dark:text-white"><a href="https://jwlankford.com" target="_blank" rel="noopener noreferrer">jwlankford.com</a></strong>, <strong class="text-slate-900 dark:text-white"><a href="https://lankfordstudios.com" target="_blank" rel="noopener noreferrer">lankfordstudios.com</a></strong>, 
+            <strong class="text-slate-900 dark:text-white"><a href="https://todayssoftwaredeveloper.com" target="_blank" rel="noopener noreferrer">todayssoftwaredeveloper.com</a></strong>
             </span>
           </div>
         </div>
