@@ -175,7 +175,7 @@ function toggleSyllabus(courseId: number) {
         v-if="activeCourseId === featuredCourse.id"
         class="bg-slate-950/75 border-t border-slate-850 p-6 sm:p-8 rounded-2xl mt-8 animate-fadeIn space-y-4 shadow-inner"
       >
-        <h4 class="text-xs font-mono uppercase tracking-widest text-blue-400 font-bold mb-3">AI Development Life Cycle (ADLC) Course Curriculum Syllabus</h4>
+        <h4 class="text-xs font-mono uppercase tracking-widest text-blue-400 font-bold mb-3">Agentic Development Life Cycle (ADLC) Course Curriculum Syllabus</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div 
             v-for="section in featuredCourse.syllabus" 

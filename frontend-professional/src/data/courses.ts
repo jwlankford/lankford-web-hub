@@ -36,7 +36,7 @@ export const courses: Course[] = [
   {
     id: 1,
     slug: 'adlc-intro-course',
-    title: 'AI Development Life Cycle (ADLC) - Intro Course',
+    title: 'Agentic Development Life Cycle (ADLC) - Intro Course',
     shortTitle: 'ADLC Intro Course',
     category: 'AI Software Engineering',
     tagline: 'Master the transition from traditional SDLC to autonomous agentic pipelines. Focus on loop engineering, machine-speed quality gates, evaluation, and least-privilege IAM.',
