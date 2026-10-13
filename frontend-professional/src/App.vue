@@ -33,6 +33,11 @@ import ArticleCard from './components/ArticleCard.vue';
 import ArticleDetailModal from './components/ArticleDetailModal.vue';
 import AddArticleModal from './components/AddArticleModal.vue';
 
+// Course Components & Data
+import CourseCard from './components/CourseCard.vue';
+import CourseDetailView from './components/CourseDetailView.vue';
+import { courses, type Course } from './data/courses';
+
 // Notebook Components
 import AddNotebookModal from './components/AddNotebookModal.vue';
 
@@ -115,9 +120,22 @@ const showTaxonomyFilters = ref(false);
 const selectedPaper = ref<ResearchPaper | null>(null);
 const isAddModalOpen = ref(false);
 
-// Scroll to top whenever a full-page article/paper detail view opens.
-watch([selectedArticle, selectedPaper], ([article, paper], [prevArticle, prevPaper]) => {
-  if ((article && article !== prevArticle) || (paper && paper !== prevPaper)) {
+// Course Selection State
+const selectedCourse = ref<Course | null>(null);
+const previousTabBeforeCourse = ref<'research' | 'matrix' | 'courses' | 'about' | 'articles' | 'donate'>('about');
+
+function handleSelectCourse(course: Course) {
+  previousTabBeforeCourse.value = activeTab.value;
+  selectedCourse.value = course;
+}
+
+// Scroll to top whenever a full-page article/paper/course detail view opens.
+watch([selectedArticle, selectedPaper, selectedCourse], ([article, paper, course], [prevArticle, prevPaper, prevCourse]) => {
+  if (
+    (article && article !== prevArticle) || 
+    (paper && paper !== prevPaper) || 
+    (course && course !== prevCourse)
+  ) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 });
@@ -758,8 +776,14 @@ onUnmounted(() => {
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
       <!-- FULL-PAGE DETAIL VIEWS (replace tab content, keep header/footer) -->
+      <CourseDetailView
+        v-if="selectedCourse"
+        :course="selectedCourse"
+        :back-label="previousTabBeforeCourse === 'courses' ? 'Back to Courses' : 'Back to About & Bio'"
+        @close="selectedCourse = null"
+      />
       <ArticleDetailModal
-        v-if="selectedArticle"
+        v-else-if="selectedArticle"
         :article="selectedArticle"
         @close="selectedArticle = null"
         @update="handleUpdateArticle"
@@ -1105,6 +1129,7 @@ onUnmounted(() => {
       <!-- TAB 6: UDEMY COURSES VIEW -->
       <UdemyCourses
         v-else-if="activeTab === 'courses'"
+        @select="handleSelectCourse"
       />
 
       <!-- TAB 7: DONATE VIEW -->
@@ -1139,6 +1164,48 @@ onUnmounted(() => {
                 <span class="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">{{ tech.name }}</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Courses Section (Udemy Courses) -->
+        <div class="max-w-4xl mx-auto w-full space-y-4 pt-4">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 text-center md:text-left">
+            <div>
+              <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-cyan-300 text-xs font-mono border border-blue-300 dark:border-blue-500/30">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-2.76 0-5-2.24-5-5V7h2v5c0 1.66 1.34 3 3 3s3-1.34 3-3V7h2v5c0 2.76-2.24 5-5 5z"/>
+                </svg>
+                <span>UDEMY CURRICULUM</span>
+              </span>
+              <h3 class="text-xl font-bold font-serif text-slate-900 dark:text-white mt-2">Courses</h3>
+              <p class="text-xs font-mono text-slate-500 dark:text-slate-400 mt-0.5">
+                Masterclasses in Agentic Software Development, Loop Engineering, and Non-Deterministic AI Systems.
+              </p>
+            </div>
+
+            <a 
+              href="https://www.udemy.com/user/jeremy-lankford-22/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="inline-flex items-center space-x-1.5 text-xs font-mono text-blue-600 dark:text-cyan-400 hover:underline mx-auto sm:mx-0"
+              title="Udemy Instructor Profile"
+            >
+              <span>Udemy Instructor Profile</span>
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+            </a>
+          </div>
+
+          <!-- Courses Cards Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <CourseCard
+              v-for="course in courses"
+              :key="course.id"
+              :course="course"
+              :featured="course.id === 1"
+              @select="handleSelectCourse"
+            />
           </div>
         </div>
 
